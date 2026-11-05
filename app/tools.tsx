@@ -53,6 +53,40 @@ export function Severance(){
  const daily=(num(salary)*3+num(bonus))/90; const estimate=daily*30*(num(days)/365);
  return <div className="calc-layout"><section className="panel"><h2>근무 정보</h2><Field label="퇴직 전 3개월 월 평균 급여" value={salary} onChange={setSalary} suffix="원"/><Field label="최근 1년 상여금 총액 (참고)" value={bonus} onChange={setBonus} suffix="원"/><Field label="총 재직일수" value={days} onChange={setDays} suffix="일"/><p className="hint">단순 추정용 입력입니다. 정확한 평균임금은 퇴직 전 3개월 임금 총액과 해당 기간의 실제 총 일수로 산정합니다.</p></section><section className="panel"><h2>예상 퇴직금</h2><Result title="세전 예상 퇴직금" value={won(estimate)} rows={[["추정 1일 평균임금",won(daily)],["계속근로기간",`${(num(days)/365).toFixed(2)}년`],["퇴직소득세", "미반영"]]}/><div className="notice">실제 퇴직금은 평균임금 산정 제외기간, 통상임금, 상여금·연차수당 등의 반영 여부에 따라 달라질 수 있습니다.</div></section></div>
 }
+
+export function Savings(){
+ const [kind,setKind]=useState("installment"),[amount,setAmount]=useState("300000"),[rate,setRate]=useState("3.5"),[months,setMonths]=useState("12"),[tax,setTax]=useState("15.4");
+ const principal=num(amount)*(kind==="installment"?num(months):1);
+ const r=num(rate)/1200,m=Math.max(1,Math.floor(num(months)));
+ let interest=0;
+ if(kind==="deposit") interest=num(amount)*num(rate)/100*m/12;
+ else { for(let i=1;i<=m;i++) interest+=num(amount)*r*(m-i); }
+ const taxAmount=interest*num(tax)/100, net=interest-taxAmount;
+ return <div className="calc-layout"><section className="panel"><h2>저축 조건</h2><div className="tabs"><button className={`tab ${kind==="installment"?"active":""}`} onClick={()=>setKind("installment")}>적금</button><button className={`tab ${kind==="deposit"?"active":""}`} onClick={()=>setKind("deposit")}>예금</button></div><Field label={kind==="installment"?"월 납입액":"예치 금액"} value={amount} onChange={setAmount} suffix="원"/><Field label="연 이자율" value={rate} onChange={setRate} suffix="%" step="0.01"/><Field label="가입 기간" value={months} onChange={setMonths} suffix="개월"/><Field label="이자 과세율" value={tax} onChange={setTax} suffix="%" step="0.1"/><p className="hint">적금은 매월 말 납입하는 단리 방식으로 월별 이자를 합산합니다. 예금은 단리로 계산합니다. 실제 금융상품의 이자 계산·세금은 상품 조건에 따라 다릅니다.</p></section><section className="panel"><h2>만기 예상 금액</h2><Result title="세후 만기 수령액" value={won(principal+net)} rows={[["총 납입 원금",won(principal)],["세전 이자",won(interest)],["이자 세금",won(taxAmount)],["세후 이자",won(net)]]}/></section></div>
+}
+export function Fuel(){
+ const [distance,setDistance]=useState("100"),[efficiency,setEfficiency]=useState("12"),[price,setPrice]=useState("1700"),[days,setDays]=useState("20");
+ const liters=num(distance)/Math.max(num(efficiency),.0001),cost=liters*num(price),monthly=cost*num(days);
+ return <div className="calc-layout"><section className="panel"><h2>주행 정보</h2><Field label="주행 거리" value={distance} onChange={setDistance} suffix="km" step="0.1"/><Field label="자동차 연비" value={efficiency} onChange={setEfficiency} suffix="km/L" step="0.1"/><Field label="리터당 유가" value={price} onChange={setPrice} suffix="원"/><Field label="월 운행 일수" value={days} onChange={setDays} suffix="일"/><p className="hint">입력한 1회 주행 거리를 매일 운행한다고 가정한 단순 추정입니다.</p></section><section className="panel"><h2>예상 유류비</h2><Result title="1회 주행 유류비" value={won(cost)} rows={[["예상 소비 연료",`${liters.toFixed(2)}L`],["월 예상 유류비",won(monthly)],["연간 예상 유류비",won(monthly*12)]]}/></section></div>
+}
+export function VAT(){
+ const [mode,setMode]=useState("exclusive"),[amount,setAmount]=useState("110000"),[rate,setRate]=useState("10");
+ const a=num(amount),r=num(rate)/100,base=mode==="exclusive"?a:a/(1+r),vat=base*r,total=base+vat;
+ return <div className="calc-layout"><section className="panel"><h2>금액 입력</h2><div className="tabs"><button className={`tab ${mode==="exclusive"?"active":""}`} onClick={()=>setMode("exclusive")}>공급가액 입력</button><button className={`tab ${mode==="inclusive"?"active":""}`} onClick={()=>setMode("inclusive")}>합계금액 입력</button></div><Field label={mode==="exclusive"?"공급가액":"부가세 포함 합계금액"} value={amount} onChange={setAmount} suffix="원"/><Field label="부가세율" value={rate} onChange={setRate} suffix="%" step="0.1"/><p className="hint">일반과세자의 기본 세율 10%를 기본값으로 제공합니다. 업종·거래 유형에 따라 영세율 또는 면세 등이 적용될 수 있습니다.</p></section><section className="panel"><h2>부가세 계산 결과</h2><Result title="부가세 포함 합계금액" value={won(total)} rows={[["공급가액",won(base)],["부가세",won(vat)],["적용 세율",`${num(rate)}%`]]}/></section></div>
+}
+export function RentConversion(){
+ const [deposit,setDeposit]=useState("300000000"),[monthly,setMonthly]=useState("1000000"),[rate,setRate]=useState("4.5");
+ const monthlyFromDeposit=num(deposit)*num(rate)/1200,depositEquivalent=num(monthly)*1200/Math.max(num(rate),.0001);
+ return <div className="calc-layout"><section className="panel"><h2>전월세 조건</h2><Field label="전환할 보증금 차액" value={deposit} onChange={setDeposit} suffix="원"/><Field label="월세 금액" value={monthly} onChange={setMonthly} suffix="원"/><Field label="전월세 전환율" value={rate} onChange={setRate} suffix="%" step="0.1"/><p className="hint">입력한 전환율을 이용한 단순 비교 계산입니다. 법정 전환율은 기준금리 및 주택임대차보호법상 기준에 따라 달라질 수 있으므로 계약 전 최신 기준을 확인하세요.</p></section><section className="panel"><h2>전환 예상 결과</h2><Result title="보증금 차액 기준 예상 월세" value={won(monthlyFromDeposit)} rows={[["월세 기준 환산 보증금",won(depositEquivalent)],["적용 전환율",`${num(rate)}%`],["연간 환산 월세",won(num(monthly)*12)]]}/></section></div>
+}
+export function DSR(){
+ const [income,setIncome]=useState("60000000"),[existing,setExisting]=useState("6000000"),[principal,setPrincipal]=useState("200000000"),[rate,setRate]=useState("4.0"),[years,setYears]=useState("30"),[limit,setLimit]=useState("40"),[stress,setStress]=useState("1.5");
+ const n=Math.max(1,Math.floor(num(years)*12)),r=(num(rate)+num(stress))/1200,P=num(principal);
+ const payment=r===0?P/n:P*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1),annual=payment*12,dsr= num(income)>0?(num(existing)+annual)/num(income)*100:0;
+ const capacity=Math.max(0,num(income)*num(limit)/100-num(existing)),maxMonthly=capacity/12,maxLoan=r===0?maxMonthly*n:maxMonthly*(1-Math.pow(1+r,-n))/r;
+ return <div className="calc-layout"><section className="panel"><h2>소득 및 대출 조건</h2><Field label="연소득" value={income} onChange={setIncome} suffix="원"/><Field label="기존 대출 연간 원리금 상환액" value={existing} onChange={setExisting} suffix="원"/><Field label="신규 대출 희망 금액" value={principal} onChange={setPrincipal} suffix="원"/><Field label="대출 금리" value={rate} onChange={setRate} suffix="%" step="0.1"/><Field label="대출 기간" value={years} onChange={setYears} suffix="년"/><Field label="DSR 기준 비율" value={limit} onChange={setLimit} suffix="%" step="1"/><Field label="추가 가산금리(가정)" value={stress} onChange={setStress} suffix="%p" step="0.1"/><p className="hint">가산금리는 사용자가 조정하는 시뮬레이션 입력값이며, 실제 스트레스 DSR 적용 금리·단계·지역·상품별 규제를 자동 판정하지 않습니다.</p></section><section className="panel"><h2>DSR 예상 결과</h2><Result title="입력 조건의 추정 DSR" value={`${dsr.toFixed(2)}%`} rows={[["신규 대출 월 상환액",won(payment)],["신규 대출 연간 상환액",won(annual)],["설정한 DSR 기준",`${num(limit)}%`],["기준 내 추가 연간 상환 여력",won(capacity)],["기준 내 예상 최대 대출액",won(maxLoan)]]}/><div className="notice">참고용 단순 원리금균등 시뮬레이션입니다. 실제 대출 한도는 금융기관 심사, 규제지역, 대출 종류, 만기, 금리 산정 및 스트레스 DSR 등 여러 조건에 따라 달라집니다. 대출 가능 금액으로 확정해 해석하지 마세요.</div></section></div>
+}
+
 export function CalculatorShell({title,desc,children}:{title:string,desc:string,children:React.ReactNode}){
  return <main><header className="wrap header"><Link href="/" className="logo">UTIL<span>WISE</span>.</Link><Link href="/" className="sub">← 전체 도구</Link></header><section className="wrap section"><div className="eyebrow">UTILWISE CALCULATOR</div><h1 style={{fontSize:32,letterSpacing:"-1px",margin:"12px 0 8px"}}>{title}</h1><p className="sub">{desc}</p>{children}<div className="footer">계산 결과는 참고용이며 실제 거래·세금·금융 판단 전 관련 기관의 최신 기준을 확인하세요.</div></section></main>
 }
