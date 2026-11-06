@@ -64,3 +64,11 @@
 - Web Share API 지원 및 미지원 브라우저용 링크 복사 처리 추가
 - 유형별 고정 URL은 개인 점수 없이 유형 설명만 보여주도록 구성
 - 아직 미완료: 로컬 설치/빌드, 실제 브라우저 및 모바일 테스트, 문항·채점 신뢰성 검토, 배포
+
+## 2026-11-06 MBTI 자동 빌드 검증 추가
+- 24개 문항 및 축별 문항 수 확인: E/S/T/J 각 6개, 총 24개
+- 16개 결과 유형 데이터 존재 확인: 누락 유형 없음
+- `.github/workflows/build.yml` 추가: PR 및 feature 브랜치 push 시 Node.js 22 환경에서 `npm install`과 `npm run build` 실행
+- GitHub Actions 빌드 실행 시작; 최종 성공/실패 결과 대기 중
+- `package-lock.json` 미존재로 현재 검증은 `npm install` 기반이며, 재현 가능한 설치를 위해 lockfile 추가는 후속 개선 대상으로 남김
+- main 병합 및 Cloudflare 배포는 하지 않음
