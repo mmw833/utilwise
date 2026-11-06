@@ -32,3 +32,10 @@ npm run preview
 - 전월세 전환율은 사용자가 입력하며 법정 상한을 자동 판정하지 않는다.
 - 부가세율은 기본 10%이며 면세·영세율·특례 여부는 사용자가 별도 확인해야 한다.
 - 예금·적금은 단순 이자 모델이며 상품별 일수 계산, 우대금리, 복리, 세제 혜택을 모두 반영하지 않는다.
+
+## SEO 설정
+- 사이트 전역 title/description, canonical 기본 주소, robots index/follow, Googlebot 미리보기 설정은 `app/layout.tsx`에서 관리한다.
+- 각 계산기 라우트의 고유 title/description/canonical/Open Graph는 해당 `app/<route>/page.tsx`의 Metadata에서 관리한다.
+- 계산기별 WebApplication 및 BreadcrumbList JSON-LD는 `CalculatorShell`에서 렌더링한다.
+- `app/robots.ts`와 `app/sitemap.ts`는 Next.js Metadata Route로 자동 제공한다.
+- SEO 변경 후 `npm run build`, Cloudflare preview, 실제 배포 URL의 robots/sitemap/canonical/JSON-LD 확인을 수행한다.
