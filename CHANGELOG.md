@@ -14,3 +14,5 @@
 ## 2026-11-06
 - 최신 main 커밋의 GitHub Actions 빌드 성공 확인
 - 홈 카테고리 필터 및 MBTI 서비스 반영 기록
+
+- Cloudflare Workers Builds의 GitHub main 브랜치 연결 및 OpenNext 빌드/배포 명령 설정을 사용자 화면으로 확인; 자동 배포 실동작 검증을 위한 기록 커밋 추가
