@@ -63,9 +63,12 @@ export default function Home(){
       </div>
     </section>
     <footer className="footer">
-      <div className="wrap footer-bottom">
+      <div className="wrap">
+        <strong>UTILWISE</strong><br/>
+        일상에 필요한 계산과 도구를 한곳에서.<br/><br/>
+        계산 결과는 참고용이며 실제 계약·세금·금융 판단 전에는 관련 기관 또는 전문가에게 확인하세요.<br/>
         <Link href="/about" className="footer-about-link">서비스 소개</Link>
-        <div className="copyright">© 2026 UTILWISE. All rights reserved.</div>
+        <br/>© 2026 UTILWISE. All rights reserved.
       </div>
     </footer>
   </main>;
