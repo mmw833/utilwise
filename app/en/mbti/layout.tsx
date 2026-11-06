@@ -1,0 +1,1 @@
+import "../../../app/mbti/mbti.css";
