@@ -5,6 +5,7 @@ import LanguageSwitcher from "../components/LanguageSwitcher";
 
 const tools = [
   { icon:"⌂", title:"평수·면적 변환", desc:"㎡와 평을 빠르고 정확하게 변환해요.", href:"/area" },
+  { icon:"▦", title:"날짜 계산기", desc:"기간, 디데이, 근무일과 만 나이를 계산해요.", href:"/date" },
   { icon:"₩", title:"대출 이자 계산기", desc:"월 상환금과 총 이자 부담을 비교해요.", href:"/loan" },
   { icon:"⌂", title:"부동산 중개수수료", desc:"매매·전세·월세 중개보수 상한을 확인해요.", href:"/brokerage" },
   { icon:"▤", title:"연봉 실수령액", desc:"4대 보험과 세금을 고려한 예상 금액을 확인해요.", href:"/salary" },
