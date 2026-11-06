@@ -104,3 +104,12 @@ npm run preview
 - 국내 법령·세금·금융 제도를 사용하는 계산기는 한국어 페이지에 대한민국 기준 안내를 표시한다.
 - 영어 홈의 계산기 카드들은 영어 계산기 구현 전까지 비활성 안내 카드로 표시해 잘못된 링크를 만들지 않는다.
 - **후속 필수 작업:** 모든 계산기 10종의 영어 UI, 단위/통화/공식/FAQ/출처/SEO를 구현하고 언어 전환 링크를 각 대응 페이지에 연결한다. 해당 구현 전까지 영어 계산기 링크는 완성으로 간주하지 않는다.
+
+
+## 영어 계산기
+- 공통 경로: `app/en/[tool]/page.tsx`
+- UI 및 계산 로직: `app/en/[tool]/EnglishCalculator.tsx`
+- 지원 도구: `area`, `loan`, `brokerage`, `salary`, `severance`, `savings`, `dsr`, `rent-conversion`, `fuel`, `vat`
+- 한국어판의 기존 계산 규칙과 기본값을 유지하면서 영어 UI, 공식, 예시, FAQ, 유의사항 및 출처를 제공한다.
+- 국내 제도 기반 도구에는 South Korea 기준 안내를 표시한다.
+- 영어 MBTI 레이아웃은 공통 CSS를 불러오고 children을 반환하는 정상적인 Next.js layout 구조를 사용한다.
