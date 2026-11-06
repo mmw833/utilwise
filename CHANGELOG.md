@@ -1,9 +1,11 @@
 # CHANGELOG
 
+## 2026-11-07
+- 별도 Cloudflare API Token 기반 배포 workflow 제거: 기존 배포 연결 방식이 확인되지 않은 상태에서 불필요한 인증 절차를 요구하지 않도록 정리
+- PROJECT_STATUS.md에 배포 방식 재검토 결과와 미확인 항목 기록
+- 기존 npm run deploy 및 wrangler.jsonc 설정은 유지
+- Cloudflare 대시보드의 기존 Git 연동 여부와 실제 운영 배포 버전은 계정 접근 권한이 없어 미검증
+
 ## 2026-11-06
-- 기존 GitHub Actions 빌드 워크플로에 Cloudflare 배포 단계가 없음을 확인
-- 기존 npm run deploy 스크립트와 Wrangler Worker 설정을 재사용하는 .github/workflows/deploy-cloudflare.yml 추가
-- 운영 배포가 인증정보 없이 실행되지 않도록 최초에는 workflow_dispatch 수동 실행으로 제한
-- 자동 배포 활성화에 필요한 GitHub Actions secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
-- Cloudflare 인증정보는 저장소 파일에 기록하지 않음
-- GitHub Actions 빌드 성공 확인; Cloudflare 실제 배포는 Secrets 등록 및 배포 실행 후 검증 예정
+- 최신 main 커밋의 GitHub Actions 빌드 성공 확인
+- 홈 카테고리 필터 및 MBTI 서비스 반영 기록
