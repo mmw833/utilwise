@@ -14,7 +14,7 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 .test-section{border-top:1px solid var(--line);background:#f8fafc}.test-section .section{padding-top:58px;padding-bottom:68px}.test-heading{text-align:center;margin-bottom:28px}.test-heading h2{font-size:29px;letter-spacing:-1px;margin:10px 0}.test-heading p{color:var(--muted);font-size:14px;margin:0}.test-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.test-tool{grid-column:2}
 .test-empty{text-align:center;padding:12px 0}
 .footer{border-top:1px solid var(--line);padding:28px 0 38px;color:var(--muted);font-size:12px;line-height:1.8;background:#fff}
-.footer strong{color:var(--ink);font-weight:700}.footer-about-link{font-size:12px;color:#526174;text-decoration:underline;text-underline-offset:3px}.footer-about-link:hover{color:var(--blue)}
+.footer strong{color:var(--ink);font-weight:700}.footer-copyright{text-align:center;margin-top:18px;color:#8490a0;font-size:11px}.footer-about-link{font-size:12px;color:#526174;text-decoration:underline;text-underline-offset:3px}.footer-about-link:hover{color:var(--blue)}
 .about-hero{padding:34px 20px 76px;background:linear-gradient(180deg,#f8fbff 0%,#fff 360px)}
 .about-page-inner{max-width:760px;margin:0 auto;text-align:center}
 .about-back{display:inline-block;color:#718096;font-size:13px;margin:0 auto 48px}.about-back:hover{color:var(--blue)}
