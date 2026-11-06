@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/about",
     "/en",
     "/en/about",
+    ...["area","loan","brokerage","salary","severance","savings","dsr","rent-conversion","fuel","vat"].map((tool) => `/en/${tool}`),
     "/en/mbti",
     "/en/mbti/test",
     ...["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"].map((type) => `/en/mbti/result/${type}`),
