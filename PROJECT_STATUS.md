@@ -80,3 +80,17 @@
 - 수정 후 최신 커밋의 빌드 재검증 대기 중
 - 실제 브라우저/모바일 상호작용 테스트 및 Cloudflare Preview 검증은 아직 미실행
 - PR #1은 열려 있으며 main 병합/운영 배포하지 않음
+
+
+## 2026-11-06 MBTI 최신 검증 상태 업데이트
+- 최신 결과 시각화 수정 커밋(SHA `5d8ff5b7faabb35f643fd29410f6f145e4525036`)의 GitHub Actions `Next.js production build` 성공 확인
+- PR #1 상태: open / draft / mergeable, 아직 main 병합하지 않음
+- Cloudflare 설정은 `wrangler.jsonc`와 `npm run preview` 스크립트 확인; 별도 원격 Preview 배포 워크플로 및 PR 미리보기 URL은 저장소에서 확인되지 않음
+- 로컬 Cloudflare 미리보기 실행과 실제 모바일·브라우저 기능 검증은 아직 미실행
+- 운영 배포 및 main 변경 없음
+
+### 다음 작업
+1. 프로젝트 로컬 환경에서 `npm install` 후 `npm run preview` 실행
+2. `/mbti`, `/mbti/test`, 결과 공유 및 작은 화면 UI를 실제 브라우저에서 검증
+3. 발견된 문제 수정 및 빌드 재검증
+4. 검증 결과 확인 후 PR 검토 및 사용자 승인에 따라 병합 여부 결정
