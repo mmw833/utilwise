@@ -71,3 +71,17 @@
 - 홈 하단의 © 2026 UTILWISE. All rights reserved. 문구를 별도 요소로 분리하고 중앙 정렬
 - 변경 파일: app/page.tsx, app/globals.css
 - GitHub main 반영 완료. Cloudflare 자동배포 및 운영 사이트 적용 확인 필요.
+
+
+## 2026-11-07 다국어 기능 1차 구현
+- 공통 LanguageSwitcher 컴포넌트 추가: components/LanguageSwitcher.tsx
+- 한국어 홈, 소개 페이지, MBTI 소개/검사/결과 페이지에 한국어·English 전환 링크 추가
+- 영어 홈 및 영어 서비스 소개 페이지 추가: /en, /en/about
+- 영어 MBTI 서비스 추가: /en/mbti, /en/mbti/test, /en/mbti/result/[type]
+- 영어 MBTI는 24문항, 5단계 답변, 역채점 및 4개 축 점수 기준을 한국어판과 동일하게 유지하며 16개 유형 결과 문구를 영어로 제공
+- 영어 MBTI 결과에 강점, 주의할 점, 생활·의사결정·관계·업무·스트레스 안내 및 공유 기능 제공
+- 부동산 중개수수료, 연봉, 퇴직금, DSR, 전월세 전환, 부가세, 예금·적금 계산기에 대한민국 기준 안내 배지 추가
+- 영어 라우트 일부와 SEO 메타데이터 및 sitemap 등록
+- 변경 파일: components/LanguageSwitcher.tsx, app/en/**, app/page.tsx, app/about/page.tsx, app/mbti/**, app/tools.tsx, app/globals.css, app/sitemap.ts
+- **미완료:** 영어 계산기 10종의 입력/결과/공식/FAQ 번역 및 영어 경로 구현. 영어 홈의 계산기 목록은 아직 각 영어 계산기 페이지가 준비되기 전 단계임.
+- **검증 대기:** GitHub Actions 빌드 및 Cloudflare 배포/실제 브라우저 동작 확인.
