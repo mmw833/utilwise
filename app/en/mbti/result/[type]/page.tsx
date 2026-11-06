@@ -1,0 +1,4 @@
+import type {Metadata} from "next";import {notFound} from "next/navigation";import {resultCopy} from "../../data";import MbtiResult from "./MbtiResult";
+type Props={params:Promise<{type:string}>};
+export async function generateMetadata({params}:Props):Promise<Metadata>{const {type}=await params;const item=resultCopy[type];return {title:item?type+" "+item.name+" | UTILWISE Personality Test":"Personality Test Result | UTILWISE",description:item?.intro??"Your UTILWISE personality test result.",alternates:{canonical:"/en/mbti/result/"+type},openGraph:{title:item?type+" · "+item.name:"UTILWISE Personality Result",description:item?.intro??"Explore your personality preferences.",url:"https://utilwise.kr/en/mbti/result/"+type,siteName:"UTILWISE",locale:"en_US",type:"website"}};}
+export default async function ResultPage({params}:Props){const {type}=await params;if(!resultCopy[type])notFound();return <MbtiResult type={type}/>;}
