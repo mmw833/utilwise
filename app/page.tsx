@@ -28,7 +28,7 @@ export default function Home(){
       <nav className="nav" aria-label="주요 메뉴">
         <a href="#calculators">유용한 계산기</a>
         <a href="#tests">테스트 모음</a>
-        <a href="#about">서비스 소개</a>
+        <Link href="/about">서비스 소개</Link>
       </nav>
     </header>
     <section className="hero">
@@ -62,18 +62,9 @@ export default function Home(){
         </div> : <p className="sub test-empty">검색 결과가 없습니다. 다른 단어로 검색해 보세요.</p>}
       </div>
     </section>
-    <footer className="footer" id="about">
-      <div className="wrap about-content">
-        <div className="about-brand">UTIL<span>WISE</span></div>
-        <h2>일상에 필요한 모든 도구</h2>
-        <p className="about-tagline">Simple Tools for Everyday Life.</p>
-        <div className="about-divider"/>
-        <p className="about-copy">UTILWISE는 일상생활에 필요한 계산과 정보 확인, 다양한 테스트를 쉽고 빠르게 이용할 수 있는 <strong>무료 생활 도구 플랫폼</strong>입니다.</p>
-        <p className="about-copy">평수·면적 변환, 대출 이자, 부동산 중개수수료, 연봉 실수령액, 퇴직금 등 <strong>실용적인 계산기</strong>와 MBTI를 비롯한 <strong>다양한 테스트</strong>를 제공합니다.</p>
-        <p className="about-copy">별도의 회원가입 없이 누구나 간편하게 이용할 수 있으며, 정확하고 편리한 서비스 제공을 위해 지속적으로 개선합니다.</p>
-        <p className="about-copy">앞으로 날짜·시간 계산과 단위 변환 등 <strong>다양한 생활 도구를 꾸준히 추가</strong>해 나가겠습니다.</p>
-        <a className="contact-email" href="mailto:mmw833@gmail.com"><span aria-hidden="true">✉</span><span>mmw833@gmail.com</span></a>
-        <p className="about-note">계산 결과는 참고용이며 실제 계약·세금·금융 판단 전에는 관련 기관 또는 전문가에게 확인하세요.</p>
+    <footer className="footer">
+      <div className="wrap footer-bottom">
+        <Link href="/about" className="footer-about-link">서비스 소개</Link>
         <div className="copyright">© 2026 UTILWISE. All rights reserved.</div>
       </div>
     </footer>
