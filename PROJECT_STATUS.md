@@ -48,3 +48,13 @@
 - GitHub Actions 최신 main 빌드 결과 확인
 - Cloudflare Workers Builds에서 최신 커밋 배포 성공 여부 확인
 - utilwise.kr에서 홈 메뉴 앵커, 계산기/테스트 분리, 이메일 링크, 모바일 레이아웃 확인
+
+
+## 2026-11-07 서비스 소개 페이지 분리 및 타이포그래피 개선
+- 홈 상단의 서비스 소개 메뉴를 /about 독립 페이지 링크로 변경
+- 홈 하단에서 긴 소개 문구를 제거하고 간단한 하단 링크/저작권 표시만 유지
+- /about 페이지를 신규 생성하고 소개 문장을 짧은 문단 단위로 나눠 중앙 정렬 및 굵기/크기 위계 적용
+- 서비스 소개 페이지에 이메일 연락처 및 홈으로 돌아가기 링크 유지
+- app/sitemap.ts에 /about 경로 추가
+- 변경 파일: app/page.tsx, app/about/page.tsx, app/globals.css, app/sitemap.ts, PROJECT_STATUS.md, CHANGELOG.md, DEVELOPMENT.md
+- GitHub main 반영 완료. Cloudflare 자동배포의 최신 빌드/운영 URL 반영은 별도 확인 필요.
