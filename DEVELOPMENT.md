@@ -92,3 +92,14 @@ npm run preview
 - 소개 문장은 짧은 단락으로 구성하고 중앙 정렬 및 타이포그래피 위계를 적용한다.
 - 이메일 문의 링크는 `mailto:mmw833@gmail.com`으로 연결한다.
 - `app/sitemap.ts`에 `/about` 경로를 포함한다.
+
+
+## 다국어 구조 (2026-11-07, 1차)
+- 한국어는 기존 기본 경로를 유지한다.
+- 영어 경로는 `/en` prefix를 사용한다.
+- 공통 언어 전환 컴포넌트: `components/LanguageSwitcher.tsx`
+- 영어 홈/소개: `app/en/page.tsx`, `app/en/about/page.tsx`
+- 영어 MBTI: `app/en/mbti`, `app/en/mbti/test`, `app/en/mbti/result/[type]`
+- 영어 MBTI 문항 및 유형 콘텐츠는 `app/en/mbti/data.ts`에서 관리한다. 채점 방식은 한국어판과 동일하다.
+- 국내 법령·세금·금융 제도를 사용하는 계산기는 한국어 페이지에 대한민국 기준 안내를 표시한다.
+- **후속 필수 작업:** 모든 계산기 10종의 영어 UI, 단위/통화/공식/FAQ/출처/SEO를 구현하고 언어 전환 링크를 각 대응 페이지에 연결한다. 해당 구현 전까지 영어 계산기 링크는 완성으로 간주하지 않는다.
