@@ -61,3 +61,7 @@ npm run preview
 - `app/mbti/layout.tsx`가 `mbti.css`를 로드해 MBTI 화면에만 스타일을 적용한다.
 - 검사 결과 링크에는 유형 코드와 4개 축 점수가 쿼리로 전달된다. 유형 경로만 공유하면 개인 점수는 노출되지 않고 유형별 공통 설명만 표시된다.
 - 결과 공유는 Web Share API를 우선 사용하고, 미지원 환경에서는 클립보드 링크 복사를 제공한다.
+
+## CI 빌드 검사
+- `.github/workflows/build.yml`에서 PR 및 `feature/mbti-service` push 시 Node.js 22 기반 `npm install`, `npm run build`를 실행한다.
+- 저장소에 `package-lock.json`이 없으므로 현재 CI는 `npm install`을 사용한다. 의존성 설치 재현성을 높이려면 추후 lockfile을 생성·커밋하고 `npm ci`로 전환한다.
