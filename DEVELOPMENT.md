@@ -39,3 +39,10 @@ npm run preview
 - 계산기별 WebApplication 및 BreadcrumbList JSON-LD는 `CalculatorShell`에서 렌더링한다.
 - `app/robots.ts`와 `app/sitemap.ts`는 Next.js Metadata Route로 자동 제공한다.
 - SEO 변경 후 `npm run build`, Cloudflare preview, 실제 배포 URL의 robots/sitemap/canonical/JSON-LD 확인을 수행한다.
+
+## 2026년 급여 계산 기준
+- 연봉 계산기는 국민연금 근로자 부담 4.75%, 건강보험 3.595%, 장기요양보험료(건강보험료×0.9448/7.19), 고용보험 근로자 부담 0.9%를 적용한다.
+- 2026.7.1~2027.6.30 국민연금 기준소득월액 하한 410,000원, 상한 6,590,000원을 반영한다. 매년 공식 공지 후 갱신한다.
+- 소득세는 가족 수·자녀 수·월 급여·비과세 항목 등에 따라 달라지므로 임의 산출하지 않고 월 소득세·지방소득세 합계를 입력받는다. 국세청 간이세액표 확인을 안내한다.
+- 퇴직금은 실제 퇴직 전 3개월 일수와 임금 총액으로 평균임금을 계산하고 상여금·해당 연차수당의 3/12를 반영하며, 통상임금이 더 높으면 이를 적용한다. 제외기간 등은 별도 확인이 필요하다.
+- 계산기별 안내 콘텐츠는 app/tools.tsx의 calculatorGuides에서 공식, 예시, FAQ, 공식 출처를 관리한다.
