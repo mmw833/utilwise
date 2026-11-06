@@ -6,6 +6,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "",
     "/about",
+    "/en",
+    "/en/about",
+    "/en/mbti",
+    "/en/mbti/test",
+    ...["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"].map((type) => `/en/mbti/result/${type}`),
     "/area",
     "/loan",
     "/brokerage",
