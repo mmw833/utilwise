@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import LanguageSwitcher from "../../components/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "서비스 소개 | UTILWISE",
@@ -24,6 +25,7 @@ export default function AboutPage() {
           <Link href="/#calculators">유용한 계산기</Link>
           <Link href="/#tests">테스트 모음</Link>
           <Link href="/about" aria-current="page">서비스 소개</Link>
+          <LanguageSwitcher/>
         </nav>
       </header>
 
