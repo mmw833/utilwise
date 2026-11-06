@@ -83,5 +83,5 @@
 - 부동산 중개수수료, 연봉, 퇴직금, DSR, 전월세 전환, 부가세, 예금·적금 계산기에 대한민국 기준 안내 배지 추가
 - 영어 라우트 일부와 SEO 메타데이터 및 sitemap 등록
 - 변경 파일: components/LanguageSwitcher.tsx, app/en/**, app/page.tsx, app/about/page.tsx, app/mbti/**, app/tools.tsx, app/globals.css, app/sitemap.ts
-- **미완료:** 영어 계산기 10종의 입력/결과/공식/FAQ 번역 및 영어 경로 구현. 영어 홈의 계산기 목록은 아직 각 영어 계산기 페이지가 준비되기 전 단계임.
+- **미완료:** 영어 계산기 10종의 입력/결과/공식/FAQ 번역 및 영어 경로 구현. 영어 홈에는 아직 번역 전인 계산기 카드가 비활성 안내 상태로 표시되며, 404 링크는 제공하지 않음.
 - **검증 대기:** GitHub Actions 빌드 및 Cloudflare 배포/실제 브라우저 동작 확인.
