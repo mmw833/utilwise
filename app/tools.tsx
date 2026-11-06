@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useMemo, useState } from "react";
 
 const won=(n:number)=>Math.round(n).toLocaleString("ko-KR")+"원";
@@ -88,5 +89,32 @@ export function DSR(){
 }
 
 export function CalculatorShell({title,desc,children}:{title:string,desc:string,children:React.ReactNode}){
- return <main><header className="wrap header"><Link href="/" className="logo">UTIL<span>WISE</span>.</Link><Link href="/" className="sub">← 전체 도구</Link></header><section className="wrap section"><div className="eyebrow">UTILWISE CALCULATOR</div><h1 style={{fontSize:32,letterSpacing:"-1px",margin:"12px 0 8px"}}>{title}</h1><p className="sub">{desc}</p>{children}<div className="footer">계산 결과는 참고용이며 실제 거래·세금·금융 판단 전 관련 기관의 최신 기준을 확인하세요.</div></section></main>
+ const pathname = usePathname();
+ const pageUrl = `https://utilwise.kr${pathname}`;
+ const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: title,
+  description: desc,
+  url: pageUrl,
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Any",
+  isAccessibleForFree: true,
+  offers: { "@type": "Offer", price: "0", priceCurrency: "KRW" },
+  inLanguage: "ko-KR",
+ };
+ const breadcrumbData = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+   { "@type": "ListItem", position: 1, name: "UTILWISE", item: "https://utilwise.kr/" },
+   { "@type": "ListItem", position: 2, name: title, item: pageUrl },
+  ],
+ };
+ return <main>
+  <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData)}} />
+  <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(breadcrumbData)}} />
+  <header className="wrap header"><Link href="/" className="logo">UTIL<span>WISE</span>.</Link><Link href="/" className="sub">← 전체 도구</Link></header>
+  <section className="wrap section"><div className="eyebrow">UTILWISE CALCULATOR</div><h1 style={{fontSize:32,letterSpacing:"-1px",margin:"12px 0 8px"}}>{title}</h1><p className="sub">{desc}</p>{children}<div className="footer">계산 결과는 참고용이며 실제 거래·세금·금융 판단 전 관련 기관의 최신 기준을 확인하세요.</div></section>
+ </main>;
 }
