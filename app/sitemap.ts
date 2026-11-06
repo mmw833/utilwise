@@ -15,6 +15,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/rent-conversion",
     "/fuel",
     "/vat",
+    "/mbti",
+    "/mbti/test",
+    ...["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"].map((type) => `/mbti/result/${type}`),
   ];
 
   return routes.map((route) => ({
