@@ -72,3 +72,11 @@
 - GitHub Actions 빌드 실행 시작; 최종 성공/실패 결과 대기 중
 - `package-lock.json` 미존재로 현재 검증은 `npm install` 기반이며, 재현 가능한 설치를 위해 lockfile 추가는 후속 개선 대상으로 남김
 - main 병합 및 Cloudflare 배포는 하지 않음
+
+## 2026-11-06 MBTI 빌드 및 결과 화면 검토
+- GitHub Actions `npm run build` 성공 확인 (SHA `87c461c49fec12900c4efc1eb3261415e92c11c7`)
+- 코드 검토 중 결과 성향 막대가 좌우 라벨과 반대 방향으로 읽힐 수 있는 시각화 문제 발견
+- 점수 18점을 중앙 기준으로 표시하고, 선호 방향 쪽으로 막대가 뻗도록 수정
+- 수정 후 최신 커밋의 빌드 재검증 대기 중
+- 실제 브라우저/모바일 상호작용 테스트 및 Cloudflare Preview 검증은 아직 미실행
+- PR #1은 열려 있으며 main 병합/운영 배포하지 않음
