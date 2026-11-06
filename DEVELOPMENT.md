@@ -69,3 +69,9 @@ npm run preview
 ## MBTI 결과 점수 표시
 - 각 성향 점수는 6~30점이며 18점을 중립 기준으로 본다.
 - 결과 화면의 막대는 중앙(18점)에서 해당 선호 방향으로 표시하며, 좌우 성향 라벨과 방향을 일치시킨다.
+
+
+## Cloudflare 미리보기 실행 참고
+- 저장소의 `package.json`에 `preview` 스크립트가 있으며, `opennextjs-cloudflare build && opennextjs-cloudflare preview`를 실행한다.
+- 미리보기는 로컬 개발 환경에서 실행하는 절차다. 현재 저장소에서 PR별 원격 Preview URL을 자동 생성하는 배포 워크플로는 확인되지 않았다.
+- `npm run preview` 실행 후 표시되는 로컬 주소에서 주요 라우트와 반응형 화면을 확인한다. `deploy` 스크립트는 운영 배포이므로 검증 단계에서 실행하지 않는다.
