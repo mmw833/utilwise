@@ -24,3 +24,13 @@
 - 운영 Worker 활성 버전: Cloudflare 대시보드에서 버전 ID 2238e5dc 확인 기록
 - 활성 버전이 최신 main 코드를 포함하는지는 미검증
 - /mbti 운영 URL 및 실제 배포 반영 여부는 미검증
+
+
+## 2026-11-07 Cloudflare 자동 배포 연결
+- 사용자 확인 화면 기준 Cloudflare Workers Builds에서 GitHub 저장소 mmw833/utilwise 연결 상태 확인
+- 프로덕션 브랜치: main
+- 빌드 명령: npx opennextjs-cloudflare build
+- 배포 명령: npx opennextjs-cloudflare deploy
+- 루트 디렉터리: /
+- 버전 명령: npx opennextjs-cloudflare preview (유지)
+- 실제 자동 배포 트리거 및 배포 성공은 새 main 커밋 이후 Cloudflare 빌드 기록으로 확인 필요
