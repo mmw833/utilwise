@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import LanguageSwitcher from "../components/LanguageSwitcher";
 
 const tools = [
   { icon:"⌂", title:"평수·면적 변환", desc:"㎡와 평을 빠르고 정확하게 변환해요.", href:"/area" },
@@ -29,6 +30,7 @@ export default function Home(){
         <a href="#calculators">유용한 계산기</a>
         <a href="#tests">테스트 모음</a>
         <Link href="/about">서비스 소개</Link>
+        <LanguageSwitcher/>
       </nav>
     </header>
     <section className="hero">
