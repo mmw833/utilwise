@@ -135,6 +135,6 @@ export function CalculatorShell({title,desc,children}:{title:string,desc:string,
   <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData)}} />
   <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(breadcrumbData)}} />
   <header className="wrap header"><Link href="/" className="logo">UTIL<span>WISE</span>.</Link><Link href="/" className="sub">← 전체 도구</Link></header>
-  <section className="wrap section"><div className="eyebrow">UTILWISE CALCULATOR</div><h1 style={{fontSize:32,letterSpacing:"-1px",margin:"12px 0 8px"}}>{title}</h1><p className="sub">{desc}</p>{children}<CalculatorGuide pathname={pathname}/><div className="footer">계산 결과는 참고용이며 실제 거래·세금·금융 판단 전 관련 기관의 최신 기준을 확인하세요.</div></section>
+  <section className="wrap section"><div className="eyebrow">UTILWISE CALCULATOR</div><h1 style={{fontSize:32,letterSpacing:"-1px",margin:"12px 0 8px"}}>{title}</h1><p className="sub">{desc}</p>{["/brokerage","/salary","/severance","/dsr","/rent-conversion","/vat","/savings"].includes(pathname)&&<div className="country-basis">대한민국 기준 적용 · 대한민국 법률·세금·금융 제도를 바탕으로 한 계산입니다.</div>}{children}<CalculatorGuide pathname={pathname}/><div className="footer">계산 결과는 참고용이며 실제 거래·세금·금융 판단 전 관련 기관의 최신 기준을 확인하세요.</div></section>
  </main>;
 }
