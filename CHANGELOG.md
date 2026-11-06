@@ -45,3 +45,9 @@
 - GitHub Actions Next.js production build 성공 확인
 - 결과 성향 막대를 18점 중앙 기준 좌우 방향으로 수정해 축 라벨과 점수 방향 일치
 - 수정 커밋에 대한 빌드 재검증 진행
+
+
+## 2026-11-06 MBTI 최신 빌드 재검증
+- 결과 점수 막대 방향 수정이 포함된 최신 커밋 `5d8ff5b7faabb35f643fd29410f6f145e4525036`의 GitHub Actions production build 성공
+- Cloudflare 미리보기 명령과 설정 파일 확인; 원격 PR Preview 배포는 구성되어 있지 않은 것으로 확인
+- 실제 브라우저/모바일 검증 및 운영 배포는 미실행
