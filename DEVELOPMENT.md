@@ -113,3 +113,10 @@ npm run preview
 - 한국어판의 기존 계산 규칙과 기본값을 유지하면서 영어 UI, 공식, 예시, FAQ, 유의사항 및 출처를 제공한다.
 - 국내 제도 기반 도구에는 South Korea 기준 안내를 표시한다.
 - 영어 MBTI 레이아웃은 공통 CSS를 불러오고 children을 반환하는 정상적인 Next.js layout 구조를 사용한다.
+
+## 날짜 계산기
+- 공통 UI/계산 로직: components/DateCalculator.tsx
+- 한국어: app/date/page.tsx (/date)
+- 영어: app/en/date/page.tsx (/en/date)
+- 기능: 날짜 차이(양 끝 날짜 포함 선택), D-day, 날짜 더하기·빼기, 근무일, 만 나이, 태어난 지 일수, 다음 생일까지 남은 날짜
+- 근무일은 토·일 제외 옵션과 사용자가 직접 입력한 공휴일 날짜 제외를 제공한다. 공휴일은 국가·연도·사업장마다 다르므로 자동으로 단정하지 않는다.
