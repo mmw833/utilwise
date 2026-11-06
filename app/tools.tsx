@@ -37,7 +37,7 @@ export function Brokerage(){
 export function Salary(){
  const [annual,setAnnual]=useState("50000000"),[nontaxable,setNontaxable]=useState("0"),[withholding,setWithholding]=useState("0");
  const monthly=num(annual)/12, taxablePay=Math.max(0,monthly-num(nontaxable));
- const pensionBase=Math.min(6_590_000,Math.max(410_000,Math.round(taxablePay/1000)*1000));
+ const pensionBase=taxablePay>0?Math.min(6_590_000,Math.max(410_000,Math.round(taxablePay/1000)*1000)):0;
  const pension=pensionBase*.0475;
  const health=taxablePay*.03595, care=health*(.9448/7.19), employment=taxablePay*.009;
  const incomeTax=num(withholding), total=pension+health+care+employment+incomeTax;
