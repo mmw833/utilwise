@@ -1,1 +1,1 @@
-import "../../../app/mbti/mbti.css";
+import "../../mbti/mbti.css";
