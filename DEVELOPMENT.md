@@ -65,3 +65,7 @@ npm run preview
 ## CI 빌드 검사
 - `.github/workflows/build.yml`에서 PR 및 `feature/mbti-service` push 시 Node.js 22 기반 `npm install`, `npm run build`를 실행한다.
 - 저장소에 `package-lock.json`이 없으므로 현재 CI는 `npm install`을 사용한다. 의존성 설치 재현성을 높이려면 추후 lockfile을 생성·커밋하고 `npm ci`로 전환한다.
+
+## MBTI 결과 점수 표시
+- 각 성향 점수는 6~30점이며 18점을 중립 기준으로 본다.
+- 결과 화면의 막대는 중앙(18점)에서 해당 선호 방향으로 표시하며, 좌우 성향 라벨과 방향을 일치시킨다.
