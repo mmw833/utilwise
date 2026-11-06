@@ -85,3 +85,12 @@
 - 변경 파일: components/LanguageSwitcher.tsx, app/en/**, app/page.tsx, app/about/page.tsx, app/mbti/**, app/tools.tsx, app/globals.css, app/sitemap.ts
 - **미완료:** 영어 계산기 10종의 입력/결과/공식/FAQ 번역 및 영어 경로 구현. 영어 홈에는 아직 번역 전인 계산기 카드가 비활성 안내 상태로 표시되며, 404 링크는 제공하지 않음.
 - **검증 대기:** GitHub Actions 빌드 및 Cloudflare 배포/실제 브라우저 동작 확인.
+
+
+## 2026-11-07 영어 계산기 10종 구현
+- 공통 경로 `app/en/[tool]/page.tsx`와 계산기 UI/산식 `app/en/[tool]/EnglishCalculator.tsx` 추가
+- 면적, 대출, 중개보수, 급여, 퇴직금, 저축, DSR, 전월세 전환, 유류비, 부가세 영어 페이지 구현
+- 입력 항목, 실시간 결과, 계산 공식, 예시, FAQ, 유의사항, 공식 출처를 영어로 제공
+- 국내 제도 기반 계산기에 South Korea 기준 표시
+- 영어 홈에서 10개 계산기 페이지 연결 및 sitemap 등록
+- GitHub Actions 빌드 및 Cloudflare 배포, 실제 결과 대조는 확인 대기
