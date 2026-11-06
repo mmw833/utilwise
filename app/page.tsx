@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 const tools = [
+  { icon:"✦", title:"MBTI 성격유형 검사", desc:"24개의 질문으로 나의 성향과 성격을 알아봐요.", href:"/mbti", tag:"성격·심리" },
   { icon:"⌂", title:"평수·면적 변환", desc:"㎡와 평을 빠르고 정확하게 변환해요.", href:"/area", tag:"부동산" },
   { icon:"₩", title:"대출 이자 계산기", desc:"월 상환금과 총 이자 부담을 비교해요.", href:"/loan", tag:"금융" },
   { icon:"⌂", title:"부동산 중개수수료", desc:"매매·전세·월세 중개보수 상한을 확인해요.", href:"/brokerage", tag:"부동산" },
