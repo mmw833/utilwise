@@ -58,3 +58,10 @@
 - app/sitemap.ts에 /about 경로 추가
 - 변경 파일: app/page.tsx, app/about/page.tsx, app/globals.css, app/sitemap.ts, PROJECT_STATUS.md, CHANGELOG.md, DEVELOPMENT.md
 - GitHub main 반영 완료. Cloudflare 자동배포의 최신 빌드/운영 URL 반영은 별도 확인 필요.
+
+
+## 2026-11-07 하단 푸터 디자인 복원
+- 홈 하단을 기존 브랜드명/서비스 한 줄 소개/계산 유의사항/저작권으로 구성된 레이아웃으로 복원
+- 서비스 소개 링크는 별도 /about 페이지로 연결되도록 추가
+- 변경 파일: app/page.tsx, app/globals.css
+- GitHub main 반영 완료. Cloudflare 자동배포 및 운영 사이트 반영은 최신 배포 상태 확인 필요.
