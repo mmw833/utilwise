@@ -65,3 +65,9 @@
 - 서비스 소개 링크는 별도 /about 페이지로 연결되도록 추가
 - 변경 파일: app/page.tsx, app/globals.css
 - GitHub main 반영 완료. Cloudflare 자동배포 및 운영 사이트 반영은 최신 배포 상태 확인 필요.
+
+
+## 2026-11-07 푸터 저작권 중앙 정렬
+- 홈 하단의 © 2026 UTILWISE. All rights reserved. 문구를 별도 요소로 분리하고 중앙 정렬
+- 변경 파일: app/page.tsx, app/globals.css
+- GitHub main 반영 완료. Cloudflare 자동배포 및 운영 사이트 적용 확인 필요.
