@@ -5,6 +5,7 @@ const siteUrl = "https://utilwise.kr";
 export default function sitemap(): MetadataRoute.Sitemap {
   const routes = [
     "",
+    "/about",
     "/area",
     "/loan",
     "/brokerage",
