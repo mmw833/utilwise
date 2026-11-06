@@ -5,21 +5,19 @@
 - 현재 운영 대상 Worker: utilwise
 - 배포 명령: npm run deploy (OpenNext Cloudflare build 후 Wrangler deploy)
 - GitHub Actions 빌드 검사: .github/workflows/build.yml
-- Cloudflare 배포 워크플로 준비: .github/workflows/deploy-cloudflare.yml (최초에는 수동 실행 전용; 인증 정보 등록 후 자동 push 배포로 전환 예정)
-- 필수 GitHub Actions secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
-- 배포 인증 정보는 저장소에 평문으로 저장하지 않음
+- Cloudflare 대시보드의 Git 연동/자동 배포 여부: 계정 화면 확인 권한이 없어 미확인
+- 별도 API 토큰 기반 GitHub Actions 배포 방식은 보류하고 관련 임시 workflow 제거
 
-## 2026-11-06 Cloudflare 자동 배포 준비
-- 최신 main 커밋 f1ef1ef의 GitHub Actions 빌드 성공 확인
-- 기존 build workflow에는 Cloudflare 배포 단계가 없음을 확인
-- package.json에 이미 존재하는 npm run deploy와 wrangler.jsonc의 Worker 설정을 재사용
-- 배포 workflow를 수동 실행 방식으로 준비하여 인증 정보 없이 운영 배포가 실행되지 않도록 함
-- 아직 GitHub Secrets 등록 및 실제 Cloudflare 배포 검증은 미완료
-- 다음: GitHub 저장소 Settings → Secrets and variables → Actions에서 Cloudflare API token 및 Account ID 등록; 등록 확인 후 workflow를 main push 자동 배포로 전환하고 배포 검증
+## 2026-11-07 배포 방식 재검토
+- 기존 build workflow는 main push 시 빌드 검사만 수행하며 Cloudflare 배포는 하지 않음
+- package.json에는 기존 npm run deploy 명령과 wrangler.jsonc Worker 설정이 이미 존재
+- 임시로 추가했던 .github/workflows/deploy-cloudflare.yml은 별도 API Token 및 Account ID 등록을 요구하므로 제거
+- Cloudflare 계정 설정에 접근할 수 없어 기존 Worker의 Git 연결 및 이전 배포 경로는 아직 확인 불가
+- 기존 배포 방식 확인 전까지 추가 인증정보 설정이나 배포 자동화 변경을 진행하지 않음
 
 ## 기존 기능 및 서비스 상태
 - 홈 카테고리 필터 및 MBTI 서비스는 main에 반영됨
-- 최신 main 빌드 검사: 성공
-- 운영 Worker 활성 버전 확인: Cloudflare 대시보드에서 버전 ID 2238e5dc 확인
-- 활성 버전이 최신 main 커밋을 포함하는지는 아직 검증되지 않음
-- /mbti 운영 URL 응답 및 실제 브라우저 검증은 자동 배포 완료 후 재확인 필요
+- GitHub Actions 빌드 검사: 이전 성공 기록 확인
+- 운영 Worker 활성 버전: Cloudflare 대시보드에서 버전 ID 2238e5dc 확인 기록
+- 활성 버전이 최신 main 코드를 포함하는지는 미검증
+- /mbti 운영 URL 및 실제 배포 반영 여부는 미검증
