@@ -40,3 +40,8 @@
 - GitHub Actions 빌드 워크플로 추가(PR 및 기능 브랜치 push)
 - 24개 질문과 16개 결과 유형 데이터 정합성 사전 확인
 - Next.js production build 결과 확인 진행 중
+
+## 2026-11-06 MBTI 결과 시각화 보정
+- GitHub Actions Next.js production build 성공 확인
+- 결과 성향 막대를 18점 중앙 기준 좌우 방향으로 수정해 축 라벨과 점수 방향 일치
+- 수정 커밋에 대한 빌드 재검증 진행
