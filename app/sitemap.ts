@@ -53,6 +53,7 @@ const pages = [
   })),
   { route: "/en/mbti", priority: 0.6, changeFrequency: "monthly" as const },
   { route: "/en/big-five", priority: 0.6, changeFrequency: "monthly" as const },
+  { route: "/en/eq", priority: 0.6, changeFrequency: "monthly" as const },
   ...mbtiTypes.map((type) => ({
     route: `/en/mbti/result/${type}`,
     priority: 0.4,
