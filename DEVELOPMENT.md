@@ -256,3 +256,11 @@ npm run preview
 - 첫 번째 심리테스트 결과 이미지는 `public/images/psychology/`의 정사각형 SVG 8개로 관리한다.
 - 유형별 파일명 매핑은 `components/PsychologyExperience.tsx`의 `resultIllustrations`에서 관리한다.
 - 한국어와 영어는 같은 결과 키를 사용하므로 별도 이미지 세트가 필요하지 않다.
+
+## 부피 계산기
+- 한국어: `/volume`, 영어: `/en/volume`
+- 공통 UI·계산 로직: `components/VolumeCalculator.tsx`
+- 직육면체: 가로 × 세로 × 높이. 원기둥: π × (지름 ÷ 2)² × 높이
+- 입력 단위: mm, cm, m. 결과 단위: m³, L, cm³, mL
+- 기하학적 부피이며 실제 사용 가능 용량은 벽 두께·내부 구조 등에 따라 달라질 수 있다.
+- 한국어·영어 홈 계산기 목록과 sitemap에 등록한다.
