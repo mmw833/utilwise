@@ -13,7 +13,8 @@ const tools=[
 {icon:"▣",title:"DSR 대출 한도 계산기",desc:"소득과 대출 상환액으로 DSR을 추정해요.",href:"/dsr"},
 {icon:"⌂",title:"전월세 전환 계산기",desc:"보증금과 월세 전환 금액을 비교해요.",href:"/rent-conversion"},
 {icon:"⛽",title:"자동차 유류비 계산기",desc:"주행 거리와 연비로 예상 주유비를 계산해요.",href:"/fuel"},
-{icon:"％",title:"부가세 계산기",desc:"공급가액과 부가세 포함 금액을 계산해요.",href:"/vat"}];
+{icon:"％",title:"부가세 계산기",desc:"공급가액과 부가세 포함 금액을 계산해요.",href:"/vat"},
+{icon:"▣",title:"부피 계산기",desc:"직육면체와 원기둥의 부피를 계산하고 리터로 변환해요.",href:"/volume"}];
 const personality=[{title:"MBTI 성격유형 검사",desc:"24개의 질문으로 나의 성향과 성격을 알아봐요.",href:"/mbti",label:"테스트 시작하기　→"},{title:"빅파이브 성격검사",desc:"50문항으로 다섯 가지 성격 차원을 분석해요.",href:"/big-five",label:"검사 시작하기　→"},{title:"감성지능(EQ) 테스트",desc:"36문항으로 감정 인식·조절·공감과 관계 능력을 살펴봐요.",href:"/eq",label:"테스트 시작하기　→"}];
 const psychology=[{title:"나도 몰랐던 나의 진짜 모습",desc:"18가지 일상 속 선택으로 숨겨진 성향과 매력을 발견해 보세요.",href:"/psychology",label:"심리테스트 시작하기　→"},{title:"내 마음속 진짜 욕망은 무엇일까?",desc:"12가지 선택으로 나의 핵심 가치와 마음속 우선순위를 알아봐요.",href:"/psychology/desire",label:"심리테스트 시작하기　→"},{title:"사람들이 보는 나 vs 진짜 나",desc:"겉으로 보이는 모습과 속마음의 차이를 살펴봐요.",href:"/psychology/mirror",label:"심리테스트 시작하기　→"}];
 export default function Home(){
