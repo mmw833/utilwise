@@ -157,3 +157,10 @@ npm run preview
 - 성장 가이드는 실천 아이디어이며 심리치료나 임상적 권고가 아니다.
 - 모든 해석은 자체 문항 응답을 바탕으로 한 자기성찰 자료로 제공하며, 표준화된 성격 진단이나 인구 규준 비교로 표현하지 않는다.
 - 관련 스타일은 `app/big-five/big-five.css`에서 관리한다.
+
+
+### 빅파이브 결과 공유
+- `components/BigFiveExperience.tsx`의 결과 공유는 `navigator.share()`를 우선 사용한다.
+- Web Share API를 지원하지 않거나 실행할 수 없는 환경에서는 Clipboard API를 사용하고, 해당 API도 사용할 수 없으면 `document.execCommand('copy')`를 보조 수단으로 사용한다.
+- 사용자가 공유창을 취소한 경우 자동으로 링크를 복사하지 않는다.
+- Web Share API의 공유 대상 앱은 브라우저·운영체제·설치 앱에 따라 다르므로 PC에서 카카오톡 표시 여부를 보장하지 않는다.
