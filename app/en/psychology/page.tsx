@@ -1,0 +1,3 @@
+import type {Metadata} from "next";import PsychologyExperience from "../../../components/PsychologyExperience";
+export const metadata:Metadata={title:"Discover Your Hidden Self | Free Fun Psychology Quiz – UTILWISE",description:"Explore your personal style with 18 everyday choices, eight playful result profiles, and thoughtful insights.",alternates:{canonical:"/en/psychology"},openGraph:{title:"Discover Your Hidden Self – Take the Quiz",description:"18 everyday choices reveal a side of you that you may not know.",url:"https://utilwise.kr/en/psychology",siteName:"UTILWISE",locale:"en_US",type:"website"}};
+export default function Page(){return <PsychologyExperience mode="intro" locale="en"/>}

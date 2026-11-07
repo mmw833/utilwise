@@ -1,0 +1,3 @@
+import type {Metadata} from "next";import PsychologyExperience from "../../../../components/PsychologyExperience";
+export const metadata:Metadata={title:"View Your Psychology Quiz Result | UTILWISE",description:"Discover your hidden-self quiz result on UTILWISE.",alternates:{canonical:"/en/psychology/result"},robots:{index:false,follow:true},openGraph:{title:"View Your Psychology Quiz Result",description:"Discover your playful self-discovery result on UTILWISE.",url:"https://utilwise.kr/en/psychology/result",siteName:"UTILWISE",locale:"en_US",type:"website"}};
+export default function Page(){return <PsychologyExperience mode="result" locale="en"/>}
