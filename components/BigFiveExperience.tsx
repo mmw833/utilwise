@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import {useEffect,useMemo,useState} from "react";
+import {useEffect,useMemo,useRef,useState} from "react";
 
 type Trait="O"|"C"|"E"|"A"|"S";
 type Item={trait:Trait;reverse:boolean;ko:string;en:string};
@@ -88,6 +88,7 @@ const [index,setIndex]=useState(0);
 const [scores,setScores]=useState<number[]|null>(null);
 const [copied,setCopied]=useState(false);
 const [shareNotice,setShareNotice]=useState("");
+const advancing=useRef(false);
 const labels=en?["Strongly disagree","Disagree","Neither agree nor disagree","Agree","Strongly agree"]:["전혀 그렇지 않다","그렇지 않은 편이다","보통이다","그런 편이다","매우 그렇다"];
 const scoreValues=useMemo(()=>scores??[],[scores]);
 useEffect(()=>{
@@ -99,6 +100,8 @@ if(traits.every((_,i)=>params.has("s"+i))&&raw.every(v=>Number.isFinite(v)&&v>=0
 },[mode]);
 const current=items[index];
 const complete=(next:number[])=>{
+const firstMissing=items.findIndex((_,i)=>!Number.isInteger(next[i])||next[i]<1||next[i]>5);
+if(firstMissing!==-1){setAnswers(next);setIndex(firstMissing);advancing.current=false;return;}
 const result=traits.map(([code])=>{
 const selected=items.map((item,i)=>({item,value:next[i]})).filter(x=>x.item.trait===code);
 const total=selected.reduce((sum,x)=>sum+(x.item.reverse?6-x.value:x.value),0);
@@ -108,8 +111,10 @@ const query=result.map((v,i)=>"s"+i+"="+v).join("&");
 window.location.href=(en?"/en":"")+"/big-five/result?"+query;
 };
 const choose=(value:number)=>{
+if(advancing.current||!Number.isInteger(value)||value<1||value>5)return;
+advancing.current=true;
 const next=[...answers];next[index]=value;setAnswers(next);
-if(index<items.length-1)setTimeout(()=>setIndex(i=>Math.min(i+1,items.length-1)),120);
+if(index<items.length-1)setTimeout(()=>{setIndex(Math.min(index+1,items.length-1));advancing.current=false;},120);
 else complete(next);
 };
 const scoreUrl=()=>window.location.href;
