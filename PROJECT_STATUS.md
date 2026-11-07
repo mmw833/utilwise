@@ -271,3 +271,13 @@
 - 원인: 클릭 잠금 ref를 변경해도 React 재렌더링이 발생하지 않아, 두 번째 문항 렌더 후 버튼이 disabled 상태로 남는 문제 확인
 - 수정: 버튼의 disabled 속성에서 ref 직접 참조를 제거하고, choose 함수의 동기 잠금 검사 및 index 변경 후 effect 해제는 유지
 - 검증: 코드 수정 및 GitHub 반영 완료. 새 CI 빌드/브라우저 실사용 테스트 대기
+
+
+## 2026-11-07 심리테스트 2종 추가
+- '내 마음속 진짜 욕망은 무엇일까?'와 '사람들이 보는 나 vs 진짜 나'를 한국어·영어로 추가
+- 각 테스트 12문항, 3개 요약 축, 8개 결과 유형 및 결과 공유·재검사·다른 테스트 이동 제공
+- 소개/검사/결과: `/psychology/desire`, `/psychology/desire/test`, `/psychology/desire/result`; `/psychology/mirror` 및 `/en` 대응 경로
+- 공통 구현: `components/PsychologyCollection.tsx`; 기존 심리테스트 CSS 재사용
+- 소개 페이지만 sitemap 등록, 검사/결과는 noindex,follow
+- 브라우저 내 응답 계산, 공유 URL에는 요약 점수만 포함
+- GitHub main 반영. GitHub Actions 빌드 및 Cloudflare 운영 반영 검증 대기.
