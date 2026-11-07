@@ -173,3 +173,11 @@
 - 빅파이브 결과 하단 버튼명을 '빅5 성격검사하기'로 변경(영문 포함)
 - MBTI 결과 하단에는 기존 'MBTI 테스트하기' 동작 유지
 - 실제 카카오톡 인앱 브라우저, 모바일 공유창, 카카오톡 링크 미리보기 검증은 배포 후 확인 필요
+
+
+## 2026-11-07 카카오톡 인앱 브라우저 공유 보완
+- 카카오톡 인앱 브라우저에서 공유창 대신 결과 URL 복사를 우선 수행하도록 MBTI/빅파이브 결과 페이지 수정
+- 복사 성공 시 '결과 링크가 복사되었습니다' 안내 및 화면 하단 ⋮ 메뉴 기준의 외부 브라우저 안내 표시
+- Clipboard API 실패 시 textarea/execCommand 복사 대체 처리
+- 변경 파일: components/BigFiveExperience.tsx, app/mbti/result/[type]/MbtiResult.tsx, app/en/mbti/result/[type]/MbtiResult.tsx
+- 빌드/실기기 검증 대기
