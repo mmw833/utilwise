@@ -1,6 +1,64 @@
 import type { MetadataRoute } from "next";
-const siteUrl="https://utilwise.kr";
-export default function sitemap():MetadataRoute.Sitemap{
-const routes=["","/about","/en","/en/about",...[ "area","loan","brokerage","salary","severance","savings","dsr","rent-conversion","fuel","vat"].map(tool=>`/en/${tool}`),"/en/mbti","/en/mbti/test","/en/big-five","/date","/en/date","/area","/loan","/brokerage","/salary","/severance","/savings","/dsr","/rent-conversion","/fuel","/vat","/mbti","/mbti/test","/big-five"];
-return routes.map(route=>({url:`${siteUrl}${route}`,lastModified:new Date("2026-11-07"),changeFrequency:route===""?"weekly":"monthly",priority:route===""?1:0.8}));
+
+const siteUrl = "https://utilwise.kr";
+
+const calculators = [
+  "/area",
+  "/date",
+  "/loan",
+  "/brokerage",
+  "/salary",
+  "/severance",
+  "/savings",
+  "/dsr",
+  "/rent-conversion",
+  "/fuel",
+  "/vat",
+];
+
+const englishCalculators = calculators.map((route) => `/en${route}`);
+const mbtiTypes = [
+  "ISTJ", "ISFJ", "INFJ", "INTJ",
+  "ISTP", "ISFP", "INFP", "INTP",
+  "ESTP", "ESFP", "ENFP", "ENTP",
+  "ESTJ", "ESFJ", "ENFJ", "ENTJ",
+];
+
+const pages = [
+  { route: "/", priority: 1, changeFrequency: "weekly" as const },
+  { route: "/about", priority: 0.6, changeFrequency: "yearly" as const },
+  ...calculators.map((route) => ({
+    route,
+    priority: 0.8,
+    changeFrequency: "monthly" as const,
+  })),
+  { route: "/mbti", priority: 0.7, changeFrequency: "monthly" as const },
+  { route: "/big-five", priority: 0.7, changeFrequency: "monthly" as const },
+  ...mbtiTypes.map((type) => ({
+    route: `/mbti/result/${type}`,
+    priority: 0.45,
+    changeFrequency: "yearly" as const,
+  })),
+  { route: "/en", priority: 0.8, changeFrequency: "weekly" as const },
+  { route: "/en/about", priority: 0.5, changeFrequency: "yearly" as const },
+  ...englishCalculators.map((route) => ({
+    route,
+    priority: 0.7,
+    changeFrequency: "monthly" as const,
+  })),
+  { route: "/en/mbti", priority: 0.6, changeFrequency: "monthly" as const },
+  { route: "/en/big-five", priority: 0.6, changeFrequency: "monthly" as const },
+  ...mbtiTypes.map((type) => ({
+    route: `/en/mbti/result/${type}`,
+    priority: 0.4,
+    changeFrequency: "yearly" as const,
+  })),
+];
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  return pages.map(({ route, priority, changeFrequency }) => ({
+    url: `${siteUrl}${route}`,
+    changeFrequency,
+    priority,
+  }));
 }

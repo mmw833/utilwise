@@ -203,3 +203,14 @@
 - 변경된 계산기: area, loan, brokerage, salary, severance, date, dsr, fuel, rent-conversion, savings, vat
 - 변경된 검사 페이지: mbti, big-five
 - 배포 및 카카오톡 캐시 반영 확인 대기
+
+
+## 2026-11-07 SEO 크롤링 구조 개선
+- 사이트맵을 실제 공개·색인 대상 페이지 기준으로 재구성하고 오래된 고정 lastModified 날짜 제거
+- 한국어·영어 계산기, 소개/검사 소개 페이지 및 16개 MBTI 유형별 결과 URL을 사이트맵에 등록
+- 답변 입력 전용 MBTI 검사 화면은 검색 결과에 노출할 필요가 없어 noindex,follow 및 자체 canonical 적용
+- MBTI 검사 진행 페이지는 사이트맵에서 제외하고 검사 소개 페이지를 검색 유입 랜딩 페이지로 사용
+- 빅파이브 검사 진행/결과 화면은 기존 noindex 설정 유지
+- 변경 파일: app/sitemap.ts, app/mbti/test/layout.tsx, app/en/mbti/test/layout.tsx
+- GitHub Actions 빌드 및 Cloudflare 운영 배포/사이트맵 실응답 검증 대기
+- 후속 SEO 과제: 개인정보처리방침·이용약관 공개 페이지, Search Console/네이버 서치어드바이저 색인 상태 확인
