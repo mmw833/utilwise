@@ -1,0 +1,3 @@
+import type {Metadata} from "next";import BigFiveExperience from "../../../components/BigFiveExperience";
+export const metadata:Metadata={title:"Free Big Five Personality Test – 50 Questions | UTILWISE",description:"Explore openness, conscientiousness, extraversion, agreeableness, and emotional stability with 50 questions.",alternates:{canonical:"/en/big-five"},openGraph:{title:"Big Five Personality Test | UTILWISE",description:"Explore five broad personality dimensions with 50 questions.",url:"https://utilwise.kr/en/big-five",siteName:"UTILWISE",locale:"en_US",type:"website"}};
+export default function Page(){return <BigFiveExperience mode="intro" locale="en"/>}
