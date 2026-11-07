@@ -13,6 +13,8 @@ const pages = [
 {route:"/big-five",priority:0.7,changeFrequency:"monthly" as const},
 {route:"/eq",priority:0.7,changeFrequency:"monthly" as const},
 {route:"/psychology",priority:0.7,changeFrequency:"monthly" as const},
+{route:"/psychology/desire",priority:0.7,changeFrequency:"monthly" as const},
+{route:"/psychology/mirror",priority:0.7,changeFrequency:"monthly" as const},
 ...mbtiTypes.map(type=>({route:`/mbti/result/${type}`,priority:0.45,changeFrequency:"yearly" as const})),
 {route:"/en",priority:0.8,changeFrequency:"weekly" as const},
 {route:"/en/about",priority:0.5,changeFrequency:"yearly" as const},
@@ -23,6 +25,8 @@ const pages = [
 {route:"/en/big-five",priority:0.6,changeFrequency:"monthly" as const},
 {route:"/en/eq",priority:0.6,changeFrequency:"monthly" as const},
 {route:"/en/psychology",priority:0.6,changeFrequency:"monthly" as const},
+{route:"/en/psychology/desire",priority:0.6,changeFrequency:"monthly" as const},
+{route:"/en/psychology/mirror",priority:0.6,changeFrequency:"monthly" as const},
 ...mbtiTypes.map(type=>({route:`/en/mbti/result/${type}`,priority:0.4,changeFrequency:"yearly" as const}))
 ];
 export default function sitemap():MetadataRoute.Sitemap{return pages.map(({route,priority,changeFrequency})=>({url:`${siteUrl}${route}`,changeFrequency,priority}));}
