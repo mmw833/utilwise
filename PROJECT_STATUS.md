@@ -235,3 +235,12 @@
 - 홈 테스트 모음 및 sitemap 등록. 검사 진행/개인 결과 페이지 noindex 설정
 - 주요 변경 파일: `components/EQExperience.tsx`, `app/eq/**`, `app/page.tsx`, `app/sitemap.ts`
 - **검증 대기:** TypeScript/Next.js 빌드, 36문항 전체 응답과 역채점 산식, 결과 링크 공유/새로고침, 모바일 레이아웃, Cloudflare 운영 반영
+
+
+## 2026-11-07 EQ 빠른 응답/결과 오류 방어 수정
+- `components/EQExperience.tsx`의 110ms 자동 이동 타이머를 제거하고 문항 인덱스가 실제 화면에 반영된 후 입력 잠금을 해제하도록 수정
+- 연속 클릭으로 문항 상태와 답변 배열이 어긋날 수 있는 가능성을 줄임
+- 제출 전 모든 문항 응답을 재검증하며 누락 문항이 있으면 해당 문항으로 복귀시키고 안내 표시
+- 결과 점수 쿼리 문자열은 `URLSearchParams`로 생성
+- GitHub 반영 커밋: `32381edbfbea774a1323054d9a8baa990c6fd5ad`
+- **검증 대기:** GitHub Actions 빌드 성공 여부, Cloudflare 자동 배포 완료 여부, 빠른 연속 클릭/정상 완료/결과 새로고침 실제 테스트
