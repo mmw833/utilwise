@@ -281,3 +281,12 @@
 - 소개 페이지만 sitemap 등록, 검사/결과는 noindex,follow
 - 브라우저 내 응답 계산, 공유 URL에는 요약 점수만 포함
 - GitHub main 반영. GitHub Actions 빌드 및 Cloudflare 운영 반영 검증 대기.
+
+
+## 2026-11-07 심리테스트 2종 결과 리포트 보강
+- `components/PsychologyCollection.tsx`의 욕망 테스트·겉과 속 테스트 8개 결과 유형 각각에 유형별 상세 해석 추가
+- 결과 항목: 핵심 해석, 자연스러운 강점, 균형을 위해 살펴볼 점, 일상 적용 아이디어, 자기성찰 질문
+- 한국어·영어 콘텐츠를 동일한 구조와 깊이로 제공
+- 기존 12문항, 3축 점수 계산, 8개 결과 분기, 결과 URL 및 공유 방식은 변경하지 않음
+- `app/psychology/psychology.css`에 상세 결과 가독성 스타일 추가
+- GitHub main 반영 완료. CI 빌드 및 Cloudflare 운영 배포/실제 화면 확인 필요.
