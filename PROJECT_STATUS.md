@@ -181,3 +181,10 @@
 - Clipboard API 실패 시 textarea/execCommand 복사 대체 처리
 - 변경 파일: components/BigFiveExperience.tsx, app/mbti/result/[type]/MbtiResult.tsx, app/en/mbti/result/[type]/MbtiResult.tsx
 - 빌드/실기기 검증 대기
+
+
+## 2026-11-07 빅파이브 공유 링크 미리보기 메타데이터 수정
+- 빅파이브 한국어/영어 결과 페이지에 Open Graph 및 Twitter 메타데이터를 명시
+- 카카오톡 등 링크 미리보기에서 사이트 기본 제목 대신 '빅5 성격검사 결과보기' 제목과 결과 전용 설명이 사용되도록 설정
+- 변경 파일: app/big-five/result/page.tsx, app/en/big-five/result/page.tsx
+- 배포 및 카카오톡 링크 미리보기 캐시 갱신 확인 대기
