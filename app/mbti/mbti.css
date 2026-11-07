@@ -11,3 +11,5 @@
 .mbti-detail-grid p{font-size:13px;line-height:1.9;color:#64748b;margin:0}
 .mbti-detail-footnote{font-size:11px;color:#8793a4;line-height:1.7;margin-top:14px}
 @media(max-width:650px){.mbti-auto-next{font-size:10px}.mbti-detail-grid{grid-template-columns:1fr}.mbti-detail-heading h2{font-size:20px}}
+
+.mbti-result-actions .mbti-primary,.mbti-result-actions .mbti-secondary{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;font:inherit;font-size:13px;font-weight:700;min-height:46px;padding:13px 20px}.mbti-result-actions .mbti-secondary{cursor:pointer}
