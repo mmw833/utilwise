@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 const siteUrl = "https://utilwise.kr";
-const calculators = ["/area","/date","/loan","/brokerage","/salary","/severance","/savings","/dsr","/rent-conversion","/fuel","/vat"];
+const calculators = ["/area","/date","/loan","/brokerage","/salary","/severance","/savings","/dsr","/rent-conversion","/fuel","/vat","/volume"];
 const englishCalculators = calculators.map((route) => `/en${route}`);
 const mbtiTypes = ["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"];
 const pages = [
