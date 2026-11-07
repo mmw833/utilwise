@@ -115,7 +115,7 @@ else complete(next);
 const scoreUrl=()=>window.location.href;
 const copyShareLink=async(url:string)=>{
 try{
-if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(url);setCopied(true);return;}
+if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(url);setCopied(true);setShareNotice(en?"Result link copied.":"결과 링크가 복사되었습니다.");return;}
 }catch{}
 try{
 const field=document.createElement("textarea");
@@ -123,7 +123,7 @@ field.value=url;field.setAttribute("readonly","");
 field.style.position="fixed";field.style.opacity="0";
 document.body.appendChild(field);field.select();
 const ok=document.execCommand("copy");document.body.removeChild(field);
-if(ok){setCopied(true);setShareNotice(en?"Link copied.":"결과 링크를 복사했어요.");}
+if(ok){setCopied(true);setShareNotice(en?"Result link copied.":"결과 링크가 복사되었습니다.");}else{setShareNotice(en?"Could not copy automatically. Please copy the page address.":"자동 복사에 실패했어요. 주소를 직접 복사해 주세요.");}
 }catch{}
 };
 const share=async()=>{
@@ -132,7 +132,8 @@ const title=en?"Big Five personality test result":"빅파이브 성격검사 결
 const text=en?"View my Big Five personality test result on UTILWISE.":"UTILWISE에서 나의 빅파이브 성격검사 결과를 확인해 보세요.";
 setShareNotice("");
 if(/KAKAOTALK/i.test(navigator.userAgent)){
-setShareNotice(en?"To share from KakaoTalk, open this page in Chrome or Samsung Internet using the ⋮ menu, then tap Share result.":"카카오톡 안에서는 공유창이 열리지 않을 수 있어요. 오른쪽 위 ⋮ 메뉴에서 ‘다른 브라우저로 열기’를 선택한 뒤 결과 공유를 눌러주세요.");
+await copyShareLink(url);
+setShareNotice(en?"KakaoTalk in-app browser cannot open the share menu here. The result link has been copied. Tap the ⋮ menu at the bottom of the screen and choose Open in another browser to share.":"카카오톡 안에서는 공유창을 열 수 없어 결과 링크를 복사했어요. 화면 아래쪽의 점 3개(⋮) 메뉴에서 ‘다른 브라우저로 열기’를 선택하면 공유할 수 있어요.");
 return;
 }
 if(navigator.share){
