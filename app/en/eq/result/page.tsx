@@ -1,0 +1,4 @@
+import type {Metadata} from "next";
+import EQExperienceEnglish from "../../../../components/EQExperienceEnglish";
+export const metadata:Metadata={title:"View Your Emotional Intelligence (EQ) Results | UTILWISE",description:"View your EQ reflection report across six dimensions and explore practical ideas for growth.",robots:{index:false,follow:true},alternates:{canonical:"/en/eq/result"},openGraph:{title:"View Your Emotional Intelligence (EQ) Results | UTILWISE",description:"Explore your EQ profile and practical reflection guide.",url:"https://utilwise.kr/en/eq/result",siteName:"UTILWISE",locale:"en_US",type:"website"},twitter:{card:"summary",title:"View Your EQ Results | UTILWISE",description:"Explore your EQ profile and reflection guide."}};
+export default function Page(){return <EQExperienceEnglish mode="result"/>}
