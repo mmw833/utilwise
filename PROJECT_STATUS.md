@@ -1,5 +1,11 @@
 # UTILWISE 프로젝트 상태
 
+## 2026-11-07 빅파이브 점수 계산 오류 수정
+- 50문항 검사에서 빠른 연속 선택으로 문항 이동 타이머가 중복 실행될 수 있는 문제를 방지하도록 선택 잠금 추가
+- 점수 계산 전 50개 응답이 모두 1~5의 유효한 정수인지 검사하고, 누락 응답이 있으면 해당 문항으로 이동하도록 보호 로직 추가
+- 변경 파일: components/BigFiveExperience.tsx
+- GitHub main 반영 완료. GitHub Actions 및 Cloudflare 운영 배포 확인 대기.
+
 - 기준 소스: GitHub 저장소 mmw833/utilwise의 main 브랜치
 - 기준 기술: Next.js 15, React 19, TypeScript, Cloudflare Workers + OpenNext
 - 현재 운영 대상 Worker: utilwise
