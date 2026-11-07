@@ -170,3 +170,8 @@ npm run preview
 - MBTI 및 빅파이브 결과 페이지는 KakaoTalk 인앱 브라우저를 감지하면 Web Share API 대신 결과 URL 복사를 시도한다.
 - Clipboard API가 실패하거나 지원되지 않으면 임시 textarea와 `document.execCommand('copy')`를 대체 사용한다.
 - 복사 성공/실패를 화면에 표시하며, 외부 브라우저 열기 안내는 카카오톡 화면 하단의 ⋮ 메뉴 기준으로 작성한다.
+
+
+### 공유 링크 미리보기 메타데이터
+- 빅파이브 결과 페이지는 `app/big-five/result/page.tsx` 및 `app/en/big-five/result/page.tsx`에서 페이지별 Open Graph와 Twitter 메타데이터를 정의한다.
+- 카카오톡 링크 미리보기는 공유 버튼의 `navigator.share()` 텍스트가 아니라 공유 URL을 크롤링해 읽은 페이지 메타데이터를 사용한다. 미리보기 변경 후에도 기존 URL 캐시가 남을 수 있다.
