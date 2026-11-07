@@ -188,3 +188,12 @@
 - 카카오톡 등 링크 미리보기에서 사이트 기본 제목 대신 '빅5 성격검사 결과보기' 제목과 결과 전용 설명이 사용되도록 설정
 - 변경 파일: app/big-five/result/page.tsx, app/en/big-five/result/page.tsx
 - 배포 및 카카오톡 링크 미리보기 캐시 갱신 확인 대기
+
+
+## 2026-11-07 전체 페이지별 공유 제목 규칙 적용
+- 계산기 11종의 Open Graph 공유 제목을 '대출이자 계산하기'처럼 계산 행동 중심으로 변경
+- MBTI/빅5 검사 시작 페이지는 검사하기, 결과 페이지는 결과 확인/보기 문구로 구분
+- 공유 설명도 각 페이지의 실제 기능에 맞게 설정
+- 변경된 계산기: area, loan, brokerage, salary, severance, date, dsr, fuel, rent-conversion, savings, vat
+- 변경된 검사 페이지: mbti, big-five
+- 배포 및 카카오톡 캐시 반영 확인 대기
