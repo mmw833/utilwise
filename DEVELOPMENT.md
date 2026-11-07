@@ -164,3 +164,9 @@ npm run preview
 - Web Share API를 지원하지 않거나 실행할 수 없는 환경에서는 Clipboard API를 사용하고, 해당 API도 사용할 수 없으면 `document.execCommand('copy')`를 보조 수단으로 사용한다.
 - 사용자가 공유창을 취소한 경우 자동으로 링크를 복사하지 않는다.
 - Web Share API의 공유 대상 앱은 브라우저·운영체제·설치 앱에 따라 다르므로 PC에서 카카오톡 표시 여부를 보장하지 않는다.
+
+
+### 카카오톡 인앱 브라우저 공유 처리
+- MBTI 및 빅파이브 결과 페이지는 KakaoTalk 인앱 브라우저를 감지하면 Web Share API 대신 결과 URL 복사를 시도한다.
+- Clipboard API가 실패하거나 지원되지 않으면 임시 textarea와 `document.execCommand('copy')`를 대체 사용한다.
+- 복사 성공/실패를 화면에 표시하며, 외부 브라우저 열기 안내는 카카오톡 화면 하단의 ⋮ 메뉴 기준으로 작성한다.
