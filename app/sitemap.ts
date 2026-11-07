@@ -27,6 +27,8 @@ const mbtiTypes = [
 const pages = [
   { route: "/", priority: 1, changeFrequency: "weekly" as const },
   { route: "/about", priority: 0.6, changeFrequency: "yearly" as const },
+  { route: "/privacy", priority: 0.4, changeFrequency: "yearly" as const },
+  { route: "/terms", priority: 0.4, changeFrequency: "yearly" as const },
   ...calculators.map((route) => ({
     route,
     priority: 0.8,
@@ -41,6 +43,8 @@ const pages = [
   })),
   { route: "/en", priority: 0.8, changeFrequency: "weekly" as const },
   { route: "/en/about", priority: 0.5, changeFrequency: "yearly" as const },
+  { route: "/en/privacy", priority: 0.4, changeFrequency: "yearly" as const },
+  { route: "/en/terms", priority: 0.4, changeFrequency: "yearly" as const },
   ...englishCalculators.map((route) => ({
     route,
     priority: 0.7,
