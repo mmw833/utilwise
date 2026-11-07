@@ -1,3 +1,12 @@
+## 2026-11-08 부피 계산기 한국어·영어 추가
+- 신규 계산기 `/volume`, `/en/volume` 구현
+- 직육면체 및 원기둥 부피 계산, mm/cm/m 입력 단위 선택
+- 계산 결과를 ㎥, L, ㎤, mL로 자동 변환하고 입력 변경 시 실시간 갱신
+- 계산 공식, 예시, FAQ, 실제 사용 가능 용량 관련 유의사항 제공
+- 한국어 홈 계산기 목록, 영어 홈 계산기 목록, sitemap 등록
+- 공통 구현: `components/VolumeCalculator.tsx`; 한국어 페이지: `app/volume/page.tsx`; 영어 페이지: `app/en/volume/page.tsx`
+- **검증 대기:** GitHub Actions 빌드, 직육면체/원기둥 계산값, 단위 변환, 모바일 레이아웃 및 Cloudflare 운영 반영 확인
+
 # UTILWISE 프로젝트 상태
 
 ## 2026-11-07 빅파이브 점수 계산 오류 수정
