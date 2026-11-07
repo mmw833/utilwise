@@ -211,3 +211,14 @@ npm run preview
 - 자체 제작 자기보고식 참고 테스트이며 표준화·타당화된 EQ 검사나 임상 진단으로 표현하지 않는다. 0~100점은 모집단 백분위가 아니다.
 - 검사 진행 및 개인 결과 페이지는 noindex,follow이며 소개 페이지만 sitemap에 등록한다.
 - CI 빌드 및 실제 브라우저/모바일 테스트는 변경 반영 후 확인해야 한다.
+
+
+## 재미형 심리테스트
+- 한국어 소개/검사/결과: `/psychology`, `/psychology/test`, `/psychology/result`
+- 영어 소개/검사/결과: `/en/psychology`, `/en/psychology/test`, `/en/psychology/result`
+- 공통 UI·질문·결과: `components/PsychologyExperience.tsx`; 스타일: `app/psychology/psychology.css`
+- 18개 상황형 선택 질문을 3개 축(혼자/함께 충전, 논리/공감, 계획/변화)에 배분하고 8개 조합 결과 제공
+- 결과 URL에는 세 축의 요약 점수만 포함. 개별 응답은 브라우저 상태로만 처리
+- 재미와 자기성찰 목적의 자체 콘텐츠이며 임상 진단 또는 표준화된 심리검사가 아님을 명시
+- 소개 페이지는 sitemap 등록, 검사 진행 및 개인 결과 페이지는 noindex,follow
+- 홈의 테스트 모음은 성격테스트(MBTI·Big Five·EQ)와 심리테스트를 별도 영역으로 구분. 생활 도구 카테고리는 보류
