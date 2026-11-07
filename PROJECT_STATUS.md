@@ -115,7 +115,12 @@
 
 
 ## 2026-11-07 MBTI 결과 공유 후 검사 유도 개선
-- 한국어·영어 MBTI 결과 화면에서 공유받은 방문자가 바로 검사를 시작할 수 있도록 눈에 띄는 '나도 MBTI 테스트하기 / Take the MBTI test too' 버튼을 결과 액션 첫 번째에 배치
+- 한국어·영어 MBTI 결과 화면에서 공유받은 방문자가 바로 검사를 시작할 수 있도록 눈에 띄는 'MBTI 테스트하기 / Take the MBTI test' 버튼을 결과 액션 첫 번째에 배치
 - 기존 결과 공유 기능은 보조 버튼으로 유지하고, 공유받은 방문자를 위한 짧은 안내 문구 추가
 - 변경 파일: app/mbti/result/[type]/MbtiResult.tsx, app/en/mbti/result/[type]/MbtiResult.tsx, app/mbti/mbti.css 및 프로젝트 기록 문서
 - GitHub main 반영 후 CI 빌드 및 Cloudflare 운영 반영 확인 필요
+
+
+## 2026-11-07 MBTI 테스트 버튼 문구 정리
+- 결과 화면은 본인과 공유받은 방문자 모두 보는 화면이므로 한국어 버튼을 'MBTI 테스트하기'로 변경
+- 영어 버튼도 'Take the MBTI test'로 통일해 불필요한 'too' 표현 제거
