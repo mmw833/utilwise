@@ -156,3 +156,11 @@
 - 분석은 응답 점수 기반 자기성찰 참고자료이며 진단·능력 판정·고정 유형이 아님을 명시
 - 변경 파일: components/BigFiveExperience.tsx, app/big-five/big-five.css
 - GitHub Actions 빌드 및 Cloudflare 운영 배포 검증 대기
+
+
+## 2026-11-07 빅파이브 결과 공유 기능 개선
+- 결과 공유 버튼에서 Web Share API를 우선 호출해 모바일 및 지원 PC 브라우저의 기본 공유 메뉴를 실행하도록 변경
+- 공유 API 미지원 또는 실행 오류 시 클립보드 복사로 대체하고 안내 문구 표시
+- 사용자가 공유 메뉴를 직접 닫은 경우에는 원치 않는 링크 복사를 하지 않도록 처리
+- 변경 파일: components/BigFiveExperience.tsx
+- GitHub Actions 빌드 및 실제 모바일·PC 브라우저 확인 대기
