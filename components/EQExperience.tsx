@@ -4,7 +4,7 @@ import {useEffect,useRef,useState} from "react";
 
 type Area={id:string;name:string;en:string;desc:string};
 type Question={area:number;reverse:boolean;ko:string;en:string};
-const areas:Area[]=[
+export const areas:Area[]=[
 {id:"awareness",name:"자기 감정 인식",en:"Emotional awareness",desc:"감정의 이름과 원인, 몸과 생각에 나타나는 신호를 알아차리는 능력"},
 {id:"regulation",name:"감정 조절",en:"Emotional regulation",desc:"강한 감정에 휩쓸리지 않고 반응을 선택하며 회복하는 능력"},
 {id:"empathy",name:"공감",en:"Empathy",desc:"타인의 감정과 관점을 이해하고 성급한 판단 없이 반응하는 능력"},
@@ -12,7 +12,7 @@ const areas:Area[]=[
 {id:"motivation",name:"자기 동기부여",en:"Self-motivation",desc:"좌절 후 다시 시작하고 감정을 목표를 향한 행동으로 연결하는 능력"},
 {id:"conflict",name:"갈등 대응",en:"Conflict management",desc:"불일치와 긴장 속에서도 문제를 분리해 대화하고 해결책을 찾는 능력"}
 ];
-const questions:Question[]=[
+export const questions:Question[]=[
 {area:0,reverse:false,ko:"나는 지금 느끼는 감정을 몇 가지 구체적인 단어로 설명할 수 있다.",en:"I can describe what I am feeling in specific words."},
 {area:0,reverse:false,ko:"감정이 갑자기 변할 때 그 직전에 있었던 상황이나 생각을 돌아본다.",en:"When my feelings shift, I reflect on what happened just before."},
 {area:0,reverse:true,ko:"불편한 기분이 들어도 무엇 때문에 그런지 잘 모를 때가 많다.",en:"I often feel uncomfortable without knowing why."},
