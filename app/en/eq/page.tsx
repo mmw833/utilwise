@@ -1,0 +1,4 @@
+import type {Metadata} from "next";
+import EQExperienceEnglish from "../../../components/EQExperienceEnglish";
+export const metadata:Metadata={title:"Free Emotional Intelligence (EQ) Test – 36 Questions | UTILWISE",description:"Explore emotional awareness, regulation, empathy, relationships, motivation, and conflict management with this free 36-question EQ self-reflection test.",alternates:{canonical:"/en/eq"},openGraph:{title:"Free Emotional Intelligence (EQ) Test | UTILWISE",description:"Explore six dimensions of emotional intelligence with 36 questions.",url:"https://utilwise.kr/en/eq",siteName:"UTILWISE",locale:"en_US",type:"website"}};
+export default function Page(){return <EQExperienceEnglish mode="intro"/>}
