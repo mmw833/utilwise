@@ -232,3 +232,13 @@ npm run preview
 - 소개 페이지만 sitemap 등록, 검사/결과는 noindex,follow
 - 브라우저 내 응답 계산, 공유 URL에는 요약 점수만 포함
 - GitHub main 반영. GitHub Actions 빌드 및 Cloudflare 운영 반영 검증 대기.
+
+
+## 심리테스트 2종 상세 결과 리포트
+- 공통 구현: `components/PsychologyCollection.tsx`의 `DETAIL` 데이터
+- 욕망 테스트와 겉과 속 테스트 각각 8개 결과 유형에 유형별 상세 문구를 제공한다.
+- 결과 구성: 기본 요약, 자연스러운 강점, 균형을 위해 살펴볼 점, 일상 적용 아이디어, 자기성찰 질문
+- 한국어·영어 결과는 항목과 깊이를 맞춰 관리한다.
+- 스타일은 `app/psychology/psychology.css`에서 관리한다.
+- 기존 12문항 및 3개 축 점수 계산, 결과 URL의 요약 점수 전달, 브라우저 내 응답 처리 방식은 변경하지 않는다.
+- 본 결과는 자기성찰을 위한 재미형 참고 콘텐츠이며 심리 진단이나 표준화된 평가가 아니다.
