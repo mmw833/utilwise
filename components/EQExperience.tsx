@@ -10,7 +10,7 @@ const areas:Area[]=[
 {id:"empathy",name:"공감",en:"Empathy",desc:"타인의 감정과 관점을 이해하고 성급한 판단 없이 반응하는 능력"},
 {id:"relationship",name:"대인관계·소통",en:"Relationship skills",desc:"감정과 요구를 존중 있게 표현하고 신뢰와 경계를 함께 만드는 능력"},
 {id:"motivation",name:"자기 동기부여",en:"Self-motivation",desc:"좌절 후 다시 시작하고 감정을 목표를 향한 행동으로 연결하는 능력"},
-{id:"conflict",name:"갈등 대응",en:"Conflict management",desc:"불일치와 긴장 속에서도 문제를 분리해 대화하고 해결책을 찾는 능>"}
+{id:"conflict",name:"갈등 대응",en:"Conflict management",desc:"불일치와 긴장 속에서도 문제를 분리해 대화하고 해결책을 찾는 능력"}
 ];
 const questions:Question[]=[
 {area:0,reverse:false,ko:"나는 지금 느끼는 감정을 몇 가지 구체적인 단어로 설명할 수 있다.",en:"I can describe what I am feeling in specific words."},
