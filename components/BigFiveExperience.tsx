@@ -93,7 +93,7 @@ useEffect(()=>{
 if(mode==="result"){
 const params=new URLSearchParams(window.location.search);
 const raw=traits.map((_,i)=>Number(params.get("s"+i)));
-if(raw.every(v=>Number.isFinite(v)&&v>=0&&v<=100))setScores(raw);else setScores(null);
+if(traits.every((_,i)=>params.has("s"+i))&&raw.every(v=>Number.isFinite(v)&&v>=0&&v<=100))setScores(raw);else setScores(null);
 }
 },[mode]);
 const current=items[index];
