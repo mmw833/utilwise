@@ -222,3 +222,13 @@ npm run preview
 - 재미와 자기성찰 목적의 자체 콘텐츠이며 임상 진단 또는 표준화된 심리검사가 아님을 명시
 - 소개 페이지는 sitemap 등록, 검사 진행 및 개인 결과 페이지는 noindex,follow
 - 홈의 테스트 모음은 성격테스트(MBTI·Big Five·EQ)와 심리테스트를 별도 영역으로 구분. 생활 도구 카테고리는 보류
+
+
+## 2026-11-07 심리테스트 2종 추가
+- '내 마음속 진짜 욕망은 무엇일까?'와 '사람들이 보는 나 vs 진짜 나'를 한국어·영어로 추가
+- 각 테스트 12문항, 3개 요약 축, 8개 결과 유형 및 결과 공유·재검사·다른 테스트 이동 제공
+- 소개/검사/결과: `/psychology/desire`, `/psychology/desire/test`, `/psychology/desire/result`; `/psychology/mirror` 및 `/en` 대응 경로
+- 공통 구현: `components/PsychologyCollection.tsx`; 기존 심리테스트 CSS 재사용
+- 소개 페이지만 sitemap 등록, 검사/결과는 noindex,follow
+- 브라우저 내 응답 계산, 공유 URL에는 요약 점수만 포함
+- GitHub main 반영. GitHub Actions 빌드 및 Cloudflare 운영 반영 검증 대기.
