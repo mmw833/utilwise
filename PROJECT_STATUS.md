@@ -136,3 +136,13 @@
 - 한국어·영어 페이지, 홈 테스트 모음 카드, sitemap 및 전용 반응형 스타일 추가
 - 주요 파일: `components/BigFiveExperience.tsx`, `app/big-five/**`, `app/en/big-five/**`
 - **검증 대기:** GitHub Actions 빌드, 점수 산식 및 문항 흐름 테스트, Cloudflare 배포 및 운영 URL 확인
+
+
+## 2026-11-07 빅파이브 결과 리포트 상세화
+- 한국어·영어 결과 화면에 5요인 레이더 차트와 0~100 점수 막대 시각화 추가
+- 점수 수준 라벨, 종합 프로필 요약, 요인별 일상·업무·활용 팁 상세 분석 추가
+- 대인관계·소통, 스트레스·회복 안내와 점수 해석상 주의사항 추가
+- 점수는 모집단 백분위가 아닌 자체 문항의 환산 점수임을 차트 및 안내문에 명확히 표시
+- 검사 문항, 자동 진행, 채점 산식, 공유 URL 구조는 유지
+- 변경 파일: components/BigFiveExperience.tsx, app/big-five/big-five.css
+- GitHub Actions 빌드 및 Cloudflare 운영 반영 확인 대기
