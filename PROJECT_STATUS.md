@@ -146,3 +146,13 @@
 - 검사 문항, 자동 진행, 채점 산식, 공유 URL 구조는 유지
 - 변경 파일: components/BigFiveExperience.tsx, app/big-five/big-five.css
 - GitHub Actions 빌드 및 Cloudflare 운영 반영 확인 대기
+
+
+## 2026-11-07 빅파이브 개인화 분석 리포트 확장
+- 기존 5요인 차트 및 상세 분석에 상위 2개 성향 조합 해석 추가
+- 상대적으로 높은 3개 성향에서 활용 가능한 강점 문구, 상대적으로 낮은 영역의 자기점검 안내 추가
+- 인간관계·소통, 업무·의사결정, 감정·스트레스·회복, 실천형 성장 가이드 영역 확장
+- 한국어·영어 문구를 공통 컴포넌트에서 제공하고 모바일 반응형 카드 레이아웃 추가
+- 분석은 응답 점수 기반 자기성찰 참고자료이며 진단·능력 판정·고정 유형이 아님을 명시
+- 변경 파일: components/BigFiveExperience.tsx, app/big-five/big-five.css
+- GitHub Actions 빌드 및 Cloudflare 운영 배포 검증 대기
