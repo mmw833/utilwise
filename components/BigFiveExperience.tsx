@@ -87,6 +87,7 @@ const [answers,setAnswers]=useState<number[]>([]);
 const [index,setIndex]=useState(0);
 const [scores,setScores]=useState<number[]|null>(null);
 const [copied,setCopied]=useState(false);
+const [shareNotice,setShareNotice]=useState("");
 const labels=en?["Strongly disagree","Disagree","Neither agree nor disagree","Agree","Strongly agree"]:["전혀 그렇지 않다","그렇지 않은 편이다","보통이다","그런 편이다","매우 그렇다"];
 const scoreValues=useMemo(()=>scores??[],[scores]);
 useEffect(()=>{
@@ -122,17 +123,24 @@ field.value=url;field.setAttribute("readonly","");
 field.style.position="fixed";field.style.opacity="0";
 document.body.appendChild(field);field.select();
 const ok=document.execCommand("copy");document.body.removeChild(field);
-if(ok)setCopied(true);
+if(ok){setCopied(true);setShareNotice(en?"Link copied.":"결과 링크를 복사했어요.");}
 }catch{}
 };
 const share=async()=>{
 const url=scoreUrl();
-const title=en?"My Big Five personality profile":"나의 빅파이브 성격 프로필";
+const title=en?"Big Five personality test result":"빅파이브 성격검사 결과 확인";
+const text=en?"View my Big Five personality test result on UTILWISE.":"UTILWISE에서 나의 빅파이브 성격검사 결과를 확인해 보세요.";
+setShareNotice("");
+if(/KAKAOTALK/i.test(navigator.userAgent)){
+setShareNotice(en?"To share from KakaoTalk, open this page in Chrome or Samsung Internet using the ⋮ menu, then tap Share result.":"카카오톡 안에서는 공유창이 열리지 않을 수 있어요. 오른쪽 위 ⋮ 메뉴에서 ‘다른 브라우저로 열기’를 선택한 뒤 결과 공유를 눌러주세요.");
+return;
+}
 if(navigator.share){
-try{await navigator.share({title,text:en?"See my Big Five personality profile.":"나의 빅파이브 성격 분석 결과를 확인해 보세요.",url});setCopied(false);return;}
+try{await navigator.share({title,text,url});setCopied(false);return;}
 catch(error){if(error instanceof DOMException&&error.name==="AbortError")return;}
 }
 await copyShareLink(url);
+if(!navigator.clipboard?.writeText)setShareNotice(en?"Copy the page address to share your result.":"결과 주소를 복사해 공유해 주세요.");
 };
 if(mode==="intro")return <main className="bf-page"><header className="bf-header"><Link href={en?"/en":"/"} className="bf-logo">UTIL<span>WISE</span>.</Link><nav><Link href={en?"/en":"/"}>{en?"Explore tools":"전체 도구 둘러보기"}</Link><Link href={en?"/big-five":"/en/big-five"}>{en?"한국어":"English"}</Link></nav></header><section className="bf-hero"><div className="bf-eyebrow">PERSONALITY · FIVE FACTORS</div><h1>{en?"Discover your personality in five dimensions":"다섯 가지 차원으로 알아보는 나의 성격"}</h1><p>{en?"Explore your tendencies across five broad personality traits with 50 thoughtful questions.":"50개의 질문으로 다섯 가지 성격 차원을 살펴보고, 나의 성향을 입체적으로 이해해 보세요."}</p><div className="bf-facts"><span>{en?"About 7–10 min":"약 7~10분"}</span><span>{en?"50 questions":"50문항"}</span><span>{en?"Free · No sign-up":"무료 · 회원가입 없음"}</span></div><Link className="bf-primary" href={(en?"/en":"")+"/big-five/test"}>{en?"Start the test":"검사 시작하기"} →</Link><small>{en?"An educational self-reflection tool, not a clinical or diagnostic assessment.":"자기이해를 돕기 위한 참고용 검사이며 임상 진단이나 전문 심리검사가 아닙니다."}</small></section><section className="bf-traits">{traits.map(([code,koName,enName,koDesc,enDesc])=><article key={code}><b>{code}</b><div><h2>{en?enName:koName}</h2><p>{en?enDesc:koDesc}</p></div></article>)}</section><section className="bf-method"><h2>{en?"How it works":"검사 방법"}</h2><p>{en?"Answer each statement based on how you generally think, feel, and behave. There are no right or wrong answers.":"각 문항을 읽고 평소의 생각과 행동에 얼마나 가까운지 선택하면 됩니다. 정답은 없으니 평소의 나를 기준으로 답해주세요."}</p><p>{en?"Your answers are scored locally in your browser and are not sent to our server.":"응답은 브라우저에서만 계산되며 서버로 전송되지 않습니다."}</p><p>{en?"This original 50-item questionnaire is informed by the public-domain IPIP framework. It is not an official IPIP scale and has not been independently validated as a standardized Korean or English instrument.":"공개 IPIP의 5요인 구성 체계를 참고해 자체 작성한 50문항입니다. 공식 IPIP 척도 자체가 아니며, 표준화된 한국어·영어 검사로 별도 타당화된 도구는 아닙니다."}</p><Link href={(en?"/en":"")+"/big-five/test"} className="bf-primary">{en?"Begin":"검사 시작하기"} →</Link></section><footer className="bf-footer"><Link href={en?"/en":"/"}>UTILWISE</Link> · © 2026</footer></main>;
 if(mode==="test")return <main className="bf-page"><header className="bf-header"><Link href={en?"/en":"/"} className="bf-logo">UTIL<span>WISE</span>.</Link><span>{en?"Big Five Test":"빅파이브 검사"}</span><Link href={en?"/en/big-five":"/big-five"}>{en?"한국어":"English"}</Link></header><section className="bf-test"><div className="bf-progress-head"><span>{en?"Question":"문항"} {index+1} / 50</span><span>{Math.round((index+1)/50*100)}%</span></div><div className="bf-progress"><i style={{width:((index+1)/50*100)+"%"}}/></div><div className="bf-question"><div className="bf-eyebrow">{en?"THINK ABOUT YOUR USUAL SELF":"평소의 나를 떠올려 보세요"}</div><h1>{en?current.en:current.ko}</h1><p>{en?"Choose how much you agree with this statement.":"이 문장이 평소의 나와 얼마나 가까운지 선택해 주세요."}</p></div><div className="bf-options">{labels.map((label,i)=><button key={label} className={answers[index]===i+1?"selected":""} onClick={()=>choose(i+1)}><span>{i+1}</span>{label}</button>)}</div><div className="bf-test-nav"><button disabled={index===0} onClick={()=>setIndex(i=>Math.max(0,i-1))}>{en?"← Previous":"← 이전 문항"}</button><span>{en?"Your answers stay in this browser.":"응답은 이 브라우저 안에서만 처리됩니다."}</span></div></section></main>;
@@ -216,5 +224,5 @@ return <main className="bf-page"><header className="bf-header"><Link href={en?"/
 <section className="bf-personalized"><div className="bf-section-heading"><div className="bf-eyebrow">{en?"WELLBEING":"WELLBEING"}</div><h2>{en?"Emotions, stress and recovery":"감정·스트레스·회복 방식"}</h2></div><article className="bf-insight-card bf-wide-insight"><p>{stressText}</p><div className="bf-recovery-grid"><div><b>{en?"1. Spot the signal":"1. 신호 알아차리기"}</b><p>{en?"Notice changes in sleep, concentration, patience, or physical tension.":"수면, 집중력, 인내심, 신체 긴장에 변화가 있는지 살펴보세요."}</p></div><div><b>{en?"2. Reduce the load":"2. 부담 줄이기"}</b><p>{en?"Choose the next manageable action and postpone what is not urgent.":"지금 할 수 있는 다음 행동 하나를 정하고 급하지 않은 일은 미뤄보세요."}</p></div><div><b>{en?"3. Restore connection":"3. 회복 자원 활용하기"}</b><p>{en?"Use rest, movement, or a trusted conversation that works for you.":"자신에게 맞는 휴식, 가벼운 움직임, 믿을 만한 사람과의 대화를 활용하세요."}</p></div></div></article></section>
 <section className="bf-personalized"><div className="bf-section-heading"><div className="bf-eyebrow">{en?"NEXT STEPS":"NEXT STEPS"}</div><h2>{en?"A practical growth guide":"나를 위한 성장 가이드"}</h2><p>{en?"Choose one or two ideas that feel realistic. Small experiments are more useful than trying to change everything at once.":"모든 것을 한 번에 바꾸기보다 지금 실천할 수 있는 한두 가지부터 선택해 보세요."}</p></div><article className="bf-growth-card">{growthTips.map((tip,i)=><div className="bf-growth-step" key={i}><span>{i+1}</span><p>{tip}</p></div>)}</article></section>
 <div className="bf-summary bf-caveat"><h2>{en?"How to read this result":"결과를 읽을 때 참고해 주세요"}</h2><p>{en?"The 0–100 values are transformed scores from this questionnaire, not percentiles or comparisons with a representative population. A higher or lower score is not better or worse. The questionnaire is an original self-reflection tool informed by the IPIP five-factor framework; it is not an official IPIP scale or a validated standardized assessment.":"0~100 점수는 이 자체 문항의 응답을 환산한 값이며, 인구 집단에서의 백분위나 다른 사람과의 비교 점수가 아닙니다. 높고 낮음은 우열을 뜻하지 않아요. 이 검사는 IPIP 5요인 체계를 참고해 자체 작성한 자기이해용 문항으로, 공식 IPIP 척도나 표준화·타당화된 전문 심리검사가 아닙니다."}</p><p>{en?"Use the report as a starting point for reflection, not as a diagnosis or a fixed description of who you are.":"이 결과는 자신을 돌아보는 출발점으로 활용하고, 진단이나 고정된 성격 규정으로 받아들이지 않는 것이 좋아요."}</p></div>
-<div className="bf-actions"><button className="bf-primary" onClick={share}>{en?"Share result":"결과 공유하기"} ↗</button><button onClick={()=>window.location.href=(en?"/en":"")+"/big-five/test"}>{en?"Retake the test":"다시 검사하기"}</button></div>{copied&&<p className="bf-copied">{en?"Sharing is unavailable, so the result link was copied.":"공유 메뉴를 사용할 수 없어 결과 링크를 복사했어요."}</p>}</section><footer className="bf-footer"><Link href={en?"/en":"/"}>UTILWISE</Link> · © 2026</footer></main>;
+<div className="bf-actions"><button className="bf-primary" onClick={share}>{en?"Share result":"결과 공유하기"} ↗</button><button onClick={()=>window.location.href=(en?"/en":"")+"/big-five/test"}>{en?"Take the Big Five test":"빅5 성격검사하기"}</button></div>{(copied||shareNotice)&&<p className="bf-copied" role="status">{shareNotice||(en?"Result link copied.":"결과 링크를 복사했어요.")}</p>}</section><footer className="bf-footer"><Link href={en?"/en":"/"}>UTILWISE</Link> · © 2026</footer></main>;
 }
