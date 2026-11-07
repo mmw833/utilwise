@@ -112,3 +112,10 @@
 - 한국어/영어 홈 계산기 목록 및 sitemap에 등록
 - 반응형 입력·결과 UI 스타일 추가
 - 검증 대기: GitHub Actions 빌드 및 실제 브라우저 계산 테스트. 날짜 경계(윤년, 월말, 과거/미래 날짜), 근무일 포함 옵션 확인 필요.
+
+
+## 2026-11-07 MBTI 결과 공유 후 검사 유도 개선
+- 한국어·영어 MBTI 결과 화면에서 공유받은 방문자가 바로 검사를 시작할 수 있도록 눈에 띄는 '나도 MBTI 테스트하기 / Take the MBTI test too' 버튼을 결과 액션 첫 번째에 배치
+- 기존 결과 공유 기능은 보조 버튼으로 유지하고, 공유받은 방문자를 위한 짧은 안내 문구 추가
+- 변경 파일: app/mbti/result/[type]/MbtiResult.tsx, app/en/mbti/result/[type]/MbtiResult.tsx, app/mbti/mbti.css 및 프로젝트 기록 문서
+- GitHub main 반영 후 CI 빌드 및 Cloudflare 운영 반영 확인 필요
