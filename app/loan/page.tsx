@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "대출 이자 계산기 | 월 상환금·총이자 계산 - UTILWISE",
   description: "대출 원금, 연 금리, 상환 기간을 입력해 원리금균등·원금균등 방식의 월 상환액과 총 이자를 비교해 보세요.",
   alternates: { canonical: "/loan" },
-  openGraph: { title: "대출 이자 계산기 - UTILWISE", description: "대출 월 상환금과 총 이자를 간편하게 계산하고 비교하세요.", url: "https://utilwise.kr/loan", siteName: "UTILWISE", locale: "ko_KR", type: "website" },
+  openGraph: { title: "대출이자 계산하기", description: "대출 원금과 금리, 기간을 입력해 월 상환액과 총 이자를 계산해 보세요.", url: "https://utilwise.kr/loan", siteName: "UTILWISE", locale: "ko_KR", type: "website" },
 };
 
 export default function Page() {
