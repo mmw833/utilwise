@@ -74,7 +74,7 @@ const highTips=[
 "주변을 돕는 만큼 자신의 회복과 경계도 같은 수준으로 중요하게 다뤄보세요."
 ];
 export default function EQExperience({mode}:{mode:"intro"|"test"|"result"}){
-const [,setAnswers]=useState<number[]>([]);const [index,setIndex]=useState(0);const [scores,setScores]=useState<number[]|null>(null);const lock=useRef(false);const [notice,setNotice]=useState("");
+const [answers,setAnswers]=useState<number[]>([]);const [index,setIndex]=useState(0);const [scores,setScores]=useState<number[]|null>(null);const lock=useRef(false);const [notice,setNotice]=useState("");
 useEffect(()=>{if(mode==="result"){const p=new URLSearchParams(window.location.search);const vals=areas.map((_,i)=>Number(p.get("s"+i)));if(areas.every((_,i)=>p.has("s"+i))&&vals.every(v=>Number.isFinite(v)&&v>=0&&v<=100))setScores(vals);}},[mode]);
 const finish=(a:number[])=>{const missing=questions.findIndex((_,i)=>!Number.isInteger(a[i])||a[i]<1||a[i]>5);if(missing>=0){setAnswers(a);setIndex(missing);lock.current=false;return;}const result=areas.map((_,area)=>{const q=questions.map((item,i)=>({item,value:a[i]})).filter(x=>x.item.area===area);const avg=q.reduce((sum,x)=>sum+(x.item.reverse?6-x.value:x.value),0)/q.length;return Math.round((avg-1)*25);});window.location.href="/eq/result?"+result.map((v,i)=>"s"+i+"="+v).join("&");};
 const choose=(v:number)=>{if(lock.current)return;lock.current=true;const a=[...answers];a[index]=v;setAnswers(a);if(index===questions.length-1)finish(a);else{setTimeout(()=>{setIndex(x=>Math.min(x+1,questions.length-1));lock.current=false;},110);}};
