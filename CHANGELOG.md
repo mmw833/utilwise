@@ -1,3 +1,12 @@
+
+## 2026-11-07 영어 EQ 테스트 추가 및 다국어 동시 관리 원칙
+- 영어 홈 테스트 모음에 Emotional Intelligence (EQ) Test 카드 추가
+- `/en/eq`, `/en/eq/test`, `/en/eq/result` 영어 소개·36문항 검사·결과 리포트 페이지 구현
+- 기존 EQ의 영어 문항 데이터를 재사용하고 6개 영역 점수 산식과 `s0`~`s5` 결과 공유 URL 규칙을 한국어판과 동일하게 적용
+- 영어 페이지 SEO 메타데이터, noindex 설정, 전용 레이아웃 및 sitemap 등록
+- `AGENTS.md`에 신규 기능/수정 시 한국어·영어 버전 동시 확인 원칙 추가
+- 변경 파일: `app/en/page.tsx`, `app/en/eq/**`, `components/EQExperience.tsx`, `components/EQExperienceEnglish.tsx`, `app/sitemap.ts`, `AGENTS.md`
+- **검증 대기:** GitHub Actions 빌드, 영어 36문항 응답/역채점/결과 URL 새로고침/공유, Cloudflare 운영 배포
 # CHANGELOG
 
 ## 2026-11-07 EQ 빠른 응답 및 결과 이동 안정화
