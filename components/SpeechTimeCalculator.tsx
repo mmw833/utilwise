@@ -1,6 +1,6 @@
 "use client";
 import {useMemo,useState} from "react";
-const fmt=(n:number)=>{const v=Math.max(0,Math.round(n)),m=Math.floor(v/60),s=v%60;return m>0?m+"분 "+s+"초":s+"초";};
+const fmt=(n:number,en=false)=>{const v=Math.max(0,Math.round(n)),m=Math.floor(v/60),s=v%60;return en?(m>0?m+" min "+s+" sec":s+" sec"):(m>0?m+"분 "+s+"초":s+"초");};
 const count=(s:string)=>Array.from(s).length;
 const words=(s:string)=>s.trim()?s.trim().split(/\s+/u).length:0;
 const sentences=(s:string)=>(s.match(/[^.!?。！？\n]+[.!?。！？]+|[^.!?。！？\n]+$/gu)||[]).filter(x=>x.trim()).length;
@@ -11,7 +11,7 @@ export default function SpeechTimeCalculator({english=false}:{english?:boolean})
  const source=mode==="basic"?script:[intro,body,closing].filter(Boolean).join("\n\n");
  const stat=useMemo(()=>({all:count(source),no:count(source.replace(/\s/gu,"")),word:words(source),sentence:sentences(source)}),[source]);
  const rate=(en?130:300)*speed/100,seconds=(en?stat.word:stat.no)/rate*60+pause,targetSeconds=(Number(target)||5)*60,diff=seconds-targetSeconds,suggest=Math.round(targetSeconds/60*rate);
- const summary=(en?"Estimated time: ":"예상 발표시간: ")+fmt(seconds)+"\n"+t.chars+": "+stat.all+"\n"+t.words+": "+stat.word+"\n"+t.target+": "+target+(en?" min":"분");
+ const summary=(en?"Estimated time: ":"예상 발표시간: ")+fmt(seconds,en)+"\n"+t.chars+": "+stat.all+"\n"+t.words+": "+stat.word+"\n"+t.target+": "+target+(en?" min":"분");
  const copy=async()=>{try{await navigator.clipboard.writeText(summary);setCopied(true);}catch{setCopied(false);}};
  const clear=()=>{setScript("");setIntro("");setBody("");setClosing("");setPause(0);setCopied(false);};
  const part=(id:string,label:string,value:string,set:(v:string)=>void,placeholder:string)=><section className="panel speech-input-panel" key={id}><label className="text-tool-label" htmlFor={"speech-"+id}>{label}</label><textarea id={"speech-"+id} value={value} onChange={e=>set(e.target.value)} placeholder={placeholder}/><div className="speech-segment-count">{en?words(value)+" words":count(value.replace(/\s/gu,""))+"자"}</div></section>;
@@ -23,7 +23,7 @@ export default function SpeechTimeCalculator({english=false}:{english?:boolean})
  <div className="speech-target-card"><strong>{t.suggest}</strong><div className="speech-target-number">{suggest.toLocaleString(en?"en-US":"ko-KR")} {en?"words":"자"}</div></div></section>
  <section className="speech-editor">{mode==="basic"?<div className="panel speech-input-panel"><label className="text-tool-label" htmlFor="speech-script">{t.script}</label><textarea id="speech-script" value={script} onChange={e=>setScript(e.target.value)} placeholder={t.placeholder}/></div>:<div className="speech-segments">{part("intro",t.intro,intro,setIntro,t.introPlaceholder)}{part("main",t.main,body,setBody,t.mainPlaceholder)}{part("closing",t.closing,closing,setClosing,t.closingPlaceholder)}</div>}
  <div className="speech-stats">{[[stat.all,t.chars],[stat.no,t.noSpaces],[stat.word,t.words],[stat.sentence,t.sentences]].map(([v,l])=><div key={String(l)}><strong>{Number(v).toLocaleString(en?"en-US":"ko-KR")}</strong><span>{l}</span></div>)}</div>
- <section className="speech-result"><div><span>{t.result}</span><strong>{source.trim()?fmt(seconds):(en?"0 sec":"0초")}</strong><small>{source.trim()?Math.floor(seconds/60)+(en?" min ":"분 ")+Math.round(seconds%60)+(en?" sec":"초"):t.empty}</small></div><div className="speech-target-status">{!source.trim()?t.empty:Math.abs(diff)<=30?t.onTarget:diff>0?t.over+" "+fmt(diff):t.under+" "+fmt(-diff)}</div></section>
+ <section className="speech-result"><div><span>{t.result}</span><strong>{source.trim()?fmt(seconds):(en?"0 sec":"0초")}</strong><small>{source.trim()?Math.floor(seconds/60)+(en?" min ":"분 ")+Math.round(seconds%60)+(en?" sec":"초"):t.empty}</small></div><div className="speech-target-status">{!source.trim()?t.empty:Math.abs(diff)<=30?t.onTarget:diff>0?t.over+" "+fmt(diff,en):t.under+" "+fmt(-diff,en)}</div></section>
  <div className="speech-actions"><button type="button" className="text-tool-secondary" onClick={clear}>{t.clear}</button><button type="button" className="primary" onClick={copy} disabled={!source.trim()}>{copied?t.copied:t.copy}</button></div></section></div>
  <section className="text-tool-guide"><h2>{t.guide}</h2><p>{t.guideText}</p></section><p className="text-tool-privacy">{t.privacy}</p></section></main>;
 }
