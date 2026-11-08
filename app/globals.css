@@ -164,3 +164,36 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 /* QR code generator */
 .qr-page{margin-top:26px}.qr-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(280px,.9fr);gap:18px;align-items:start}.qr-form,.qr-preview{min-width:0}.qr-mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 20px}.qr-mode-grid .tab{min-width:0;padding:10px 8px}.qr-form .field textarea{width:100%;min-height:112px;padding:12px;border:1px solid var(--line);border-radius:9px;resize:vertical;font:inherit;line-height:1.6;color:var(--ink)}.qr-form .field input,.qr-form .field select{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink)}.qr-image-frame{min-height:320px;display:grid;place-items:center;padding:18px;border:1px dashed #d6e0eb;border-radius:13px;background:#f8fafc}.qr-image-frame img{display:block;max-width:100%;height:auto;image-rendering:pixelated;background:#fff}.qr-empty{max-width:250px;text-align:center;color:var(--muted);font-size:13px;line-height:1.7}.qr-download{display:block;margin-top:16px;text-align:center;text-decoration:none}.qr-error{font-size:12px;color:#b42318;line-height:1.5}.qr-guide{margin-top:28px;padding:24px;background:#f7f8fa;border-radius:15px;line-height:1.75}.qr-guide h2{font-size:19px;margin:0 0 9px}.qr-guide h2:not(:first-child){margin-top:26px}.qr-guide h3{font-size:14px;margin:16px 0 4px}.qr-guide p{font-size:13px;color:var(--muted);margin:0}.qr-title{font-size:32px;letter-spacing:-1px;margin:12px 0 8px}.qr-back{margin-top:24px;text-align:center}.qr-back a{font-size:13px;color:var(--blue);font-weight:700;text-decoration:underline;text-underline-offset:3px}
 @media(max-width:760px){.qr-layout{grid-template-columns:1fr}.qr-image-frame{min-height:280px}.qr-form,.qr-preview{padding:18px}.qr-guide{padding:18px}.qr-mode-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Browser-based image utilities */
+.image-tool-page{max-width:980px}
+.image-tool-page>h1{font-size:clamp(28px,4vw,38px);letter-spacing:-1.2px;margin:12px 0}
+.image-tool{margin-top:26px}
+.image-tool-panel{max-width:760px;margin:0 auto}
+.image-tool .field input[type=file]{padding:12px;border:1px dashed #cbd5e1;border-radius:10px;background:#f8fafc;width:100%}
+.image-tool .field input[type=range]{accent-color:var(--blue);padding:0}
+.image-file-list{display:grid;gap:7px;margin:12px 0 18px}
+.image-file{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 11px;border:1px solid var(--line);border-radius:8px;font-size:12px;min-width:0}
+.image-file span{overflow-wrap:anywhere}.image-file small{white-space:nowrap;color:var(--muted)}
+.image-size-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.image-check{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13px;color:#40516a}
+.image-check input{accent-color:var(--blue);width:16px;height:16px}
+.image-process{width:100%;margin-top:8px}
+.image-process:disabled{opacity:.55;cursor:not-allowed}
+.image-privacy{margin-top:14px;text-align:center}
+.image-error{color:#b42318;font-size:13px;margin:12px 0}
+.image-output{margin:28px 0 0}
+.image-output h2{font-size:21px;margin:0 0 14px}
+.image-output-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.image-output-card{min-width:0;border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.image-output-card img{width:100%;height:190px;object-fit:contain;background:#f8fafc;border-radius:9px}
+.image-output-card>strong{font-size:13px;overflow-wrap:anywhere}
+.image-stats{display:grid;gap:5px;font-size:12px;color:var(--muted)}
+.image-download{text-align:center;text-decoration:none;display:block;margin-top:auto}
+.image-tool-guide{max-width:760px;margin:34px auto 0;padding:24px;background:#f7f8fa;border-radius:14px;line-height:1.8}
+.image-tool-guide h2{font-size:18px;margin:22px 0 8px}.image-tool-guide h2:first-child{margin-top:0}
+.image-tool-guide p,.image-tool-guide li{font-size:14px;color:#53647b}
+.image-tool-guide a{color:var(--blue);text-decoration:underline;text-underline-offset:3px}
+.image-tool-guide ol{padding-left:22px}
+@media(max-width:600px){.image-size-fields{grid-template-columns:1fr}.image-output-grid{grid-template-columns:1fr}.image-output-card img{height:220px}.image-tool-guide{padding:18px}.image-tool-panel{padding:18px}}
