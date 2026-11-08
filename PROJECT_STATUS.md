@@ -1,3 +1,16 @@
+## 2026-11-08 QR 코드 생성기 및 온라인 도구 카테고리 추가 (작업 브랜치)
+- 한국어·영어 신규 카테고리 랜딩: `/online-tools`, `/en/online-tools`
+- QR 코드 생성기: `/qr-code-generator`, `/en/qr-code-generator`
+- URL, 일반 텍스트, Wi-Fi(WPA/WPA2·암호 없음), 이메일(mailto), 전화번호(tel) 유형 지원
+- QR 코드 크기 선택 및 PNG 다운로드 지원, 한글 입력은 UTF-8 QR 데이터로 인코딩
+- qrcode 라이브러리로 브라우저 내 생성. 입력 데이터는 UTILWISE 서버로 전송하지 않음
+- 한국어·영어 홈 카테고리, PC/모바일 내비게이션, sitemap, 페이지별 title/description/canonical/hreflang/Open Graph 반영
+- 신규 파일: `components/QRCodeGenerator.tsx`, `app/qr-code-generator/page.tsx`, `app/en/qr-code-generator/page.tsx`, `app/online-tools/page.tsx`, `app/en/online-tools/page.tsx`
+- 변경 파일: `package.json`, `app/page.tsx`, `app/en/page.tsx`, `app/sitemap.ts`, `app/globals.css`, 개인정보처리방침 및 프로젝트 문서
+- 작업 브랜치: `feature/qr-code-generator`
+- **검증 대기:** GitHub Actions 빌드, 한글/영문·URL·Wi-Fi·이메일·전화 QR 스캔, PNG 다운로드, PC/모바일 레이아웃, 개인정보처리방침 문구 확인
+- **배포 상태:** 아직 main 병합 및 Cloudflare 운영 배포 전. 배포 완료로 간주하지 않음
+
 ## 2026-11-08 영어권 검색 유입 SEO 강화
 - 영어 방문자 비중이 약 50%라는 운영자 공유 정보를 반영해 영어 페이지를 독립적인 글로벌 검색 유입 랜딩 페이지로 보완
 - 영어 계산기별 title/description을 실제 기능과 국가 적용 범위에 맞게 재작성: 일반 도구는 글로벌 검색 의도, 한국 제도 기반 금융·부동산 도구는 South Korea/Korea/KRW 범위를 명시
