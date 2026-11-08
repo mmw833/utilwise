@@ -1,0 +1,11 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import LanguageSwitcher from "../../../components/LanguageSwitcher";
+import ImageTools from "../../../components/ImageTools";
+export const metadata: Metadata = {
+  title: "Free Image Compressor | Reduce JPG, PNG & WebP Size - UTILWISE",
+  description: "Compress JPG, PNG, and WebP images for free. Adjust quality, process multiple images, and download results. Files are processed locally in your browser.",
+  alternates: { canonical: "/en/image-compressor", languages: { en: "/en/image-compressor", "ko-KR": "/image-compressor" } },
+  openGraph: { title: "Free Image Compressor", description: "Reduce JPG, PNG, and WebP image file sizes directly in your browser.", url: "https://utilwise.kr/en/image-compressor", siteName: "UTILWISE", locale: "en_US", type: "website" }
+};
+export default function Page(){return <main lang="en"><header className="wrap header"><Link href="/en" className="logo">UTIL<span>WISE</span>.</Link><nav className="nav"><Link href="/en/online-tools">Online Tools</Link><LanguageSwitcher/></nav></header><section className="wrap section image-tool-page"><div className="eyebrow">UTILWISE ONLINE TOOLS</div><h1>Free Image Compressor</h1><p className="sub">Reduce JPG, PNG, and WebP image sizes for websites, blogs, and documents.</p><ImageTools mode="compress" lang="en"/><div className="image-tool-guide"><h2>What is image compression?</h2><p>Image compression balances visual quality and file size to reduce storage use and the amount of data transferred by a webpage. Lower quality settings can create smaller files but may reduce fine details.</p><h2>How to compress images</h2><ol><li>Select one or more JPG, PNG, or WebP images.</li><li>Adjust the quality and choose an output format.</li><li>Compare the result with the original file and download it.</li></ol><p>Images are processed in your browser and are not uploaded to UTILWISE servers. Results vary depending on the source image and its content.</p><h2>Related tools</h2><p>Use the <Link href="/en/image-resizer">image resizer</Link> to change pixel dimensions or try the <Link href="/en/qr-code-generator">QR code generator</Link>.</p></div></section></main>}
