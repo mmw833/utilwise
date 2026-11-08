@@ -306,3 +306,11 @@ npm run preview
 - 기본(PC) 화면에서는 `.mobile-language-toggle`와 `.mobile-menu`를 숨기고 데스크톱 `.nav` 안의 언어 전환만 표시한다.
 - 760px 이하에서는 `.nav`를 숨기고 모바일 언어 전환과 햄버거 메뉴를 표시한다.
 - 관련 공통 스타일은 `app/globals.css`의 Mobile navigation 구역에서 관리한다. 이 영역의 CSS 줄바꿈은 실제 줄바꿈이어야 하며 문자열 `\\n`이 CSS 파일에 들어가지 않도록 한다.
+
+
+## 발표시간 계산기
+- 공통 UI/계산: `components/SpeechTimeCalculator.tsx`
+- 한국어: `/text-tools/speech-time`, 영어: `/en/text-tools/speech-time`
+- 한국어 예상 시간은 공백 제외 글자 수 ÷ 분당 글자 수(기본 300자), 영어는 단어 수 ÷ 분당 단어 수(기본 130단어)로 산출한다.
+- 말하기 속도는 기본 속도의 60~140%, 목표 시간과 추가 여유 시간(초)을 설정할 수 있다. 고급 모드는 도입·본론·마무리 원고를 구분한다.
+- 계산은 브라우저에서 수행하며 원고를 서버에 전송하지 않는다.
