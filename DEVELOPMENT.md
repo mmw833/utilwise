@@ -1,5 +1,18 @@
 
 
+## 온라인 도구 및 QR 코드 생성기
+- 온라인 도구 카테고리: `/online-tools`, 영어 `/en/online-tools`
+- QR 코드 생성기: `/qr-code-generator`, 영어 `/en/qr-code-generator`
+- 공통 UI 및 생성: `components/QRCodeGenerator.tsx`
+- `qrcode` 패키지의 브라우저용 API로 URL, 텍스트, Wi-Fi, 이메일, 전화번호 QR 코드를 생성한다.
+- Wi-Fi QR 문자열은 WIFI 형식이며 네트워크 이름/비밀번호의 구분 문자를 이스케이프한다. WPA/WPA2 및 암호 없는 네트워크를 지원한다.
+- 이메일은 `mailto:` URI, 전화번호는 `tel:` URI로 인코딩한다.
+- 생성 이미지는 PNG data URL이며 다운로드는 브라우저에서 수행한다.
+- 사용자 입력과 QR 이미지 데이터는 서버로 전송하지 않는다. 정책 페이지에도 브라우저 내 처리 사실을 명시한다.
+- 새 의존성: `qrcode` 및 타입 패키지 `@types/qrcode`
+- 검증: 한국어·영어 문자 인코딩, Wi-Fi 연결 QR, 이메일/전화 앱 연결, QR 스캔, PNG 다운로드, 모바일 레이아웃 및 GitHub Actions 빌드
+
+
 ## 영어권 검색 최적화 운영
 - 영어 페이지는 한국어 페이지의 단순 번역이 아니라 영어 검색 의도에 맞는 고유 title, description, H1, 본문을 갖춘다.
 - 일반 도구(날짜, 부피, 텍스트, 연료 등)는 국제 사용자 검색 의도를 고려하고, 한국의 법률·세금·급여·부동산 계산기는 South Korea / Korea / KRW 적용 범위를 제목 또는 설명과 본문에 명확히 표시한다.
