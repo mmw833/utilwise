@@ -369,3 +369,10 @@ npm run preview
 ## 팁 계산기
 - 한국어: /tip, 영어: /en/tip; 공통 계산: components/TipCalculator.tsx
 - 팁=결제금액×선택비율, 총액=결제금액+팁, 인원별 분할 지원. 통화 표시는 환율 변환이 아님.
+
+## PDF 도구
+- `pdf-lib`를 사용해 PDF 합치기, 페이지 추출, 페이지 회전, 페이지 순서 변경, 이미지 PDF 변환을 브라우저에서 처리한다.
+- 공통 UI 및 로직: `components/PDFTools.tsx`
+- 각 도구는 `app/[tool]/page.tsx`, 영어 버전은 `app/en/[tool]/page.tsx`에서 공통 컴포넌트를 사용한다.
+- 파일 업로드 API나 서버 저장소를 사용하지 않는다. 대용량 파일은 브라우저 메모리 제약을 받을 수 있다.
+- PDF 압축, 암호화/복호화, OCR은 제공하지 않는다.
