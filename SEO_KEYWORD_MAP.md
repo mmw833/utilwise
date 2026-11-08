@@ -134,3 +134,16 @@ Notes:
 - 주요 페이지별 검색 결과 title/description 실제 표시와 canonical 선택 확인
 - 모바일 Core Web Vitals 및 실제 사용자 경험 확인
 - 법률·세금·금융 계산기 공식 출처와 기준일 분기별 확인
+
+
+## 온라인 도구 / Online Tools
+
+| URL | 대표 검색어 | 보조 검색어 / 검색 의도 |
+|---|---|---|
+| /online-tools | 온라인 도구 | 무료 온라인 도구, 생활 유틸리티, QR 코드 생성기 |
+| /qr-code-generator | QR 코드 생성기 | 무료 QR 만들기, URL QR 코드, 와이파이 QR 코드, 텍스트 QR 코드, 이메일 QR 코드 |
+| /en/online-tools | free online tools | online utilities, everyday tools, QR code generator |
+| /en/qr-code-generator | free QR code generator | URL QR code, Wi-Fi QR code, text QR code, email QR code, phone QR code |
+
+- QR 코드는 브라우저에서 생성하며 입력한 데이터는 UTILWISE 서버로 전송하지 않는다.
+- 검색 콘텐츠는 실제 지원하는 유형(URL, plain text, Wi-Fi, email, phone)과 일치시킨다.
