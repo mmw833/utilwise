@@ -109,6 +109,19 @@ function CalculatorGuide({pathname}:{pathname:string}){
  <p style={{marginTop:20,fontSize:13,color:"#596579"}}>공식 참고 자료: <a href={guide.source} target="_blank" rel="noreferrer">{guide.sourceLabel}</a>{guide.extraSources?.map(([label,url])=><> · <a href={url} target="_blank" rel="noreferrer">{label}</a></>)}<br/>기준 확인일: 2026년 11월 6일 · 계산 결과는 참고용입니다.</p></section>;
 }
 
+const relatedCalculators:Record<string,[string,string][]>={
+ "/area":[["부피 계산기","/volume"],["부동산 중개수수료 계산기","/brokerage"]],
+ "/loan":[["DSR 계산기","/dsr"],["예금·적금 이자 계산기","/savings"]],
+ "/brokerage":[["평수·면적 변환 계산기","/area"],["전월세 전환 계산기","/rent-conversion"]],
+ "/salary":[["퇴직금 계산기","/severance"],["예금·적금 이자 계산기","/savings"]],
+ "/severance":[["연봉 실수령액 계산기","/salary"],["날짜 계산기","/date"]],
+ "/savings":[["대출 이자 계산기","/loan"],["연봉 실수령액 계산기","/salary"]],
+ "/dsr":[["대출 이자 계산기","/loan"],["연봉 실수령액 계산기","/salary"]],
+ "/rent-conversion":[["부동산 중개수수료 계산기","/brokerage"],["평수 계산기","/area"]],
+ "/fuel":[["날짜 계산기","/date"],["부피 계산기","/volume"]],
+ "/vat":[["연봉 실수령액 계산기","/salary"],["예금·적금 이자 계산기","/savings"]],
+ "/volume":[["평수·면적 변환 계산기","/area"],["자동차 유류비 계산기","/fuel"]]
+};
 export function CalculatorShell({title,desc,children}:{title:string,desc:string,children:React.ReactNode}){
  const pathname = usePathname();
  const pageUrl = `https://utilwise.kr${pathname}`;
@@ -136,6 +149,6 @@ export function CalculatorShell({title,desc,children}:{title:string,desc:string,
   <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData)}} />
   <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(breadcrumbData)}} />
   <header className="wrap header"><Link href="/" className="logo">UTIL<span>WISE</span>.</Link><Link href="/" className="sub">← 전체 도구</Link></header>
-  <section className="wrap section"><div className="eyebrow">UTILWISE CALCULATOR</div><h1 style={{fontSize:32,letterSpacing:"-1px",margin:"12px 0 8px"}}>{title}</h1><p className="sub">{desc}</p>{["/brokerage","/salary","/severance","/dsr","/rent-conversion","/vat","/savings"].includes(pathname)&&<div className="country-basis">대한민국 기준 적용 · 대한민국 법률·세금·금융 제도를 바탕으로 한 계산입니다.</div>}{children}<CalculatorGuide pathname={pathname}/><div className="footer">계산 결과는 참고용이며 실제 거래·세금·금융 판단 전 관련 기관의 최신 기준을 확인하세요.</div></section>
+  <section className="wrap section"><div className="eyebrow">UTILWISE CALCULATOR</div><h1 style={{fontSize:32,letterSpacing:"-1px",margin:"12px 0 8px"}}>{title}</h1><p className="sub">{desc}</p>{["/brokerage","/salary","/severance","/dsr","/rent-conversion","/vat","/savings"].includes(pathname)&&<div className="country-basis">대한민국 기준 적용 · 대한민국 법률·세금·금융 제도를 바탕으로 한 계산입니다.</div>}{children}<CalculatorGuide pathname={pathname}/>{relatedCalculators[pathname]&&<nav className="related-calculators" aria-label="관련 계산기"><h2>함께 사용하면 좋은 계산기</h2><div>{relatedCalculators[pathname].map(([label,href])=><Link key={href} href={href}>{label} →</Link>)}</div></nav>}<div className="footer">계산 결과는 참고용이며 실제 거래·세금·금융 판단 전 관련 기관의 최신 기준을 확인하세요.</div></section>
  </main>;
 }
