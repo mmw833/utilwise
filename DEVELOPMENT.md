@@ -351,3 +351,21 @@ npm run preview
 - 녹음 타이머, 일시정지/재개, 종료 후 브라우저 내 재생 및 파일 다운로드를 지원한다.
 - 마이크 접근은 HTTPS 등 보안 컨텍스트와 사용자 권한이 필요하다. 녹음 데이터는 서버로 전송하지 않는다.
 - 테스트 시 권한 허용/거부, 녹음 시작·일시정지·재개·종료, 재생 및 다운로드, 모바일 브라우저 호환성을 확인한다.
+
+
+## 이미지 온라인 도구
+- 공통 UI/처리: `components/ImageTools.tsx`
+- 한국어/영어 압축기: `/image-compressor`, `/en/image-compressor`
+- 한국어/영어 크기 조절기: `/image-resizer`, `/en/image-resizer`
+- 브라우저 Canvas API로 JPG·PNG·WebP 입력을 처리하며 파일을 서버에 업로드하지 않는다.
+- 다중 파일을 선택해 개별 결과 파일로 다운로드할 수 있다. 압축 품질, 출력 형식, 픽셀 크기 및 비율 유지 옵션을 제공한다.
+- 검증 시 PNG 투명 배경과 JPEG 변환, WebP 출력, 여러 이미지 선택, 최대 20MB 제한, 모바일 파일 선택/다운로드를 확인한다.
+
+
+## 이미지 도구
+- 한국어: /image-compressor, /image-resizer; 영어: /en/image-compressor, /en/image-resizer
+- 공통 UI/처리: components/ImageTools.tsx. 브라우저 Canvas API 처리, 파일별 최대 20MB, 개별 다운로드 지원. ZIP 미지원.
+
+## 팁 계산기
+- 한국어: /tip, 영어: /en/tip; 공통 계산: components/TipCalculator.tsx
+- 팁=결제금액×선택비율, 총액=결제금액+팁, 인원별 분할 지원. 통화 표시는 환율 변환이 아님.
