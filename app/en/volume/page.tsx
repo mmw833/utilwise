@@ -6,7 +6,7 @@ import VolumeCalculator from "../../../components/VolumeCalculator";
 export const metadata: Metadata = {
   title: "Volume Calculator | Cubic Meters, Liters & cm³ - UTILWISE",
   description: "Calculate the volume of a rectangular prism or cylinder and convert the result to cubic meters, liters, cubic centimeters, and milliliters.",
-  alternates: { canonical: "/en/volume" },
+  alternates: { canonical: "/en/volume", languages: { en: "/en/volume", "ko-KR": "/volume" } },
   openGraph: {
     title: "Calculate Volume",
     description: "Calculate rectangular prism and cylinder volume and convert between common volume units.",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <main>
+  return <main lang="en">
     <header className="wrap header"><Link href="/en" className="logo">UTIL<span>WISE</span>.</Link><nav className="nav"><Link href="/en">All tools</Link><LanguageSwitcher /></nav></header>
     <section className="wrap section">
       <div className="eyebrow">UTILWISE CALCULATOR</div>
