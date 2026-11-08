@@ -1,0 +1,11 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import LanguageSwitcher from "../../../components/LanguageSwitcher";
+import ImageTools from "../../../components/ImageTools";
+export const metadata: Metadata = {
+  title: "Free Image Resizer | Resize Photos by Pixels - UTILWISE",
+  description: "Resize JPG, PNG, and WebP images to custom pixel dimensions. Keep the aspect ratio, process multiple images, and download files processed locally in your browser.",
+  alternates: { canonical: "/en/image-resizer", languages: { en: "/en/image-resizer", "ko-KR": "/image-resizer" } },
+  openGraph: { title: "Free Image Resizer", description: "Change image width and height in pixels with an optional aspect ratio lock.", url: "https://utilwise.kr/en/image-resizer", siteName: "UTILWISE", locale: "en_US", type: "website" }
+};
+export default function Page(){return <main lang="en"><header className="wrap header"><Link href="/en" className="logo">UTIL<span>WISE</span>.</Link><nav className="nav"><Link href="/en/online-tools">Online Tools</Link><LanguageSwitcher/></nav></header><section className="wrap section image-tool-page"><div className="eyebrow">UTILWISE ONLINE TOOLS</div><h1>Free Image Resizer</h1><p className="sub">Change image width and height in pixels and download your resized images.</p><ImageTools mode="resize" lang="en"/><div className="image-tool-guide"><h2>What is image resizing?</h2><p>Image resizing changes the pixel width and height of a photo or graphic. You can prepare images for websites, blogs, documents, and online posts.</p><h2>How to resize images</h2><ol><li>Select one or more images.</li><li>Enter the target width and height in pixels.</li><li>Keep the aspect ratio enabled to preserve the original proportions.</li><li>Choose an output format and download the resized images.</li></ol><p>The same dimensions are applied to all selected images. Enlarging an image may reduce sharpness. Files are processed in your browser and are not uploaded to our servers.</p><h2>Related online tool</h2><p>Use the <Link href="/en/image-compressor">image compressor</Link> to reduce file size.</p></div></section></main>}
