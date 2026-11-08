@@ -147,3 +147,13 @@ Notes:
 
 - QR 코드는 브라우저에서 생성하며 입력한 데이터는 UTILWISE 서버로 전송하지 않는다.
 - 검색 콘텐츠는 실제 지원하는 유형(URL, plain text, Wi-Fi, email, phone)과 일치시킨다.
+
+
+## 팁 계산기
+- 한국어 URL: /tip; 대표 검색어: 팁 계산기, 팁 계산, 팁 포함 금액, 팁 나누기
+- 영어 URL: /en/tip; 대표 검색어: tip calculator, tip percentage calculator, split tip calculator
+
+## 이미지 도구
+- 한국어 URL: /image-compressor, /image-resizer
+- 영어 URL: /en/image-compressor, /en/image-resizer
+- 대표 검색어: 이미지 압축, 이미지 용량 줄이기, 이미지 크기 조절, image compressor, image resizer, resize image online
