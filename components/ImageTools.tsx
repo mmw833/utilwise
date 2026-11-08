@@ -78,7 +78,7 @@ export default function ImageTools({ mode, lang = "ko" }: Props) {
         if (file.size > 20 * 1024 * 1024) throw new Error("too-large");
         const bitmap = await createImageBitmap(file);
         const targetWidth = mode === "resize" ? Math.max(1, Math.min(12000, Math.round(width))) : bitmap.width;
-        const targetHeight = mode === "resize" ? Math.max(1, Math.min(12000, Math.round(height))) : bitmap.height;
+        const targetHeight = mode === "resize" ? Math.max(1, Math.min(12000, keepRatio ? Math.round(targetWidth * bitmap.height / bitmap.width) : Math.round(height))) : bitmap.height;
         const canvas = document.createElement("canvas");
         canvas.width = targetWidth; canvas.height = targetHeight;
         const context = canvas.getContext("2d");
