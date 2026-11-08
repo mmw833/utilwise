@@ -1,3 +1,11 @@
+## 2026-11-08 팁 계산기 추가 (작업 브랜치)
+- 한국어 /tip, 영어 /en/tip 신규 페이지 및 공통 UI/계산 로직 components/TipCalculator.tsx 추가
+- 결제 금액, 통화 표시(KRW/USD/EUR/GBP/JPY/CAD/AUD), 팁 비율 프리셋(10/15/18/20/25%) 및 직접 입력, 인원별 분할 계산 지원
+- 팁 총액, 팁 포함 결제 총액, 1인당 팁 및 1인당 결제 금액을 실시간 표시
+- 홈의 '유용한 계산기' 카테고리 한국어·영어 목록과 sitemap에 등록
+- 계산은 브라우저에서 수행하며 환율 변환이나 국가별 적정 팁 권고는 제공하지 않음
+- 작업 브랜치: feature/tip-calculator; GitHub Actions 빌드 및 계산·반응형 테스트 대기
+
 ## 2026-11-08 QR 코드 생성기 및 온라인 도구 카테고리 추가 (작업 브랜치)
 - 한국어·영어 신규 카테고리 랜딩: `/online-tools`, `/en/online-tools`
 - QR 코드 생성기: `/qr-code-generator`, `/en/qr-code-generator`
