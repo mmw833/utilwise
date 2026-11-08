@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "UTILWISE | 일상에 필요한 모든 도구",
   description: "일상에 필요한 다양한 계산기와 테스트를 한곳에서 쉽고 간편하게 이용하세요.",
   metadataBase: new URL(siteUrl),
-  alternates: { canonical: "/" },
+  alternates: { canonical: "/", languages: { "ko-KR": "/", en: "/en" } },
   robots: {
     index: true,
     follow: true,
