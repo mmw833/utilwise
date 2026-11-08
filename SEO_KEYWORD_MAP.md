@@ -72,6 +72,43 @@
 | /en/psychology/desire | Values and priorities quiz | what do I truly want, personal values quiz |
 | /en/psychology/mirror | Self perception quiz | how others see me, public image vs inner self |
 
+
+### English keyword expansion for global search intent
+
+These are natural phrase variations to test in Search Console. Country-specific tools should not target broad global queries without clearly stating their South Korean scope.
+
+| Page | Additional English query themes |
+|---|---|
+| /en | free online calculators, everyday calculators, free online tools, simple utility tools, free text tools |
+| /en/area | square meter converter, m2 to pyeong, pyeong to square meters, Korean apartment size converter |
+| /en/date | days between dates calculator, date duration calculator, add days to a date, subtract days from a date, days until date, age calculator |
+| /en/loan | monthly loan payment calculator, loan repayment calculator, total loan interest calculator, equal payment loan calculator |
+| /en/brokerage | real estate agent commission Korea, realtor fee South Korea, Korean property transaction fee |
+| /en/salary | Korea salary calculator, South Korea net salary, Korean paycheck calculator, salary after tax Korea |
+| /en/severance | Korean severance calculator, South Korea retirement pay, severance pay estimate Korea |
+| /en/savings | compound interest calculator (only if supported), fixed deposit calculator, monthly savings calculator, savings maturity calculator, after-tax interest |
+| /en/dsr | DSR meaning calculator, debt service ratio Korea, Korean mortgage DSR estimate |
+| /en/rent-conversion | Korea rental deposit calculator, jeonse monthly rent conversion, wolse deposit conversion |
+| /en/fuel | road trip fuel cost calculator, gas cost calculator, fuel consumption calculator, cost per trip |
+| /en/vat | VAT calculator online, add VAT to price, remove VAT from total, reverse VAT calculator |
+| /en/volume | volume calculator online, cubic meters to liters, cm3 to ml, cylinder volume formula, rectangular prism volume |
+| /en/text-tools/character-counter | online character counter, letter counter, character count with spaces, character count without spaces, word counter |
+| /en/text-tools/text-compare | compare text online, text diff checker, compare two paragraphs, find differences between documents |
+| /en/text-tools/remove-duplicates | remove duplicate lines, remove duplicate sentences online, repeated text remover |
+| /en/text-tools/speech-time | speech timer, presentation time calculator, words per minute speech calculator, 5 minute speech word count, speech practice recorder |
+| /en/mbti | 16 personality types quiz, free personality type quiz, 24 question personality quiz (avoid implying official MBTI affiliation) |
+| /en/big-five | OCEAN personality test, five factor personality quiz, Big Five traits test |
+| /en/eq | emotional intelligence quiz, EQ self assessment, emotional awareness test, empathy self reflection |
+| /en/psychology | fun personality quiz, self discovery quiz, hidden personality quiz |
+| /en/psychology/desire | personal values quiz, life priorities quiz, what matters most to me quiz |
+| /en/psychology/mirror | self perception quiz, first impression quiz, how others perceive me quiz |
+
+Notes:
+- "Compound interest calculator" must only be used if the savings tool actually compounds interest; the current calculator uses simple-interest assumptions. Do not add this phrase to titles or descriptions until the calculation model supports compounding.
+- "Speech timer" and "words per minute" should be described as estimates based on the current word-count and speaking-speed model; do not claim live audio transcription.
+- "MBTI" is a registered mark. Describe the page as an informal MBTI-style or 16-type personality quiz, and retain the non-affiliation disclaimer.
+- Search intent for Korea-specific finance and property tools should explicitly include Korea / South Korea / KRW in the visible page copy and snippets.
+
 ## 영어 페이지 원칙
 
 - 영어 URL은 영어권 검색 의도에 맞춘 독립 title, description, H1, 본문을 사용한다.
