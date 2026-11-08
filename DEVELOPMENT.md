@@ -299,3 +299,10 @@ npm run preview
 - 파일 위치: `public/images/psychology/mirror/`
 - 파일명 순서는 `components/PsychologyCollection.tsx`의 `mirrorIllustrations` 배열에서 결과 인덱스 0~7과 연결한다.
 - 두 번째 테스트의 `desireIllustrations` 매핑과 분리해 관리하며, 각 테스트의 한·영 결과 화면에서 공통 사용한다.
+
+
+## 홈 헤더 반응형 내비게이션 (2026-11-08)
+- `app/page.tsx`, `app/en/page.tsx`는 데스크톱 `.nav`, 모바일 `.mobile-language-toggle`, `.mobile-menu`를 각각 렌더링한다.
+- 기본(PC) 화면에서는 `.mobile-language-toggle`와 `.mobile-menu`를 숨기고 데스크톱 `.nav` 안의 언어 전환만 표시한다.
+- 760px 이하에서는 `.nav`를 숨기고 모바일 언어 전환과 햄버거 메뉴를 표시한다.
+- 관련 공통 스타일은 `app/globals.css`의 Mobile navigation 구역에서 관리한다. 이 영역의 CSS 줄바꿈은 실제 줄바꿈이어야 하며 문자열 `\\n`이 CSS 파일에 들어가지 않도록 한다.
