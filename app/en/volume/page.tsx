@@ -4,11 +4,11 @@ import LanguageSwitcher from "../../../components/LanguageSwitcher";
 import VolumeCalculator from "../../../components/VolumeCalculator";
 
 export const metadata: Metadata = {
-  title: "Volume Calculator | Cubic Meters, Liters & cm³ - UTILWISE",
-  description: "Calculate the volume of a rectangular prism or cylinder and convert the result to cubic meters, liters, cubic centimeters, and milliliters.",
+  title: "Volume Calculator | m³, Liters, cm³ & Cylinder Volume - UTILWISE",
+  description: "Calculate rectangular prism and cylinder volume from dimensions. Convert results between cubic meters (m³), liters (L), cubic centimeters (cm³), and milliliters (mL).",
   alternates: { canonical: "/en/volume", languages: { en: "/en/volume", "ko-KR": "/volume" } },
   openGraph: {
-    title: "Calculate Volume",
+    title: "Free Volume Calculator | Cuboid & Cylinder",
     description: "Calculate rectangular prism and cylinder volume and convert between common volume units.",
     url: "https://utilwise.kr/en/volume",
     siteName: "UTILWISE",
