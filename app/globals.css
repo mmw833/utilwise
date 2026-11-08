@@ -145,3 +145,14 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 
 /* Speech practice recording mode */
 .speech-practice-panel{min-height:340px;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:14px}.speech-practice-status{display:flex;align-items:center;gap:9px;font-size:14px;font-weight:700;color:var(--muted)}.speech-record-dot{width:10px;height:10px;border-radius:50%;background:#dc4545;box-shadow:0 0 0 5px #dc45451c;animation:speech-pulse 1.4s infinite}.speech-practice-time{font-size:clamp(42px,8vw,64px);line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:-2px;color:var(--ink)}.speech-practice-controls{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:8px 0}.speech-practice-controls button{min-height:44px;padding:10px 18px}.speech-record-error{padding:11px 14px;border-radius:9px;background:#fff1f1;color:#a52b2b;font-size:13px;line-height:1.5}.speech-playback{width:100%;max-width:520px;margin-top:12px;padding:18px;background:#f6f8fb;border:1px solid var(--line);border-radius:12px;display:grid;gap:12px;text-align:left}.speech-playback audio{width:100%}.speech-download{font-size:13px;font-weight:700;color:var(--blue);text-decoration:underline;text-underline-offset:3px}.speech-practice-panel>.hint{max-width:560px;line-height:1.6}@keyframes speech-pulse{50%{opacity:.35;box-shadow:0 0 0 9px #dc45450d}}
+
+
+/* SEO guide content for text utilities */
+.text-tool-seo,.speech-seo-guide{margin-top:34px;padding:26px;background:#f7f9fc;border:1px solid var(--line);border-radius:14px;line-height:1.8;color:#43536a}
+.text-tool-seo>h2,.speech-seo-guide>h2{font-size:21px;letter-spacing:-.5px;color:var(--ink);margin:0 0 12px}
+.text-tool-seo>p,.speech-seo-guide>p{font-size:14px;margin:0 0 18px}
+.text-tool-seo section,.speech-seo-guide section{margin-top:18px}
+.text-tool-seo h3,.speech-seo-guide h3{font-size:16px;color:var(--ink);margin:0 0 6px}
+.text-tool-seo section p,.speech-seo-guide section p{font-size:13px;margin:0;line-height:1.85}
+.text-tool-seo>h2:not(:first-child),.speech-seo-guide>h2:not(:first-child){margin-top:30px}
+@media(max-width:760px){.text-tool-seo,.speech-seo-guide{padding:19px;margin-top:26px}.text-tool-seo>h2,.speech-seo-guide>h2{font-size:19px}}
