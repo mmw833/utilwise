@@ -157,3 +157,21 @@ Notes:
 - 한국어 URL: /image-compressor, /image-resizer
 - 영어 URL: /en/image-compressor, /en/image-resizer
 - 대표 검색어: 이미지 압축, 이미지 용량 줄이기, 이미지 크기 조절, image compressor, image resizer, resize image online
+
+## PDF 도구 / PDF Utilities
+
+| URL | 대표 검색어 | 보조 검색어 / 검색 의도 |
+|---|---|---|
+| /pdf-merge | PDF 합치기 | PDF 파일 병합, 여러 PDF 하나로, PDF 결합 |
+| /pdf-split | PDF 분할 | PDF 페이지 추출, PDF 페이지 나누기, 페이지 범위 저장 |
+| /pdf-rotate | PDF 회전 | PDF 페이지 회전, PDF 방향 변경, rotate PDF |
+| /pdf-organize | PDF 페이지 정리 | PDF 페이지 순서 변경, PDF 페이지 삭제, reorder PDF pages |
+| /image-to-pdf | 이미지 PDF 변환 | JPG PDF 변환, PNG PDF 변환, 사진 PDF 만들기 |
+| /en/pdf-merge | merge PDF | combine PDF files, merge multiple PDFs online |
+| /en/pdf-split | split PDF | extract PDF pages, split PDF by page range |
+| /en/pdf-rotate | rotate PDF | rotate PDF pages, change PDF page orientation |
+| /en/pdf-organize | organize PDF pages | reorder PDF pages, remove PDF pages |
+| /en/image-to-pdf | image to PDF | JPG to PDF, PNG to PDF, convert images to PDF |
+
+- 파일 처리는 브라우저 내에서 수행하며 서버 업로드를 하지 않는다고 안내한다.
+- 암호화 PDF 지원, OCR, 압축 등 구현되지 않은 기능을 검색 메타데이터에서 약속하지 않는다.
