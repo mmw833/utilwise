@@ -69,7 +69,8 @@ export default function QRCodeGenerator({ lang = "ko" }: { lang?: Lang }) {
       const params = new URLSearchParams();
       if (subject) params.set("subject",subject);
       if (body) params.set("body",body);
-      const query = params.toString();\n      return `mailto:${email.trim()}${query ? `?${query}` : ""}`;
+      const query = params.toString();
+      return `mailto:${email.trim()}${query ? `?${query}` : ""}`;
     }
     return phone.trim() ? `tel:${phone.trim()}` : "";
   },[mode,url,plainText,ssid,password,security,email,subject,body,phone]);
