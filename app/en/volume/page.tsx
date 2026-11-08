@@ -5,7 +5,7 @@ import VolumeCalculator from "../../../components/VolumeCalculator";
 
 export const metadata: Metadata = {
   title: "Volume Calculator | m³, Liters, cm³ & Cylinder Volume - UTILWISE",
-  description: "Calculate rectangular prism and cylinder volume from dimensions. Convert results between cubic meters (m³), liters (L), cubic centimeters (cm³), and milliliters (mL).",
+  description: "Calculate rectangular prism and cylinder volume, then convert between m³, liters, cm³, and mL.",
   alternates: { canonical: "/en/volume", languages: { en: "/en/volume", "ko-KR": "/volume" } },
   openGraph: {
     title: "Free Volume Calculator | Cuboid & Cylinder",
