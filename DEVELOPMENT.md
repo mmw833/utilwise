@@ -276,3 +276,9 @@ npm run preview
 - 파일 위치: `public/images/psychology/desire/`
 - 이미지 파일명 순서는 `components/PsychologyCollection.tsx`의 `desireIllustrations` 배열에서 결과 인덱스 0~7과 연결한다.
 - 한국어/영어 결과 페이지가 동일한 결과 인덱스를 사용하므로 동일 이미지가 표시된다.
+
+
+## 세 번째 심리테스트 결과 이미지
+- 파일 위치: `public/images/psychology/mirror/`
+- 파일명 순서는 `components/PsychologyCollection.tsx`의 `mirrorIllustrations` 배열에서 결과 인덱스 0~7과 연결한다.
+- 두 번째 테스트의 `desireIllustrations` 매핑과 분리해 관리하며, 각 테스트의 한·영 결과 화면에서 공통 사용한다.
