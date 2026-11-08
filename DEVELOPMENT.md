@@ -270,3 +270,9 @@ npm run preview
 - 실제 결과 화면은 `public/images/psychology/`에 업로드된 8개 WebP 파일을 사용한다.
 - 파일명 매핑은 `components/PsychologyExperience.tsx`의 `resultIllustrations`에 정의한다.
 - 기존 SVG 파일은 fallback/이전 리소스로 남아 있으며 현재 결과 이미지 매핑에서는 사용하지 않는다.
+
+
+## 두 번째 심리테스트 결과 이미지
+- 파일 위치: `public/images/psychology/desire/`
+- 이미지 파일명 순서는 `components/PsychologyCollection.tsx`의 `desireIllustrations` 배열에서 결과 인덱스 0~7과 연결한다.
+- 한국어/영어 결과 페이지가 동일한 결과 인덱스를 사용하므로 동일 이미지가 표시된다.
