@@ -1,3 +1,10 @@
+## 2026-11-09 PDF 도구를 온라인 도구 카테고리로 통합
+- 한국어·영어 홈페이지에서 별도 PDF 도구 섹션과 상단/모바일 PDF 메뉴를 제거하고 PDF 도구 5종을 온라인 도구 목록으로 이동
+- 온라인 도구 랜딩 페이지에서도 PDF 도구를 같은 카테고리 안의 별도 소제목으로 묶어 표시
+- PDF 도구의 기존 독립 URL, 기능, SEO 페이지 및 사이트맵 경로는 유지
+- 변경 파일: app/page.tsx, app/en/page.tsx, app/online-tools/page.tsx, app/en/online-tools/page.tsx
+- GitHub 반영 완료. CI 빌드, 한국어·영어 PC/모바일 화면 및 Cloudflare 운영 반영은 확인 대기
+
 ## 2026-11-08 QR 코드 생성기 및 온라인 도구 카테고리
 - 한국어·영어 온라인 도구 카테고리 랜딩 페이지 추가
 - QR 코드 생성기 추가: URL, 텍스트, Wi-Fi, 이메일, 전화번호 QR 생성 및 PNG 다운로드
