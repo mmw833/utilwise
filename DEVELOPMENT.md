@@ -1,3 +1,10 @@
+
+
+## 모바일 홈 내비게이션
+- 한국어/영어 홈의 헤더는 PC에서 기존 가로 내비게이션을 유지한다.
+- 760px 이하에서는 가로 내비게이션 대신 `details.mobile-menu` 접이식 메뉴를 표시한다.
+- 모바일 메뉴는 카테고리/서비스 소개 링크를 2열로 배치하고 하단에 공통 `LanguageSwitcher`를 표시한다.
+- 관련 구현: `app/page.tsx`, `app/en/page.tsx`, `app/globals.css`.
 ## 문서·텍스트 도구
 - 카테고리: /text-tools 및 /en/text-tools
 - 기능 페이지: character-counter, text-compare, remove-duplicates
