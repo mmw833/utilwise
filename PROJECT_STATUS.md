@@ -327,3 +327,10 @@
 - `components/PsychologyCollection.tsx`에서 desire 결과 인덱스(0~7)와 이미지 파일 8개를 연결했다.
 - 두 번째 테스트의 한국어/영어 결과 화면에 같은 이미지가 표시되도록 적용했다. 세 번째 테스트(mirror)에는 영향 없다.
 - 코드 커밋: `1470575a88ae7abf5a837a70d9825023f20d9daf`. CI 및 실서비스 배포는 별도 확인 필요.
+
+
+## 2026-11-08 세 번째 심리테스트 결과 이미지 연결
+- `public/images/psychology/mirror/`에 업로드된 WebP 일러스트 8개를 확인했다.
+- `components/PsychologyCollection.tsx`에 mirror 결과 인덱스(0~7)와 이미지 파일 매핑을 추가했다.
+- 세 번째 테스트의 한국어/영어 결과 화면에 유형별 이미지를 연결했다. 기존 desire 이미지 연결은 유지했다.
+- 코드 커밋: `e6f2b774c022a85176a4cf6b10f0f58d7ba74ac9`. CI 및 Cloudflare 배포 확인은 별도 필요.
