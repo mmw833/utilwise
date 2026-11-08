@@ -429,3 +429,15 @@
 - `components/PsychologyCollection.tsx`에 mirror 결과 인덱스(0~7)와 이미지 파일 매핑을 추가했다.
 - 세 번째 테스트의 한국어/영어 결과 화면에 유형별 이미지를 연결했다. 기존 desire 이미지 연결은 유지했다.
 - 코드 커밋: `e6f2b774c022a85176a4cf6b10f0f58d7ba74ac9`. CI 및 Cloudflare 배포 확인은 별도 필요.
+
+
+## 2026-11-08 이미지 압축기 및 이미지 크기 조절기 추가 (작업 브랜치)
+- 한국어·영어 온라인 도구 페이지 추가: `/image-compressor`, `/en/image-compressor`, `/image-resizer`, `/en/image-resizer`
+- 공통 클라이언트 컴포넌트 `components/ImageTools.tsx`에서 브라우저 Canvas API로 이미지 처리
+- JPG·PNG·WebP 입력, 다중 파일 선택, 압축 품질 조절, WebP/JPEG/PNG 출력, 이미지 픽셀 크기 변경 및 비율 유지 옵션 제공
+- 변환 결과 미리보기, 원본/결과 용량과 픽셀 정보 표시, 개별 다운로드 제공. 파일당 20MB 제한
+- 이미지 원본/결과는 서버로 업로드하지 않으며 개인정보처리방침 한국어·영어 문구 반영
+- 한국어·영어 홈 카드, 온라인 도구 카테고리, sitemap, SEO 메타데이터 및 관련 도구 내부 링크 추가
+- 작업 브랜치: `feature/image-tools`
+- **검증 대기:** GitHub Actions 빌드, JPG/PNG/WebP 입력 및 변환, 투명 PNG→JPEG 배경, 다중 파일, 비율 유지, 다운로드, 모바일 화면 및 Cloudflare 배포 확인
+- **주의:** 현재 개별 파일 다운로드를 지원하며 ZIP 일괄 다운로드는 구현하지 않음. PNG 출력은 브라우저 Canvas 특성상 품질 슬라이더가 적용되지 않을 수 있음
