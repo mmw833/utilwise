@@ -14,7 +14,7 @@ const copy = {
     network:"Wi-Fi 이름 (SSID)", password:"비밀번호", security:"보안 방식", none:"암호 없음", emailAddress:"받는 사람 이메일", subject:"제목 (선택)", body:"메시지 (선택)", phoneNumber:"전화번호",
     size:"이미지 크기", small:"작게", medium:"보통", large:"크게", generate:"QR 코드 생성", download:"PNG 다운로드",
     empty:"내용을 입력하면 QR 코드가 생성됩니다.", invalidUrl:"http 또는 https로 시작하는 올바른 URL을 입력하세요.",
-    invalidEmail:"올바른 이메일 주소를 입력하세요.", invalidPhone:"전화번호를 입력하세요.", error:"QR 코드를 생성하지 못했습니다. 입력 내용을 확인해 주세요.",
+    invalidEmail:"올바른 이메일 주소를 입력하세요.", invalidWifi:"Wi-Fi 비밀번호를 입력하거나 암호 없음 방식을 선택하세요.", invalidPhone:"전화번호를 입력하세요.", error:"QR 코드를 생성하지 못했습니다. 입력 내용을 확인해 주세요.",
     privacy:"입력한 내용과 QR 코드는 이 브라우저 안에서 처리됩니다. 입력값은 UTILWISE 서버로 전송되지 않습니다.",
     guide:"QR 코드 사용 안내", guideText:"생성한 QR 코드를 다운로드해 인쇄물, 안내문, 명함, 매장 안내 등에 사용할 수 있습니다. 실제 사용 전에 휴대전화 카메라로 스캔해 연결과 내용을 확인하세요.",
     faq:"자주 묻는 질문", q1:"QR 코드에 입력한 정보가 서버로 전송되나요?",a1:"아니요. QR 코드는 브라우저에서 생성되며 입력 내용은 UTILWISE 서버로 전송되지 않습니다.",
@@ -29,7 +29,7 @@ const copy = {
     network:"Wi-Fi network name (SSID)", password:"Password", security:"Security", none:"No password", emailAddress:"Recipient email", subject:"Subject (optional)", body:"Message (optional)", phoneNumber:"Phone number",
     size:"Image size", small:"Small", medium:"Medium", large:"Large", generate:"Generate QR code", download:"Download PNG",
     empty:"Enter content to generate your QR code.", invalidUrl:"Enter a valid URL beginning with http:// or https://.",
-    invalidEmail:"Enter a valid email address.", invalidPhone:"Enter a phone number.", error:"Could not generate the QR code. Please check your input.",
+    invalidEmail:"Enter a valid email address.", invalidWifi:"Enter a Wi-Fi password or choose No password.", invalidPhone:"Enter a phone number.", error:"Could not generate the QR code. Please check your input.",
     privacy:"Your content and QR code are processed in this browser. Nothing you enter is sent to UTILWISE servers.",
     guide:"How to use your QR code", guideText:"Download your QR code and add it to print materials, signs, business cards, or in-store information. Scan it with a phone camera before sharing or printing to make sure it works as expected.",
     faq:"Frequently asked questions", q1:"Is my QR code data sent to a server?",a1:"No. The QR code is generated in your browser, and your content is not sent to UTILWISE servers.",
@@ -69,7 +69,7 @@ export default function QRCodeGenerator({ lang = "ko" }: { lang?: Lang }) {
       const params = new URLSearchParams();
       if (subject) params.set("subject",subject);
       if (body) params.set("body",body);
-      return `mailto:${email.trim()}${params.size ? `?${params.toString()}` : ""}`;
+      const query = params.toString();\n      return `mailto:${email.trim()}${query ? `?${query}` : ""}`;
     }
     return phone.trim() ? `tel:${phone.trim()}` : "";
   },[mode,url,plainText,ssid,password,security,email,subject,body,phone]);
