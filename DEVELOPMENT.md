@@ -264,3 +264,9 @@ npm run preview
 - 입력 단위: mm, cm, m. 결과 단위: m³, L, cm³, mL
 - 기하학적 부피이며 실제 사용 가능 용량은 벽 두께·내부 구조 등에 따라 달라질 수 있다.
 - 한국어·영어 홈 계산기 목록과 sitemap에 등록한다.
+
+
+## 심리테스트 1번 결과 이미지 원본
+- 실제 결과 화면은 `public/images/psychology/`에 업로드된 8개 WebP 파일을 사용한다.
+- 파일명 매핑은 `components/PsychologyExperience.tsx`의 `resultIllustrations`에 정의한다.
+- 기존 SVG 파일은 fallback/이전 리소스로 남아 있으며 현재 결과 이미지 매핑에서는 사용하지 않는다.
