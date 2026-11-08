@@ -320,3 +320,10 @@
 - `components/PsychologyExperience.tsx`의 결과 이미지 매핑을 기존 임시 SVG에서 업로드된 WebP 파일로 변경했다.
 - 이미지 파일은 재생성하지 않고 저장소에 업로드된 원본 WebP를 사용한다.
 - GitHub 코드 반영 완료. CI 빌드 및 Cloudflare 실서비스 배포는 별도 확인 필요.
+
+
+## 2026-11-08 두 번째 심리테스트 결과 이미지 연결
+- `public/images/psychology/desire/`에 업로드된 WebP 일러스트 8개를 확인했다.
+- `components/PsychologyCollection.tsx`에서 desire 결과 인덱스(0~7)와 이미지 파일 8개를 연결했다.
+- 두 번째 테스트의 한국어/영어 결과 화면에 같은 이미지가 표시되도록 적용했다. 세 번째 테스트(mirror)에는 영향 없다.
+- 코드 커밋: `1470575a88ae7abf5a837a70d9825023f20d9daf`. CI 및 실서비스 배포는 별도 확인 필요.
