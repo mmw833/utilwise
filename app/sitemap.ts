@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 const siteUrl = "https://utilwise.kr";
 const calculators = ["/area","/date","/loan","/brokerage","/salary","/severance","/savings","/dsr","/rent-conversion","/fuel","/vat","/volume"];
 const englishCalculators = calculators.map((route) => `/en${route}`);
+const onlineToolPages = ["/online-tools","/qr-code-generator"];
+const englishOnlineToolPages = onlineToolPages.map((route) => `/en${route}`);
 const textToolPages = ["/text-tools","/text-tools/character-counter","/text-tools/text-compare","/text-tools/remove-duplicates","/text-tools/speech-time"];
 const englishTextToolPages = textToolPages.map((route) => `/en${route}`);
 const mbtiTypes = ["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"];
@@ -11,6 +13,7 @@ const pages = [
 {route:"/privacy",priority:0.4,changeFrequency:"yearly" as const},
 {route:"/terms",priority:0.4,changeFrequency:"yearly" as const},
 ...calculators.map(route=>({route,priority:0.8,changeFrequency:"monthly" as const})),
+...onlineToolPages.map(route=>({route,priority:0.75,changeFrequency:"monthly" as const})),
 ...textToolPages.map(route=>({route,priority:0.75,changeFrequency:"monthly" as const})),
 {route:"/mbti",priority:0.7,changeFrequency:"monthly" as const},
 {route:"/big-five",priority:0.7,changeFrequency:"monthly" as const},
@@ -24,6 +27,7 @@ const pages = [
 {route:"/en/privacy",priority:0.4,changeFrequency:"yearly" as const},
 {route:"/en/terms",priority:0.4,changeFrequency:"yearly" as const},
 ...englishCalculators.map(route=>({route,priority:0.7,changeFrequency:"monthly" as const})),
+...englishOnlineToolPages.map(route=>({route,priority:0.65,changeFrequency:"monthly" as const})),
 ...englishTextToolPages.map(route=>({route,priority:0.65,changeFrequency:"monthly" as const})),
 {route:"/en/mbti",priority:0.6,changeFrequency:"monthly" as const},
 {route:"/en/big-five",priority:0.6,changeFrequency:"monthly" as const},
