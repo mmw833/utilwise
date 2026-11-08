@@ -447,3 +447,13 @@
 - 한국어/영어 팁 계산기: /tip, /en/tip. 팁 비율, 통화 표시, 인원 분할 지원. 통화 표시는 환율 변환 아님.
 - 홈페이지, 온라인 도구 카테고리, sitemap, 개인정보처리방침 반영.
 - 통합 브랜치: integration/tip-and-image-tools. CI 및 실제 배포 검증 전.
+
+## 2026-11-08 PDF 도구 1차 구현 (작업 브랜치)
+- 한국어·영어 PDF 도구 5종 추가: PDF 합치기, PDF 분할, PDF 회전, PDF 페이지 정리, 이미지 PDF 변환
+- 독립 URL: `/pdf-merge`, `/pdf-split`, `/pdf-rotate`, `/pdf-organize`, `/image-to-pdf` 및 `/en` 대응 URL
+- `pdf-lib`를 이용해 브라우저에서 PDF 문서 처리. 문서와 이미지를 서버로 업로드하지 않음
+- 홈, 온라인 도구 카테고리, sitemap, 개인정보처리방침에 신규 기능 반영
+- 작업 브랜치: `feature/pdf-tools`
+- **검증 대기:** GitHub Actions 빌드, 샘플 PDF 합치기/분할/회전/페이지 재정렬, 이미지 변환(JPG/PNG/WebP), 손상·암호화 PDF 오류 처리, 모바일 UI, Cloudflare 운영 배포
+- **주의:** PDF 파일 암호 해제, OCR, 압축, 비밀번호 설정, 대용량 문서 안정성은 이번 범위에 포함하지 않음. 암호화 PDF는 처리되지 않을 수 있음.
+- **배포 상태:** PR 검토 및 빌드 확인 전. 운영 반영 완료로 간주하지 않음
