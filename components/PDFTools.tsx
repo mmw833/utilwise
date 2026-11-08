@@ -56,7 +56,7 @@ async function imageBytes(file: File): Promise<{ bytes: Uint8Array; type: "jpg" 
 }
 
 export default function PDFTools({ mode, lang = "ko" }: Props) {
-  const t = copy[lang][mode];
+  const t = copy[lang][mode] as Record<string, string>;
   const [files, setFiles] = useState<File[]>([]);
   const [range, setRange] = useState("");
   const [angle, setAngle] = useState(90);
