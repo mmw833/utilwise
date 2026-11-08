@@ -1,15 +1,15 @@
 import type {Metadata} from "next";import {notFound} from "next/navigation";import EnglishCalculator from "./EnglishCalculator";
 const info:Record<string,{title:string;description:string}>={
-area:{title:"Area Converter",description:"Convert square meters to pyeong and pyeong to square meters."},
-loan:{title:"Loan Interest Calculator",description:"Estimate monthly repayments and total interest for equal-payment and equal-principal loans."},
-brokerage:{title:"Real Estate Brokerage Fee Calculator",description:"Estimate the maximum residential brokerage fee under South Korean rules."},
-salary:{title:"Take-home Salary Calculator",description:"Estimate monthly take-home pay using South Korean payroll insurance rates."},
-severance:{title:"Severance Pay Calculator",description:"Estimate severance pay using South Korean labor-law calculation principles."},
-savings:{title:"Savings Interest Calculator",description:"Estimate deposit and installment savings interest and maturity amounts."},
-dsr:{title:"DSR Loan Capacity Calculator",description:"Simulate debt service ratio and borrowing capacity using your assumptions."},
-"rent-conversion":{title:"Rent Conversion Calculator",description:"Convert between rental deposit differences and monthly rent."},
-fuel:{title:"Fuel Cost Calculator",description:"Estimate trip and monthly fuel costs from distance, fuel economy, and price."},
-vat:{title:"VAT Calculator",description:"Calculate VAT and the total amount using a selected rate."}
+area:{title:"Square Meter to Pyeong Converter | Korean Area Calculator",description:"Convert square meters (m²) to pyeong and pyeong to square meters. A quick area converter for understanding South Korean apartment and property listings."},
+loan:{title:"Loan Payment Calculator | Monthly Payments & Total Interest",description:"Estimate monthly loan payments, total repayment, and interest with equal-payment or equal-principal methods. Enter your loan amount in KRW, annual rate, and term."},
+brokerage:{title:"Korean Real Estate Brokerage Fee Calculator | Realtor Commission",description:"Estimate residential realtor commission and the maximum brokerage fee for a home sale or monthly rental in South Korea. Results use KRW and Korean fee rules."},
+salary:{title:"South Korea Salary Calculator | Take-Home Pay After Tax",description:"Estimate monthly take-home pay from gross annual salary using South Korean pension, health, long-term care, and employment insurance assumptions. KRW-based estimate."},
+severance:{title:"South Korea Severance Pay Calculator | Retirement Pay Estimate",description:"Estimate Korean severance pay from final three-month wages, eligible bonuses, unused leave allowance, and length of service. Pre-tax estimate in KRW."},
+savings:{title:"Savings Interest Calculator | Deposit & Monthly Savings",description:"Calculate estimated interest and maturity value for a fixed deposit or monthly installment savings plan. Adjust the annual rate, term, and interest tax."},
+dsr:{title:"DSR Calculator Korea | Debt Service Ratio & Loan Capacity",description:"Estimate debt service ratio (DSR), annual repayments, and potential borrowing capacity using Korean-style KRW inputs and your assumed stress rate. Not a loan approval."},
+"rent-conversion":{title:"Korea Rent Conversion Calculator | Deposit to Monthly Rent",description:"Convert a rental deposit difference into an estimated monthly rent, or monthly rent into a deposit equivalent using an annual conversion rate. For South Korea."},
+fuel:{title:"Fuel Cost Calculator | Trip, Gas & Monthly Fuel Costs",description:"Estimate fuel used and the cost of a trip or monthly driving from distance, fuel economy, fuel price per liter, and driving days. Supports km and KRW inputs."},
+vat:{title:"VAT Calculator | Add or Remove Tax from a Price",description:"Calculate value-added tax (VAT), a pre-tax amount, or a VAT-inclusive total using your chosen tax rate. Useful for pricing, invoices, and quick estimates."}
 };
 export function generateStaticParams(){return Object.keys(info).map(tool=>({tool}));}
 export async function generateMetadata({params}:{params:Promise<{tool:string}>}):Promise<Metadata>{const {tool}=await params;const item=info[tool];if(!item)return {title:"Calculator | UTILWISE"};return {title:item.title+" | UTILWISE",description:item.description,alternates:{canonical:"/en/"+tool,languages:{"en":"/en/"+tool,"ko-KR":"/"+tool}},openGraph:{title:item.title+" | UTILWISE",description:item.description,url:"https://utilwise.kr/en/"+tool,siteName:"UTILWISE",locale:"en_US",type:"website"}};}
