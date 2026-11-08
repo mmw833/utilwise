@@ -82,6 +82,9 @@ export default function QRCodeGenerator({ lang = "ko" }: { lang?: Lang }) {
     if (mode === "url" && !/^https?:\/\//i.test(payload)) {
       setImage(""); setError(t.invalidUrl); return () => { active = false; };
     }
+    if (mode === "wifi" && security === "WPA" && !password) {
+      setImage(""); setError(t.invalidWifi); return () => { active = false; };
+    }
     if (mode === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       setImage(""); setError(t.invalidEmail); return () => { active = false; };
     }
