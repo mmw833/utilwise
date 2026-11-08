@@ -14,7 +14,8 @@ const tools=[
 {icon:"⌂",title:"전월세 전환 계산기",desc:"보증금과 월세 전환 금액을 비교해요.",href:"/rent-conversion"},
 {icon:"⛽",title:"자동차 유류비 계산기",desc:"주행 거리와 연비로 예상 주유비를 계산해요.",href:"/fuel"},
 {icon:"％",title:"부가세 계산기",desc:"공급가액과 부가세 포함 금액을 계산해요.",href:"/vat"},
-{icon:"▣",title:"부피 계산기",desc:"직육면체와 원기둥의 부피를 계산하고 리터로 변환해요.",href:"/volume"}];
+{icon:"▣",title:"부피 계산기",desc:"직육면체와 원기둥의 부피를 계산하고 리터로 변환해요.",href:"/volume"},
+{icon:"％",title:"팁 계산기",desc:"팁 비율과 인원수에 따른 1인당 결제 금액을 계산해요.",href:"/tip"}];
 const personality=[{title:"MBTI 성격유형 검사",desc:"24개의 질문으로 나의 성향과 성격을 알아봐요.",href:"/mbti",label:"테스트 시작하기　→"},{title:"빅파이브 성격검사",desc:"50문항으로 다섯 가지 성격 차원을 분석해요.",href:"/big-five",label:"검사 시작하기　→"},{title:"감성지능(EQ) 테스트",desc:"36문항으로 감정 인식·조절·공감과 관계 능력을 살펴봐요.",href:"/eq",label:"테스트 시작하기　→"}];
 const onlineTools=[{title:"QR 코드 생성기",desc:"URL, 텍스트, Wi-Fi, 이메일, 전화번호를 QR 코드로 만들어요.",href:"/qr-code-generator"}];
 const textTools=[{title:"발표시간 계산기",desc:"발표 원고와 말하기 속도로 예상 시간을 계산해요.",href:"/text-tools/speech-time"},{title:"글자 수·단어 수 세기",desc:"공백 포함·제외 글자 수와 단어 수를 실시간으로 확인해요.",href:"/text-tools/character-counter"},{title:"텍스트 비교",desc:"두 문서에서 서로 다른 내용을 찾아봐요.",href:"/text-tools/text-compare"},{title:"중복 문장 제거",desc:"반복된 문장을 찾아 첫 번째 문장만 남겨요.",href:"/text-tools/remove-duplicates"}];
