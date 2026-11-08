@@ -39,6 +39,39 @@
 | /psychology/desire | 가치관 테스트 | 나의 욕망 테스트, 핵심 가치관 테스트, 내면의 우선순위 |
 | /psychology/mirror | 첫인상·자아 인식 테스트 | 남이 보는 나 테스트, 겉모습과 속마음, 자기 인식 테스트 |
 
+
+## English calculator pages
+
+| URL | Primary search phrase | Supporting phrases / intent |
+|---|---|---|
+| /en/area | Pyeong converter | square meters to pyeong, m2 to pyeong, Korean apartment area |
+| /en/date | Date calculator | date difference calculator, days between dates, D-Day countdown, business days calculator, age calculator |
+| /en/loan | Loan payment calculator | monthly loan payment, loan interest calculator, equal payment, equal principal |
+| /en/brokerage | Real estate brokerage fee calculator | Korean realtor fee, property agent commission Korea, rental brokerage fee Korea |
+| /en/salary | South Korea take-home pay calculator | Korean salary after tax, Korea payroll calculator, Korean 4 social insurances |
+| /en/severance | South Korea severance pay calculator | Korean retirement pay estimate, severance formula Korea |
+| /en/savings | Savings interest calculator | deposit interest calculator, installment savings calculator, after-tax maturity amount |
+| /en/dsr | DSR calculator Korea | debt service ratio calculator, Korean mortgage borrowing capacity |
+| /en/rent-conversion | Rent conversion calculator | rental deposit to monthly rent, monthly rent to deposit calculator Korea |
+| /en/fuel | Fuel cost calculator | trip fuel cost, gas cost by distance, fuel economy calculator |
+| /en/vat | VAT calculator | VAT inclusive calculator, pre-tax amount, reverse VAT calculation |
+| /en/volume | Volume calculator | cubic meter to liters, cylinder volume calculator, rectangular prism volume |
+
+## English text and personality pages
+
+| URL | Primary search phrase | Supporting phrases / intent |
+|---|---|---|
+| /en/text-tools/character-counter | Character and word counter | character count with spaces, character count without spaces, essay word counter |
+| /en/text-tools/text-compare | Text comparison tool | compare two documents, find text differences, compare document versions |
+| /en/text-tools/remove-duplicates | Duplicate sentence remover | remove repeated sentences, duplicate text cleaner |
+| /en/text-tools/speech-time | Speech time calculator | presentation time calculator, speech word count, speech recorder, presentation practice |
+| /en/mbti | Free personality test | 24 question personality quiz, personality type preferences |
+| /en/big-five | Big Five personality test | five factor personality test, openness conscientiousness extraversion agreeableness |
+| /en/eq | Emotional intelligence test | EQ self assessment, emotional awareness, emotional regulation |
+| /en/psychology | Fun psychology quiz | self discovery quiz, hidden personality quiz |
+| /en/psychology/desire | Values and priorities quiz | what do I truly want, personal values quiz |
+| /en/psychology/mirror | Self perception quiz | how others see me, public image vs inner self |
+
 ## 영어 페이지 원칙
 
 - 영어 URL은 영어권 검색 의도에 맞춘 독립 title, description, H1, 본문을 사용한다.
