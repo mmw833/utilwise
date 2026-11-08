@@ -313,3 +313,10 @@
 - 첫 번째 심리테스트의 8개 결과 유형별 정사각형 SVG 일러스트를 `public/images/psychology/`에 추가했다.
 - `PsychologyExperience.tsx` 결과 화면에 유형별 이미지 매핑을 연결했다. 한국어/영어 결과 화면은 동일 이미지를 사용한다.
 - 이미지와 코드 변경은 GitHub main에 반영했다. CI 빌드 및 실제 Cloudflare 배포 확인은 별도 확인이 필요하다.
+
+
+## 2026-11-08 심리테스트 1번 원본 이미지 업로드 확인 및 연결
+- GitHub `public/images/psychology/`에 업로드된 정사각형 WebP 일러스트 8개를 확인했다: quiet-observer, curious-explorer, warm-empath, free-spirit, steady-strategist, bold-pioneer, thoughtful-connector, energetic-connector.
+- `components/PsychologyExperience.tsx`의 결과 이미지 매핑을 기존 임시 SVG에서 업로드된 WebP 파일로 변경했다.
+- 이미지 파일은 재생성하지 않고 저장소에 업로드된 원본 WebP를 사용한다.
+- GitHub 코드 반영 완료. CI 빌드 및 Cloudflare 실서비스 배포는 별도 확인 필요.
