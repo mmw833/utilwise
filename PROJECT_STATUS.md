@@ -429,3 +429,10 @@
 - `components/PsychologyCollection.tsx`에 mirror 결과 인덱스(0~7)와 이미지 파일 매핑을 추가했다.
 - 세 번째 테스트의 한국어/영어 결과 화면에 유형별 이미지를 연결했다. 기존 desire 이미지 연결은 유지했다.
 - 코드 커밋: `e6f2b774c022a85176a4cf6b10f0f58d7ba74ac9`. CI 및 Cloudflare 배포 확인은 별도 필요.
+
+
+## 2026-11-08 온라인 도구 섹션의 전체 도구 보기 링크 제거
+- 한국어 홈 `app/page.tsx`의 온라인 도구 제목 오른쪽 `전체 도구 보기 →` 링크 제거
+- 영어 홈 `app/en/page.tsx`의 `View all tools →` 링크도 함께 제거(중복 섹션 포함)
+- 도구 카드 및 온라인 도구 카테고리 페이지 자체는 유지
+- 작업 브랜치: `fix/remove-online-tools-view-all`; GitHub 반영 후 Actions 빌드 및 실제 PC/모바일 화면 확인 필요
