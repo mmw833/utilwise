@@ -202,3 +202,68 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 /* Tip calculator */
 .tip-calculator .calc-layout{margin-top:24px}.tip-calculator .tabs{margin:10px 0 12px}.tip-calculator .field .tabs{gap:7px}.tip-calculator .field .tab{min-width:48px}.tip-calculator .result strong{font-size:30px}.tip-calculator .result-row{align-items:center}
 @media(max-width:480px){.tip-calculator .field .tabs{gap:6px}.tip-calculator .field .tab{padding:9px 10px;min-width:44px}}
+
+
+/* Mobile-first density pass: keep the desktop layout intact while reducing
+   vertical scrolling and improving touch/readability on narrow screens. */
+@media(max-width:480px){
+  html{scroll-padding-top:76px}
+  .wrap{padding-left:15px;padding-right:15px}
+  .header{min-height:62px;padding-top:10px;padding-bottom:10px}
+  .hero{padding:34px 0 28px}
+  .hero h1{font-size:clamp(27px,8vw,34px);line-height:1.2;margin:10px 0}
+  .hero-english{font-size:14px;margin-bottom:10px}
+  .search{margin-top:18px;border-radius:10px}
+  .search input{font-size:13px;padding:7px 5px}
+  .search button{padding:10px 11px}
+  .section{padding-top:27px;padding-bottom:34px}
+  .section-head{margin-bottom:14px}
+  .section h2{font-size:21px}
+  .sub{font-size:12px;line-height:1.55}
+  .section>.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .section>.grid>.tool{min-width:0;padding:13px 11px;border-radius:11px}
+  .section>.grid>.tool:hover{transform:none;box-shadow:none}
+  .tool-icon{width:32px;height:32px;border-radius:9px;font-size:16px;margin-bottom:10px}
+  .tool h3{font-size:13px;line-height:1.4;letter-spacing:-.25px;margin-bottom:5px;overflow-wrap:anywhere}
+  .tool p{font-size:11px;line-height:1.45;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+  .tool-link-label{font-size:10px;margin-top:10px}
+  .test-section .section{padding-top:32px;padding-bottom:36px}
+  .test-heading{margin-bottom:17px}
+  .test-heading h2{font-size:24px;margin:7px 0}
+  .test-heading p{font-size:12px;line-height:1.55}
+  .test-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .test-grid>.tool{grid-column:auto}
+  .footer{padding:22px 0 28px;font-size:11px;line-height:1.7}
+  .footer-legal-links{gap:10px}
+  .calc-layout{gap:11px;margin:18px 0 34px}
+  .panel{padding:15px;border-radius:12px}
+  .panel h2{font-size:16px;margin-bottom:14px}
+  .field{gap:6px;margin:12px 0}
+  .field input,.field select{min-height:44px;padding:10px}
+  .result{padding:15px}
+  .result strong{font-size:23px}
+  .result-row{font-size:12px;padding:10px 0}
+  .notice{padding:11px;font-size:11px}
+  .date-guide,.volume-guide,.qr-guide,.text-tool-guide,.image-tool-guide,
+  .text-tool-seo,.speech-seo-guide{padding:15px;margin-top:20px}
+  .date-guide h2,.volume-guide h2,.qr-guide h2{font-size:18px}
+  .date-guide h3,.volume-guide h3{font-size:14px}
+  .policy-content{width:calc(100% - 30px)}
+  .policy-section{padding-bottom:16px;margin-bottom:16px}
+  .policy-section p{font-size:13px;line-height:1.75}
+  .related-calculators{padding:16px;margin:22px 0}
+  .related-calculators>div{gap:9px 13px}
+  .speech-settings,.speech-input-panel,.speech-practice-panel{padding:15px}
+  .speech-practice-panel{min-height:270px}
+  .qr-image-frame{min-height:230px;padding:12px}
+  .image-output-card{padding:12px}
+  .text-tool-panel textarea{min-height:180px}
+}
+@media(max-width:360px){
+  .wrap{padding-left:12px;padding-right:12px}
+  .section>.grid>.tool{padding:11px 9px}
+  .tool h3{font-size:12px}
+  .tool p{font-size:10.5px;-webkit-line-clamp:2}
+  .mobile-menu>summary{padding:8px 9px;font-size:12px}
+  .mobile-language-toggle .language-switcher{font-size:10px}
+}
