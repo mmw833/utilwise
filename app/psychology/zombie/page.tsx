@@ -1,0 +1,3 @@
+import type {Metadata} from "next";import ZombieExperience from "../../../components/ZombieExperience";
+export const metadata:Metadata={title:"좀비 아포칼립스 생존 유형 테스트 | 무료 심리테스트 - UTILWISE",description:"좀비 아포칼립스 상황 12가지 선택으로 나의 생존 캐릭터를 알아보세요. 8가지 재미있는 생존 유형과 상세 해석을 확인하는 무료 심리테스트.",alternates:{canonical:"/psychology/zombie",languages:{"ko-KR":"/psychology/zombie","en":"/en/psychology/zombie"}},openGraph:{title:"좀비 아포칼립스 생존 유형 테스트하기",description:"위기 상황에서 드러나는 나의 생존 캐릭터는? 12가지 선택으로 확인해 보세요.",url:"https://utilwise.kr/psychology/zombie",siteName:"UTILWISE",locale:"ko_KR",type:"website"}};
+export default function Page(){return <ZombieExperience mode="intro"/>}
