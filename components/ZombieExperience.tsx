@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import {useMemo,useState} from "react";
+import {useEffect,useState} from "react";
 
 type Locale="ko"|"en";
 type Question={axis:0|1|2;ko:string;en:string;a:string;b:string;ae:string;be:string};
@@ -31,9 +31,9 @@ const profiles=[
 const copy=(ko:string,en:string,locale:Locale)=>locale==="ko"?ko:en;
 export default function ZombieExperience({mode,locale="ko"}:{mode:"intro"|"test"|"result";locale?:Locale}){
 const [answers,setAnswers]=useState<number[]>([]);const [index,setIndex]=useState(0);const [notice,setNotice]=useState("");
-const [shareMessage,setShareMessage]=useState("");
+const [shareMessage,setShareMessage]=useState("");const [resultCode,setResultCode]=useState("");
 const isKo=locale==="ko";
-const resultCode=typeof window!=="undefined"?new URLSearchParams(window.location.search).get("type")||"": "";
+useEffect(()=>{setResultCode(new URLSearchParams(window.location.search).get("type")||"");},[]);
 const profileIndex=profiles.findIndex((_,i)=>i.toString(2).padStart(3,"0")===resultCode);
 const profile=profiles[Math.max(0,profileIndex)];
 const title=copy("좀비 아포칼립스가 시작됐다! 나는 어떤 생존자일까?","Zombie Apocalypse: What Kind of Survivor Are You?",locale);
