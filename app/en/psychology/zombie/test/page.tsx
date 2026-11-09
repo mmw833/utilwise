@@ -1,0 +1,3 @@
+import type {Metadata} from "next";import ZombieExperience from "../../../../../components/ZombieExperience";
+export const metadata:Metadata={title:"Start the Zombie Survival Quiz | UTILWISE",description:"Answer 12 fictional survival scenarios and discover your zombie apocalypse personality.",robots:{index:false,follow:true}};
+export default function Page(){return <ZombieExperience mode="test" locale="en"/>}
