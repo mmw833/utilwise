@@ -1,3 +1,13 @@
+## 2026-11-10 영어 홈페이지 SEO 안내 콘텐츠 위치 조정
+- 영어 홈페이지 하단에 길게 노출되던 SEO 안내 문단을 홈페이지에서 제거하고 `/en/about` 서비스 소개 페이지로 이동
+- 검색 의도에 필요한 계산기·QR·이미지·PDF·텍스트 도구 관련 설명과 내부 링크는 소개 페이지에 유지
+- 한국어 홈페이지는 변경하지 않음. 사용자 화면에서 영어 홈 하단의 긴 회색 소개 블록이 사라지도록 구성
+- 변경 파일: `app/en/page.tsx`, `app/en/about/page.tsx`, `PROJECT_STATUS.md`, `CHANGELOG.md`, `DEVELOPMENT.md`
+- 작업 브랜치: `fix/english-home-seo-content-placement`
+- **검증 대기:** GitHub Actions 빌드, `/en` 및 `/en/about` 데스크톱·모바일 표시, 내부 링크 확인
+- **배포 상태:** PR 및 운영 배포 전. 운영 사이트 반영 완료로 간주하지 않음
+
+
 
 ## 2026-11-09 모바일 전체 화면 밀도 최적화 (작업 브랜치)
 - 기존 Next.js/공통 CSS 구조를 유지하고 `app/globals.css`에 모바일 전용 밀도 조정 규칙을 추가
