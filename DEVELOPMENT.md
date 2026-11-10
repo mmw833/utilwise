@@ -458,3 +458,14 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 조회수 API: POST /api/blog/view에 {language, slug} 전송. 서버가 발급한 uw_blog_visitor HttpOnly 쿠키를 사용하며 원문 IP는 저장하지 않음
 - Markdown은 안전한 제한 문법으로 렌더링. 원시 HTML/스크립트는 허용하지 않음
 - R2 이미지 업로드 및 이미지 렌더링은 별도 후속 구현
+
+
+## Preview 환경 보호 및 개발 DB 분리 (2026-11-10)
+- Cloudflare Worker의 Worker Previews는 브랜치/PR별 격리된 Preview 환경을 사용한다.
+- Preview Default의 runtime Secret `PREVIEW_ACCESS_PASSWORD`를 등록한다. 비밀번호는 Git 저장소나 일반 변수에 기록하지 않는다.
+- Preview Default의 D1 binding 이름은 `BLOG_DB`, 대상은 `utilwise-blog-staging`이다. Production의 `BLOG_DB`는 `utilwise-blog`를 유지한다.
+- `middleware.ts`는 `utilwise.kr`, `www.utilwise.kr`, localhost를 제외한 호스트에 Basic 인증을 적용한다. 사용자명은 `preview`다.
+- Preview Secret이 없거나 24자 미만이면 503으로 차단하므로, Preview 공개 전 반드시 Cloudflare Preview Default에 Secret이 등록되어 있어야 한다.
+- Preview 응답은 `X-Robots-Tag: noindex, nofollow, noarchive`, `Cache-Control: private, no-store`를 설정한다.
+- 테스트: 무인증/잘못된 인증은 401, 올바른 인증은 페이지·API·정적 리소스까지 통과, Preview 응답은 noindex, Production 도메인은 기존 정상 응답, D1 쓰기/읽기는 staging DB에서만 수행되는지 확인한다.
+- 운영 배포 명령 `npm run deploy` 또는 main 병합은 별도 사용자 승인 전 실행하지 않는다.
