@@ -64,3 +64,12 @@
 
 ## 팁 계산기
 - 한국어 /tip, 영어 /en/tip. 통화 표시는 환율 변환이 아니며, 팁 비율은 사용자 선택값이다.
+
+
+## Preview 환경 격리 및 접근 보호
+- 개발 브랜치/PR Preview는 Production과 분리해 운영한다. Cloudflare Worker의 Preview Default 환경 설정만 수정하고 Production 설정은 변경하지 않는다.
+- Preview 전용 비밀값은 Cloudflare Preview Default Secret으로만 보관하며 Git, 일반 환경 변수, 문서에 기록하지 않는다.
+- Preview D1 binding `BLOG_DB`는 `utilwise-blog-staging`을 사용하고 Production `BLOG_DB`와 절대 혼용하지 않는다.
+- 비운영 호스트는 Basic 인증으로 보호하고 인증 설정이 누락되면 공개하지 말고 fail-closed로 차단한다.
+- Preview에는 noindex 및 private/no-store 헤더를 적용하되, noindex를 접근 제어 대체 수단으로 간주하지 않는다.
+- Preview의 무인증/오인증/정상 인증, API 및 정적 리소스 접근, D1 대상, Production 도메인 회귀 테스트를 통과하기 전 보호 완료로 보고하지 않는다.
