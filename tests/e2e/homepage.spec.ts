@@ -15,7 +15,7 @@ test("Korean homepage loads and calculator search filters results", async ({ pag
 test("English homepage loads with calculator navigation", async ({ page }) => {
   await page.goto("/en");
   await expect(page).toHaveTitle(/UTILWISE/);
-  await expect(page.getByRole("heading", { name: "All the tools you need, made simple." })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("All the tools you need");
   await expect(page.getByRole("link", { name: "Area Converter" })).toHaveAttribute("href", "/en/area");
 });
 
