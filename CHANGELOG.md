@@ -421,3 +421,9 @@
 - Preview build command를 `npx wrangler preview`로 변경
 - Preview Default Secret과 staging D1 binding을 별도 환경 설정으로 사용
 - 새 Preview URL 생성 및 Basic 인증/DB 분리 실환경 검증은 진행 중
+
+
+## 2026-11-10 Preview 배포 검증 보류
+- Worker Previews가 활성화되고 branch Preview URL이 생성됨
+- Preview URL은 아직 앱 대신 Cloudflare 기본 "There is nothing here yet" 페이지를 반환해 인증 테스트를 완료하지 못함
+- Preview 빌드가 실제 앱 버전을 생성한 뒤 Basic 인증과 staging D1 연결을 다시 확인할 것
