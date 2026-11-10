@@ -471,3 +471,16 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 운영 배포 명령 `npm run deploy` 또는 main 병합은 별도 사용자 승인 전 실행하지 않는다.
 
 - Production 호스트 예외에는 `utilwise.kr`, `www.utilwise.kr`, `utilwise.mmw833.workers.dev`가 포함된다. 다른 비운영 Preview 호스트는 인증 대상이다.
+
+
+## Cloudflare Worker Previews (2026-11-10)
+- Cloudflare Worker Previews를 활성화해 비운영 브랜치/PR마다 격리된 Preview를 생성한다.
+- Production branch는 `main`으로 유지한다.
+- Workers Builds Build command: `npx opennextjs-cloudflare build`
+- Workers Builds Deploy command: `npx opennextjs-cloudflare deploy`
+- Worker Previews Preview build command: `npx wrangler preview` (기존 `opennextjs-cloudflare preview` 대신 새 Preview 모델 사용)
+- Preview Default runtime Secret: `PREVIEW_ACCESS_PASSWORD`
+- Preview Default D1 binding: `BLOG_DB` → `utilwise-blog-staging`
+- Production의 `BLOG_DB`는 기존 `utilwise-blog`를 사용해야 하며 Preview DB와 혼용하지 않는다.
+- Preview URL 생성 후 인증 없는 요청 401, 정상 인증 200, `X-Robots-Tag` noindex, D1 staging read/write를 확인한다.
+- 새 Preview 모델 적용 후 첫 빌드가 완료되기 전에는 Preview 준비 완료로 간주하지 않는다.
