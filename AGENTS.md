@@ -1,3 +1,4 @@
+- Cloudflare Worker Previews는 Wrangler 4.135.0 이상을 요구한다. `package.json`의 Wrangler 최소 버전을 낮추지 말고, 버전 변경 후 Preview 빌드 성공 로그를 확인한다.
 
 - 영어권 방문자 비중이 높으므로 모든 신규 기능은 영어 URL, 영어 검색 의도, 영어 고유 메타데이터와 설명 콘텐츠를 함께 검토한다.
 - 국제 공통 도구와 한국 법령·세금·급여·부동산 기반 도구를 구분한다. 후자는 제목/설명/본문에서 South Korea 및 KRW 기준을 명확히 한다.
