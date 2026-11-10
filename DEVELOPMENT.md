@@ -458,3 +458,11 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 조회수 API: POST /api/blog/view에 {language, slug} 전송. 서버가 발급한 uw_blog_visitor HttpOnly 쿠키를 사용하며 원문 IP는 저장하지 않음
 - Markdown은 안전한 제한 문법으로 렌더링. 원시 HTML/스크립트는 허용하지 않음
 - R2 이미지 업로드 및 이미지 렌더링은 별도 후속 구현
+
+
+## UTILWISE 저널형 블로그 메인 화면
+- 공개 피드 컴포넌트: `components/BlogFeed.tsx`; 스타일: `app/globals.css` 마지막의 `UTILWISE Journal redesign` 구역
+- 한국어 `/blog`, 영어 `/en/blog`가 동일한 컴포넌트를 사용하며 언어별 문구와 링크를 분기한다.
+- 메인 구성: 홈/블로그/도구 탐색 헤더, 언어 전환, 에디토리얼 히어로, 콘텐츠 주제 소개, 인기글, 최신글, 게시글이 없을 때의 안내 및 도구 탐색 링크, 푸터
+- 게시글 카드 데이터는 기존 D1 공개 피드(`popular`, `posts`)를 사용한다. 게시글 이미지 업로드/R2 연결 전에는 CSS 기반 추상 그래픽을 사용하며 이미지가 실제 업로드된 것처럼 표시하지 않는다.
+- 900px/620px 기준으로 태블릿·모바일 레이아웃을 조정한다. 배포 후 PC 1280px, 태블릿 768px, 모바일 390px/360px에서 overflow와 링크·카드 배치를 확인한다.
