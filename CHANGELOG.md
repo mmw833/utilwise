@@ -1,3 +1,9 @@
+## 2026-11-10 Playwright 브라우저 테스트 환경 추가
+- `@playwright/test`와 데스크톱 Chromium/iPhone 13 모바일 테스트 설정 추가
+- 한국어·영어 홈페이지 렌더링, 검색 필터, 모바일 메뉴, 주요 공개 URL의 HTTP 응답을 확인하는 E2E 테스트 추가
+- GitHub Actions에서 PR 및 feature 브랜치 push 시 브라우저 테스트를 실행하도록 별도 workflow 구성
+- 작업 브랜치 `feature/playwright-e2e`; 최초 CI 실행 및 테스트 통과 여부 확인 대기
+
 ## 2026-11-10 영어 홈페이지 SEO 콘텐츠 이동
 - `/en` 하단의 긴 SEO 안내 블록을 제거해 홈페이지 첫 화면과 도구 목록 흐름을 간결하게 정리
 - 기존 검색 관련 설명과 관련 도구 내부 링크는 `/en/about` 서비스 소개 페이지로 이동
