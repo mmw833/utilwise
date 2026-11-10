@@ -1,3 +1,37 @@
+## Cloudflare PR 미리보기 배포
+- Workflow: `.github/workflows/preview-deploy.yml`
+- PR이 열리거나 업데이트되면 `npx opennextjs-cloudflare build` 후 `npx wrangler deploy --name utilwise-preview` 실행
+- 운영 Worker 이름은 `utilwise`, 미리보기 Worker 이름은 `utilwise-preview`로 분리한다. 미리보기 workflow는 운영 Worker 및 운영 도메인 설정을 수정하지 않는다.
+- GitHub 저장소 Settings → Secrets and variables → Actions에 다음 secrets를 등록해야 한다.
+  - `CLOUDFLARE_API_TOKEN`: 해당 Cloudflare 계정의 Workers 배포 권한이 있는 API Token
+  - `CLOUDFLARE_ACCOUNT_ID`: Cloudflare Account ID
+- 배포가 성공하면 Wrangler 로그에 표시되는 `https://utilwise-preview.<workers-subdomain>.workers.dev` 주소를 PR의 Actions 실행 로그에서 확인한다. 실제 계정의 workers.dev 활성화 상태에 따라 URL 사용 가능 여부가 달라질 수 있다.
+- 인증정보 등록 전 또는 workflow 성공 전에는 미리보기 URL을 완료된 것으로 안내하지 않는다.
+
+### 계산기 상호작용 테스트
+- `tests/e2e/calculators.spec.ts`는 부피 계산기 입력/도형 변경과 팁 계산기 금액·팁 비율·통화·인원별 분배 결과를 브라우저에서 검증한다.
+- 계산기 UI를 수정할 때 초기 표시뿐 아니라 사용자 입력 변경 후 결과 갱신도 테스트한다.
+- 테스트 실행 결과는 GitHub Actions에서 확인하며, 실패 시 trace/screenshot을 기준으로 원인을 수정한다.
+
+### 최초 CI 검증 결과 (2026-11-10)
+- PR #11의 Playwright E2E workflow가 Chromium 설치와 브라우저 테스트 단계를 포함해 성공했다.
+- 같은 커밋의 Next.js production build도 성공했다.
+- 실행 상세: https://github.com/mmw833/utilwise/actions/runs/42763513163
+- 이후 신규 페이지/기능의 테스트는 이 설정을 기반으로 확장한다. 새 테스트 추가 후에는 PR CI 결과를 별도로 확인한다.
+
+## Playwright 브라우저 테스트
+- 테스트 프레임워크: `@playwright/test` (개발 의존성)
+- 설정: `playwright.config.ts`
+- 테스트 파일: `tests/e2e/`
+- 실행: `npm install` 후 `npx playwright install chromium`, 다음 `npm run test:e2e`
+- 브라우저 UI 모드: `npm run test:e2e:ui`
+- 기본 대상: 로컬 Next.js 개발 서버 `http://127.0.0.1:3000`; 별도 대상은 `PLAYWRIGHT_BASE_URL` 환경변수로 지정
+- 데스크톱 Chromium과 iPhone 13 모바일 에뮬레이션을 사용한다. 모바일 프로젝트도 Chromium 기반이므로 별도 WebKit 설치는 필요하지 않다.
+- GitHub Actions: `.github/workflows/playwright.yml`에서 PR 및 `feature/**` 브랜치 push 시 Chromium 설치 후 E2E 테스트 실행
+- 테스트는 페이지 렌더링/라우트 응답과 주요 내비게이션 흐름을 확인하며 Cloudflare 운영 배포를 수행하지 않는다.
+- 신규 테스트를 추가할 때 실제 접근성 이름과 URL을 기준으로 selector를 작성하고, 테스트 실패 시 스크린샷/trace artifact를 확인한다.
+- 최초 GitHub Actions 실행 전까지 CI 성공 여부는 미확인 상태로 유지한다.
+
 ## 영어 홈페이지 SEO 안내 콘텐츠 관리
 - 영어 홈페이지(`/en`)는 계산기·온라인 도구·텍스트 도구·테스트 목록에 집중하며 긴 SEO 소개 문단을 하단에 반복 노출하지 않는다.
 - 서비스 전체 설명과 관련 도구 내부 링크는 `/en/about` 소개 페이지에서 관리한다.

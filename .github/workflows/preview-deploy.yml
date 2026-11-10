@@ -1,0 +1,39 @@
+name: Cloudflare Preview
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    name: Deploy isolated preview Worker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull request
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Build OpenNext Worker
+        run: npx opennextjs-cloudflare build
+      - name: Deploy preview Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Add CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID to the GitHub repository Actions secrets to enable preview deployments."
+            exit 1
+          fi
+          npx wrangler deploy --name utilwise-preview

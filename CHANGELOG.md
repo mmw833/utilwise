@@ -1,3 +1,30 @@
+## 2026-11-10 Cloudflare 미리보기 배포 성공
+- GitHub Actions Cloudflare Preview workflow 실행 성공
+- 독립 미리보기 Worker `utilwise-preview` 배포 및 URL 발급: https://utilwise-preview.mmw833.workers.dev
+- 운영 환경 변경이나 main 병합 없음
+
+## 2026-11-10 Cloudflare 미리보기 배포 워크플로 추가
+- PR 전용 GitHub Actions workflow `.github/workflows/preview-deploy.yml` 추가
+- OpenNext 빌드 결과를 운영 Worker와 별개인 `utilwise-preview` Worker로 배포하도록 구성
+- GitHub Actions secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`가 필요하며 실제 미리보기 배포는 인증정보 등록 후 검증
+
+## 2026-11-10 Playwright 계산기 상호작용 테스트 확장
+- 부피 계산기의 입력값 변경 및 직육면체/원기둥 전환 테스트 추가
+- 팁 계산기의 결제 금액, 팁 비율, 통화 변경 및 인당 분할 결과 테스트 추가
+- 확장 테스트 CI 실행 결과 확인 대기
+
+## 2026-11-10 Playwright 최초 CI 검증 통과
+- PR #11에서 Chromium 기반 Playwright E2E workflow 성공
+- 기존 Next.js production build workflow도 동일 커밋에서 성공
+- 실행 결과: https://github.com/mmw833/utilwise/actions/runs/42763513163
+- 빌드 결과: https://github.com/mmw833/utilwise/actions/runs/42763513171
+
+## 2026-11-10 Playwright 브라우저 테스트 환경 추가
+- `@playwright/test`와 데스크톱 Chromium/iPhone 13 모바일 테스트 설정 추가
+- 한국어·영어 홈페이지 렌더링, 검색 필터, 모바일 메뉴, 주요 공개 URL의 HTTP 응답을 확인하는 E2E 테스트 추가
+- GitHub Actions에서 PR 및 feature 브랜치 push 시 브라우저 테스트를 실행하도록 별도 workflow 구성
+- 작업 브랜치 `feature/playwright-e2e`; 최초 CI 실행 및 테스트 통과 여부 확인 대기
+
 ## 2026-11-10 영어 홈페이지 SEO 콘텐츠 이동
 - `/en` 하단의 긴 SEO 안내 블록을 제거해 홈페이지 첫 화면과 도구 목록 흐름을 간결하게 정리
 - 기존 검색 관련 설명과 관련 도구 내부 링크는 `/en/about` 서비스 소개 페이지로 이동

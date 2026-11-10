@@ -1,3 +1,41 @@
+## 2026-11-10 Cloudflare 미리보기 배포 성공
+- GitHub Actions Cloudflare Preview 실행 성공: `42767801254`
+- 미리보기 URL: `https://utilwise-preview.mmw833.workers.dev`
+- Worker 이름: `utilwise-preview`; 운영 Worker/도메인과 분리
+- OpenNext 빌드 및 Cloudflare 업로드/배포 성공 확인. PR #11은 계속 draft/open 상태이며 main 병합 및 운영 배포는 하지 않음
+
+## 2026-11-10 Cloudflare 독립 미리보기 배포 구성
+- PR #11의 개발 브랜치에 `.github/workflows/preview-deploy.yml` 추가
+- PR이 열리거나 새 커밋이 올라오면 OpenNext 빌드 후 `utilwise-preview`라는 별도 Cloudflare Worker로 배포하도록 구성
+- 운영 Worker `utilwise`와 분리하며 운영 도메인/DNS/운영 Worker를 변경하지 않음
+- 미리보기 URL은 Cloudflare가 배포 후 출력하는 `workers.dev` 주소를 사용
+- **사용자 설정 필요:** GitHub 저장소 Settings → Secrets and variables → Actions에 `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` 등록
+- 현재는 Cloudflare 인증정보 등록 여부와 실제 배포 URL이 확인되지 않아 미리보기 접속 가능 상태로 간주하지 않음
+
+## 2026-11-10 Playwright 계산기 상호작용 테스트 확장
+- `tests/e2e/calculators.spec.ts` 추가
+- 부피 계산기: 초기 직육면체 결과, 입력 변경에 따른 부피·리터 재계산, 원기둥 전환 확인
+- 팁 계산기: 초기 총액/1인당 금액, 결제 금액 변경, 팁 비율 및 통화 변경 확인
+- **검증 대기:** 확장된 테스트의 GitHub Actions 실행 결과 확인
+
+## 2026-11-10 Playwright 1차 자동 검증 결과
+- PR #11 브랜치 `feature/playwright-e2e`에서 GitHub Actions 실행 확인
+- Playwright E2E: 성공 (Chromium 브라우저 설치 및 전체 정의 테스트 통과)
+- Next.js production build: 성공
+- 실행 링크: https://github.com/mmw833/utilwise/actions/runs/42763513163
+- 빌드 링크: https://github.com/mmw833/utilwise/actions/runs/42763513171
+- 이 결과는 PR 브랜치 코드에 대한 CI 검증이며 main 병합/Cloudflare 운영 배포를 의미하지 않음
+
+## 2026-11-10 Playwright 브라우저 테스트 1차 도입 (작업 브랜치)
+- 작업 브랜치: `feature/playwright-e2e` (main 기준, 운영 브랜치와 분리)
+- `@playwright/test` 개발 의존성 및 `npm run test:e2e`, `npm run test:e2e:ui` 스크립트 추가
+- Chromium 데스크톱 및 iPhone 13 모바일 에뮬레이션 프로젝트 구성
+- 한국어/영어 홈, 한국어 검색 필터, 모바일 접이식 메뉴, 주요 공개 경로 HTTP 응답을 확인하는 E2E 테스트 추가
+- GitHub Actions 전용 Playwright workflow 추가: PR 및 feature 브랜치 push 시 Chromium 테스트 실행
+- **검증 대기:** GitHub Actions 최초 실행, npm 의존성 설치, Playwright 테스트 결과 및 필요 시 selector 보정
+- **주의:** 로컬 설치/브라우저 실행을 이 작업 환경에서 직접 수행하지 못했으므로 테스트 성공으로 간주하지 않음
+- **배포 상태:** PR 생성 및 main 병합 전. Cloudflare Production 설정/배포는 변경하지 않음
+
 ## 2026-11-10 영어 홈페이지 SEO 안내 콘텐츠 위치 조정
 - 영어 홈페이지 하단에 길게 노출되던 SEO 안내 문단을 홈페이지에서 제거하고 `/en/about` 서비스 소개 페이지로 이동
 - 검색 의도에 필요한 계산기·QR·이미지·PDF·텍스트 도구 관련 설명과 내부 링크는 소개 페이지에 유지
