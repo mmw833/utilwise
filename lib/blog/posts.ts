@@ -35,7 +35,7 @@ const POST_SUMMARY_SELECT = `
     p.title,
     p.excerpt,
     p.cover_image_key,
-    c.name_ko AS category_name,
+    CASE WHEN p.language = 'en' THEN COALESCE(c.name_en, c.name_ko) ELSE c.name_ko END AS category_name,
     c.slug AS category_slug,
     p.view_count,
     p.published_at
@@ -100,7 +100,7 @@ export async function getPublishedPostBySlug(
         p.excerpt,
         p.content_md,
         p.cover_image_key,
-        c.name_ko AS category_name,
+        CASE WHEN p.language = 'en' THEN COALESCE(c.name_en, c.name_ko) ELSE c.name_ko END AS category_name,
         c.slug AS category_slug,
         p.seo_title,
         p.seo_description,
