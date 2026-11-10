@@ -13,9 +13,7 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
   const base = en ? "/en/blog" : "/blog";
   const home = en ? "/en" : "/";
   const tools = en ? "/en/online-tools" : "/online-tools";
-  const topics = en
-    ? [{ mark: "01", title: "Everyday life", desc: "Useful ideas for daily decisions" }, { mark: "02", title: "Digital life", desc: "Make the most of useful technology" }, { mark: "03", title: "Work & productivity", desc: "Simple ways to work smarter" }, { mark: "04", title: "Guides & know-how", desc: "Clear answers to practical questions" }]
-    : [{ mark: "01", title: "일상과 생활", desc: "매일의 선택에 도움이 되는 정보" }, { mark: "02", title: "디지털 라이프", desc: "유용한 기술과 온라인 활용법" }, { mark: "03", title: "업무와 생산성", desc: "더 편리하고 효율적인 일하는 방법" }, { mark: "04", title: "실용 가이드", desc: "생활 속 궁금증을 풀어주는 안내" }];
+  const featured = popular[0];
   const card = (post: BlogPostSummary, index: number, featured = false) => (
     <article className={`journal-card journal-card-tone-${index % 4}${featured ? " journal-card-featured" : ""}`} key={post.id}>
       <Link href={`${base}/${post.slug}`} className="journal-card-link">
@@ -53,22 +51,22 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
           <Link href={tools} className="journal-secondary-link">{en ? "Discover useful tools" : "유용한 도구 살펴보기"} ↗</Link>
         </div>
       </div>
-      <div className="journal-hero-art" aria-hidden="true">
+      {featured ? <Link href={`${base}/${featured.slug}`} className="journal-hero-art journal-hero-feature" aria-label={featured.title}>
+        <div className="journal-hero-feature-image">
+          {featured.cover_image_key ? <img src={`/api/blog/images/${featured.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt="" /> : <div className="journal-feature-fallback"><span>U.</span><i>✳</i><small>UTILWISE JOURNAL</small></div>}
+        </div>
+        <div className="journal-hero-feature-caption"><span>{en ? "MOST READ" : "이번 주 많이 읽은 글"}</span><strong>{featured.title}</strong><small>{en ? "Read the story" : "이야기 읽기"} ↗</small></div>
+      </Link> : <div className="journal-hero-art" aria-hidden="true">
         <div className="journal-art-orbit journal-art-orbit-one" />
         <div className="journal-art-orbit journal-art-orbit-two" />
         <div className="journal-art-paper"><span>U.</span><small>MAKE EVERYDAY<br />A LITTLE EASIER</small><i>✳</i></div>
         <div className="journal-art-caption">TOOLS · IDEAS · EVERYDAY</div>
-      </div>
+      </div>}
     </section>
 
-    <section className="journal-topics" aria-label={en ? "Journal topics" : "블로그 주제"}>
-      <div className="journal-topics-intro"><span>{en ? "A LITTLE BIT OF EVERYTHING" : "EVERYDAY, MADE BETTER"}</span><strong>{en ? "Explore by interest" : "다양한 주제를 만나보세요"}</strong></div>
-      {topics.map((topic) => <div className="journal-topic" key={topic.mark}><span>{topic.mark}</span><div><strong>{topic.title}</strong><small>{topic.desc}</small></div><b>↗</b></div>)}
-    </section>
-
-    {popular.length > 0 && <section className="journal-section journal-popular">
+    {popular.length > 1 && <section className="journal-section journal-popular">
       <div className="journal-section-heading"><div><span className="journal-eyebrow">{en ? "READER FAVORITES" : "READERS' PICKS"}</span><h2>{en ? "Popular reads" : "많이 읽은 이야기"}</h2></div><p>{en ? "The articles readers come back to." : "독자들이 많이 찾는 콘텐츠"}</p></div>
-      <div className="journal-feature-grid">{popular.slice(0, 3).map((post, index) => card(post, index, index === 0))}</div>
+      <div className="journal-feature-grid">{popular.slice(1, 4).map((post, index) => card(post, index + 1))}</div>
     </section>}
 
     <section className="journal-section journal-latest" id="latest">
