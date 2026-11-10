@@ -29,7 +29,7 @@ export default function BlogArticle({ post, language }: { post: BlogPost; langua
           <p>{post.excerpt}</p>
           <div className="journal-article-byline"><span className="journal-byline-mark">U.</span><div><strong>UTILWISE</strong><small>{en ? "Simple Tools for Everyday Life." : "일상을 더 편리하게 만드는 유용한 정보"}</small></div></div>
         </div>
-        <div className="journal-article-cover" aria-hidden="true"><span>UTILWISE JOURNAL</span><strong>U.</strong><i>✳</i><small>{en ? "IDEAS FOR EVERYDAY" : "IDEAS FOR EVERYDAY"}</small></div>
+        <div className="journal-article-cover" aria-hidden="true">{post.cover_image_key ? <img src={`/api/blog/images/${post.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt="" /> : <><span>UTILWISE JOURNAL</span><strong>U.</strong><i>✳</i><small>IDEAS FOR EVERYDAY</small></>}</div>
       </header>
 
       <div className="journal-article-layout">
