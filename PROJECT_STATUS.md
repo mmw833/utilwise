@@ -580,7 +580,7 @@
 
 ## 2026-11-10 Preview 배포 검증 현황
 - Worker Previews 활성화 후 Preview URL이 생성됨: `https://feature-staging-environment-utilwise.mmw833.workers.dev`
-- 최신 브랜치 커밋 `d4c0fc6`의 Preview 빌드는 대기/처리 중으로 확인됨. 완료된 Worker 버전은 아직 확인되지 않음
+- 확인 당시 `d4c0fc6` 커밋 Preview 빌드는 대기/처리 중이었고, 완료된 Worker 버전은 확인되지 않음. 이후 문서 기록용 커밋(`9ccbef1` 포함)이 추가됐으나 해당 최신 커밋의 Preview 빌드 성공 여부는 아직 미확인
 - Preview URL을 무인증으로 열었을 때 앱 대신 Cloudflare 기본 안내 페이지("There is nothing here yet")가 표시됨. HTTP 401 및 `X-Robots-Tag`는 아직 확인되지 않음
 - 따라서 Basic 인증이 실제 Preview Worker에서 작동한다고 보고하지 않음. 앱 버전이 배포된 뒤 무인증 401, 정상 인증 200, API 차단, noindex 및 staging DB 연결을 재검증해야 함
 - 현재 Production 도메인 및 Worker 버전은 변경하지 않음
