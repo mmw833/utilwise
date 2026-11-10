@@ -20,9 +20,7 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
     <article className={`journal-card journal-card-tone-${index % 4}${featured ? " journal-card-featured" : ""}`} key={post.id}>
       <Link href={`${base}/${post.slug}`} className="journal-card-link">
         <div className="journal-card-art" aria-hidden="true">
-          <span className="journal-art-kicker">UTILWISE JOURNAL</span>
-          <span className="journal-art-symbol">{["U.", "✳", "↗", "◎"][index % 4]}</span>
-          <span className="journal-art-index">{String(index + 1).padStart(2, "0")}</span>
+          {post.cover_image_key ? <img src={`/api/blog/images/${post.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt="" loading="lazy" /> : <><span className="journal-art-kicker">UTILWISE JOURNAL</span><span className="journal-art-symbol">{["U.", "✳", "↗", "◎"][index % 4]}</span><span className="journal-art-index">{String(index + 1).padStart(2, "0")}</span></>}
         </div>
         <div className="journal-card-copy">
           <div className="journal-card-meta">{post.category_name && <span className="blog-tag">{post.category_name}</span>}<time dateTime={new Date(post.published_at * 1000).toISOString()}>{dateLabel(post.published_at, locale)}</time></div>
