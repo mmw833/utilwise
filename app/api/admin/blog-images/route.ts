@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/blog/admin-auth";
 import { getBlogImageBucket } from "@/lib/blog/db";
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 const MAX_BYTES = 5 * 1024 * 1024;
 const TYPES = {
