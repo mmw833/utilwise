@@ -449,3 +449,12 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - Markdown은 원문으로 저장한다. 공개 화면에서 HTML로 렌더링할 때 반드시 안전한 Markdown 파서/HTML sanitization을 적용하고 원문을 신뢰 가능한 HTML로 직접 삽입하지 않는다.
 - 현재 관리자 화면은 작성/수정/삭제/상태 관리/조회수 확인을 제공하지만, 공개 블로그 화면·미리보기·R2 이미지 업로드·카테고리 수정/삭제는 아직 제공하지 않는다.
 - API는 인증 후에만 응답하며 `Cache-Control: no-store`를 적용한다. 변경 요청은 Origin을 확인하고 입력값 크기/형식을 제한한다.
+
+
+## 블로그 공개 페이지
+- 공개 URL: /blog, /blog/[slug], /en/blog, /en/blog/[slug]
+- D1 binding BLOG_DB를 사용하는 서버 컴포넌트에서 발행 게시글만 조회
+- 인기글은 view_count 내림차순, 전체 글은 published_at 내림차순
+- 조회수 API: POST /api/blog/view에 {language, slug} 전송. 서버가 발급한 uw_blog_visitor HttpOnly 쿠키를 사용하며 원문 IP는 저장하지 않음
+- Markdown은 안전한 제한 문법으로 렌더링. 원시 HTML/스크립트는 허용하지 않음
+- R2 이미지 업로드 및 이미지 렌더링은 별도 후속 구현
