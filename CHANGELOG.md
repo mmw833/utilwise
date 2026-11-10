@@ -413,3 +413,11 @@
 - CI/Preview 실환경 테스트 및 운영 무영향 확인 대기
 
 - 기존 Production workers.dev 호스트 `utilwise.mmw833.workers.dev`를 인증 예외에 추가해 운영 별칭이 잠기지 않도록 보완.
+
+
+## 2026-11-10 Cloudflare Worker Previews 활성화
+- utilwise Worker의 브랜치/PR 격리 Preview 기능 활성화
+- Production branch `main`, 기존 build/deploy 명령은 유지
+- Preview build command를 `npx wrangler preview`로 변경
+- Preview Default Secret과 staging D1 binding을 별도 환경 설정으로 사용
+- 새 Preview URL 생성 및 Basic 인증/DB 분리 실환경 검증은 진행 중
