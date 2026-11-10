@@ -567,3 +567,12 @@
 - **배포 상태:** main 병합 및 운영 배포 없음. Preview 환경 설정만 변경
 
 - 추가 확인: Cloudflare의 기존 Production 접속 호스트 `utilwise.mmw833.workers.dev`도 운영 도메인이므로 Preview 인증 예외 목록에 포함. 운영 도메인 `utilwise.kr`, `www.utilwise.kr`과 함께 공개 유지.
+
+
+## 2026-11-10 Cloudflare Worker Previews 활성화
+- Cloudflare Worker `utilwise`의 Worker Previews 기능을 활성화 완료. 브랜치/PR별 격리 Preview 배포가 가능하도록 설정
+- Production branch는 `main` 유지. Build command `npx opennextjs-cloudflare build`, Deploy command `npx opennextjs-cloudflare deploy` 유지
+- Preview build command는 새 Worker Previews 방식에 맞춰 `npx wrangler preview`로 변경됨
+- Preview Default의 `PREVIEW_ACCESS_PASSWORD` Secret 및 `BLOG_DB` → `utilwise-blog-staging` binding을 별도 탭에서 확인 완료
+- 이전 Preview 모델에서 실행된 빌드는 아직 완료된 버전을 생성하지 못함. 새 Preview 모델 설정 이후 브랜치 재빌드 및 인증 테스트 대기
+- Production Worker 버전 및 `main` 운영 배포는 변경하지 않음
