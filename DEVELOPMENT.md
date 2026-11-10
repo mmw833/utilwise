@@ -404,3 +404,14 @@ npm run preview
 - 조회수 API는 `blog_view_dedup`에 (post_id, visitor_hash) 복합 키를 사용하고, 마지막 집계 시각에서 86,400초가 지난 경우에만 UPSERT가 반영되도록 구현한다. 트리거가 게시글 누적 조회수를 갱신한다.
 - 방문자 토큰은 서버에서 생성하고 HttpOnly/Secure/SameSite 쿠키로 관리한다. 원 IP 주소와 원 토큰은 저장하지 않는다.
 - 초기 범위에서 댓글, AI 번역, 관리자 인증, R2 업로드는 아직 구현하지 않았으며 별도 단계로 진행한다.
+
+
+## 블로그 D1 서버 데이터 접근
+
+- `lib/blog/db.ts`는 `getCloudflareContext()`를 요청 시점에 호출해 `BLOG_DB`를 반환한다. 모듈 최상위에서 Cloudflare 컨텍스트를 호출하지 않는다.
+- `lib/blog/posts.ts`는 공개 발행 글의 최신 목록, 인기글, slug 상세 조회 및 조회수 UPSERT를 제공한다.
+- 조회수 UPSERT에 전달하는 `visitorHash`는 서버가 무작위 HttpOnly 쿠키 토큰을 생성하고 SHA-256으로 해시한 값이어야 한다. 브라우저가 전달한 식별값을 그대로 사용하면 안 된다.
+- 동일 게시글/방문자 조합은 마지막 집계 시각에서 86,400초가 지나야 다시 집계된다. D1 트리거가 `view_count`를 갱신한다.
+- `next.config.ts`의 `initOpenNextCloudflareForDev()`는 `next dev`에서 Cloudflare 바인딩을 사용할 수 있게 한다.
+- 현재 구현은 데이터 접근 계층만 포함한다. 관리자 인증, 쿠키 발급/갱신 API, 게시글 CRUD, 공개 화면, R2는 별도 구현 및 검증이 필요하다.
+
