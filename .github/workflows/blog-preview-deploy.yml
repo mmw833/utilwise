@@ -1,0 +1,49 @@
+name: Blog Preview Deploy
+
+on:
+  push:
+    branches:
+      - preview/blog-system
+
+permissions:
+  contents: read
+
+concurrency:
+  group: blog-preview-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Build and deploy blog branch preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout blog preview branch
+        uses: actions/checkout@v4
+        with:
+          ref: preview/blog-system
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Build OpenNext Worker
+        run: npx opennextjs-cloudflare build
+      - name: Deploy isolated preview Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Cloudflare repository secrets are missing."
+            exit 1
+          fi
+          npx wrangler deploy --name utilwise-preview
+      - name: Smoke test Korean and English blog pages
+        run: |
+          for path in /blog /en/blog; do
+            echo "Checking $path"
+            curl --retry 5 --retry-delay 2 --retry-connrefused -fsS "https://utilwise-preview.mmw833.workers.dev$path" -o /tmp/blog-preview.html
+            grep -qi "UTILWISE" /tmp/blog-preview.html
+          done
