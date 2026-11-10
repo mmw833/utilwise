@@ -1,3 +1,11 @@
+## 2026-11-10 블로그 서버 데이터 접근 계층 1차 구현
+- OpenNext `getCloudflareContext()`를 사용하는 서버 전용 D1 접근 모듈 `lib/blog/db.ts` 추가
+- `lib/blog/posts.ts`에 언어별 최신 게시글 목록, 조회수 기준 인기글, 발행 게시글 상세 조회 함수 추가
+- 조회수는 서버가 생성·해시한 방문자 식별값을 받는 UPSERT 방식으로 24시간 중복 집계를 DB에서 원자적으로 처리하도록 구현
+- `next.config.ts`에 `initOpenNextCloudflareForDev()`를 추가해 로컬 개발에서도 OpenNext Cloudflare 바인딩을 사용할 수 있도록 설정
+- 아직 관리자 인증/API/UI, 방문자 쿠키 발급, 공개 블로그 화면, R2 업로드는 미구현
+- GitHub Actions 빌드 결과 및 실제 Cloudflare Preview 실행 검증 대기. 운영 Worker 배포 및 main 병합 없음
+
 ## 2026-11-10 블로그 D1 기반 구조 준비
 - Cloudflare D1 `utilwise-blog` 생성 확인: database ID `607946e3-d4cd-4cce-b7e9-eaf515244cb4`
 - 작업 브랜치 `feature/blog-d1-foundation` 생성 (main 기준, 운영 코드와 분리)
