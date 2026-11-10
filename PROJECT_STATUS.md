@@ -1,3 +1,9 @@
+## 2026-11-10 Cloudflare 미리보기 배포 성공
+- GitHub Actions Cloudflare Preview 실행 성공: `42767801254`
+- 미리보기 URL: `https://utilwise-preview.mmw833.workers.dev`
+- Worker 이름: `utilwise-preview`; 운영 Worker/도메인과 분리
+- OpenNext 빌드 및 Cloudflare 업로드/배포 성공 확인. PR #11은 계속 draft/open 상태이며 main 병합 및 운영 배포는 하지 않음
+
 ## 2026-11-10 Cloudflare 독립 미리보기 배포 구성
 - PR #11의 개발 브랜치에 `.github/workflows/preview-deploy.yml` 추가
 - PR이 열리거나 새 커밋이 올라오면 OpenNext 빌드 후 `utilwise-preview`라는 별도 Cloudflare Worker로 배포하도록 구성
