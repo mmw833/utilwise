@@ -69,14 +69,19 @@ function constantTimeEqual(left: Uint8Array, right: Uint8Array): boolean {
   return difference === 0;
 }
 
-export function isAdminAuthConfigured(): boolean {
+export function getAdminAuthStatus() {
   const { ADMIN_PASSWORD, ADMIN_SESSION_SECRET } = getSecrets();
-  return Boolean(
-    ADMIN_PASSWORD &&
-      ADMIN_PASSWORD.length >= 12 &&
-      ADMIN_SESSION_SECRET &&
-      ADMIN_SESSION_SECRET.length >= 32,
-  );
+  return {
+    passwordPresent: Boolean(ADMIN_PASSWORD),
+    passwordLengthValid: Boolean(ADMIN_PASSWORD && ADMIN_PASSWORD.length >= 12),
+    sessionSecretPresent: Boolean(ADMIN_SESSION_SECRET),
+    sessionSecretLengthValid: Boolean(ADMIN_SESSION_SECRET && ADMIN_SESSION_SECRET.length >= 32),
+  };
+}
+
+export function isAdminAuthConfigured(): boolean {
+  const status = getAdminAuthStatus();
+  return status.passwordLengthValid && status.sessionSecretLengthValid;
 }
 
 export async function verifyAdminPassword(candidate: string): Promise<boolean> {
