@@ -401,3 +401,13 @@
 - 한국어·영어 홈페이지 내비게이션에 블로그 진입 링크 추가
 - 대표 이미지 R2 업로드와 브라우저 실기기 검증은 후속 단계
 - 작업 브랜치 feature/blog-d1-foundation, PR #10 초안. main 병합 및 운영 배포 없음
+
+
+## 2026-11-10 Preview 전용 Basic 인증 및 staging D1 연결
+- 비운영 호스트에만 HTTP Basic 인증을 적용하는 `middleware.ts` 추가
+- 인증 비밀번호는 Cloudflare Preview Default의 `PREVIEW_ACCESS_PASSWORD` Secret에서만 읽도록 구성
+- Cloudflare Preview Default 환경에 Secret 등록 완료
+- Cloudflare Preview Default의 `BLOG_DB` binding을 별도 D1 `utilwise-blog-staging`으로 연결 완료
+- Preview 응답에 noindex 및 private/no-store 헤더 적용
+- 운영 도메인 및 Production Worker 설정은 변경하지 않음
+- CI/Preview 실환경 테스트 및 운영 무영향 확인 대기
