@@ -1,3 +1,9 @@
+## 2026-11-10 Playwright 최초 CI 검증 통과
+- PR #11에서 Chromium 기반 Playwright E2E workflow 성공
+- 기존 Next.js production build workflow도 동일 커밋에서 성공
+- 실행 결과: https://github.com/mmw833/utilwise/actions/runs/42763513163
+- 빌드 결과: https://github.com/mmw833/utilwise/actions/runs/42763513171
+
 ## 2026-11-10 Playwright 브라우저 테스트 환경 추가
 - `@playwright/test`와 데스크톱 Chromium/iPhone 13 모바일 테스트 설정 추가
 - 한국어·영어 홈페이지 렌더링, 검색 필터, 모바일 메뉴, 주요 공개 URL의 HTTP 응답을 확인하는 E2E 테스트 추가
