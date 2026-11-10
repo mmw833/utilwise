@@ -415,3 +415,11 @@
 - breadcrumb, 게시글 메타정보, 제목/요약, 브랜드 byline, 대표 그래픽, 본문 타이포그래피, 블로그 복귀 및 온라인 도구 CTA 추가
 - 기존 안전 Markdown 렌더러와 조회수 트래커 유지
 - 반응형 스타일 추가, 운영 반영 전 미리보기 검증 대기
+
+## Cloudflare R2 블로그 대표 이미지 (2026-11-10)
+- R2 버킷 `utilwise-blog-images`는 Standard 클래스로 생성 완료.
+- Preview 전용 `wrangler.preview.jsonc`에 `BLOG_IMAGES` binding을 연결하고 preview workflow에서 해당 config만 사용한다. 운영 `wrangler.jsonc`는 변경하지 않는다.
+- 관리자 업로드 API는 관리자 세션과 same-origin을 확인하고 JPG/PNG/WebP/AVIF의 실제 파일 시그니처 및 5MB 제한을 검사한다. 객체 키는 `blog/{uuid}.{ext}`이며 기존 객체를 교체/삭제하지 않는다.
+- 공개 GET API는 blog UUID 키만 허용하고 `nosniff` 및 immutable cache 헤더를 설정한다.
+- 관리자 UI에서 업로드/미리보기/키 제거가 가능하며 게시글 저장 시 D1의 `cover_image_key`에 반영한다. 공개 한국어·영어 피드와 상세 페이지에서 실제 이미지가 표시된다.
+- 검증: GitHub Actions preview build/deploy 및 실제 업로드·표시 테스트 대기. 운영 배포 및 main 병합은 하지 않는다.
