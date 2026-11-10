@@ -1,3 +1,8 @@
+## 2026-11-10 Playwright 계산기 상호작용 테스트 확장
+- 부피 계산기의 입력값 변경 및 직육면체/원기둥 전환 테스트 추가
+- 팁 계산기의 결제 금액, 팁 비율, 통화 변경 및 인당 분할 결과 테스트 추가
+- 확장 테스트 CI 실행 결과 확인 대기
+
 ## 2026-11-10 Playwright 최초 CI 검증 통과
 - PR #11에서 Chromium 기반 Playwright E2E workflow 성공
 - 기존 Next.js production build workflow도 동일 커밋에서 성공
