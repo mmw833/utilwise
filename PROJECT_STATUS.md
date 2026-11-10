@@ -1,3 +1,11 @@
+## 2026-11-10 Worker Previews 호환 Wrangler 버전 보정
+- Cloudflare 빌드 기록에서 `feature/staging-environment` Preview 빌드가 연속 실패하고 새 Preview Worker가 생성되지 않는 것을 확인
+- Cloudflare 공식 문서 기준 Worker Previews는 Wrangler 4.135.0 이상 필요. 기존 `package.json`의 Wrangler 최소 버전 `^4.36.0`을 `^4.135.0`으로 상향
+- 변경 커밋: `73bfd0c14d686b76cd100572f9bbd08fd9531e68`
+- **원인 확정 아님:** Cloudflare 빌드 상세 로그의 실제 오류 메시지는 아직 확인하지 못함. 버전 요건 불일치 가능성을 우선 제거한 조치
+- **검증 대기:** 새 Preview 빌드 성공, Preview URL 응답, Basic 인증, noindex, staging D1 분리
+- 운영 Worker 배포 및 main 병합 없음
+
 
 
 ## 2026-11-10 블로그 관리자 인증 1차 구현
