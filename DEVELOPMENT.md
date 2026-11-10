@@ -1,3 +1,7 @@
+## Cloudflare Worker Previews Wrangler 요구 버전
+- Cloudflare Worker Previews 기능은 Wrangler 4.135.0 이상을 요구하므로 `package.json`의 `devDependencies.wrangler` 최소 버전은 `^4.135.0`을 유지한다.
+- 버전을 변경한 뒤 Workers Builds의 Preview 빌드가 실제로 성공하는지 확인한다. 버전 상향만으로 배포 성공을 간주하지 않는다.
+
 ## 영어 홈페이지 SEO 안내 콘텐츠 관리
 - 영어 홈페이지(`/en`)는 계산기·온라인 도구·텍스트 도구·테스트 목록에 집중하며 긴 SEO 소개 문단을 하단에 반복 노출하지 않는다.
 - 서비스 전체 설명과 관련 도구 내부 링크는 `/en/about` 소개 페이지에서 관리한다.
