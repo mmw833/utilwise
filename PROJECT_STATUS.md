@@ -1,3 +1,14 @@
+
+
+## 2026-11-10 블로그 관리자 인증 1차 구현
+- `/admin/blog/login` 로그인 화면과 `/admin/blog` 보호된 관리자 진입 화면 추가
+- `/api/admin/login`, `/api/admin/logout` 로그인/로그아웃 API 추가
+- 비밀번호 및 HMAC 세션 서명키는 Cloudflare Worker secret(`ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`)에서 읽고 저장소에는 포함하지 않음
+- 8시간 만료, HttpOnly, SameSite=Strict 세션 쿠키와 HMAC-SHA256 서명 검증 적용
+- 관리자 화면은 인증 전 접근 시 로그인 페이지로 이동하며 검색엔진 noindex 처리
+- 아직 비밀값 등록, Cloudflare 배포, 실제 브라우저 로그인 테스트, 로그인 시도 제한 정책 확인 전. 빌드/CI 검증 대기
+- 현재 관리자 화면은 인증 연결 확인용 placeholder이며 게시글 CRUD는 미구현
+
 ## 2026-11-10 블로그 서버 데이터 접근 계층 1차 구현
 - OpenNext `getCloudflareContext()`를 사용하는 서버 전용 D1 접근 모듈 `lib/blog/db.ts` 추가
 - `lib/blog/posts.ts`에 언어별 최신 게시글 목록, 조회수 기준 인기글, 발행 게시글 상세 조회 함수 추가
