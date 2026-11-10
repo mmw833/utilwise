@@ -391,3 +391,16 @@ npm run preview
 - 데스크톱 스타일은 이 구역에서 변경하지 않는다. 헤더/메뉴 동작은 기존 모바일 내비게이션 구현을 유지한다.
 - 검증 시 360px, 390px, 430px 폭과 PC 1280px 이상을 비교하고 가로 스크롤, 버튼/입력 가림, 텍스트 잘림, 계산 결과 표시를 확인한다.
 
+
+
+## 네이티브 블로그 및 Cloudflare D1
+- 작업 브랜치: `feature/blog-d1-foundation`
+- D1 데이터베이스: `utilwise-blog` / ID: `607946e3-d4cd-4cce-b7e9-eaf515244cb4`
+- Wrangler binding: `BLOG_DB`; migration directory: `migrations/`
+- 최초 스키마: `migrations/0001_blog_initial.sql`
+- D1 migration은 로컬/원격 환경에 명시적으로 적용해야 한다. 코드 설정만 추가했다고 원격 테이블이 생성된 것은 아니다.
+- 원격 적용 전에는 migration SQL과 대상 database ID를 다시 확인하고 `wrangler d1 migrations apply utilwise-blog --remote` 실행 결과를 검증한다.
+- D1 binding은 서버 측 코드에서만 사용한다. Worker 배포 전 `npm run cf-typegen`으로 Cloudflare binding 타입을 갱신하고 TypeScript/Next.js 빌드를 수행한다.
+- 조회수 API는 `blog_view_dedup`에 (post_id, visitor_hash) 복합 키를 사용하고, 마지막 집계 시각에서 86,400초가 지난 경우에만 UPSERT가 반영되도록 구현한다. 트리거가 게시글 누적 조회수를 갱신한다.
+- 방문자 토큰은 서버에서 생성하고 HttpOnly/Secure/SameSite 쿠키로 관리한다. 원 IP 주소와 원 토큰은 저장하지 않는다.
+- 초기 범위에서 댓글, AI 번역, 관리자 인증, R2 업로드는 아직 구현하지 않았으며 별도 단계로 진행한다.
