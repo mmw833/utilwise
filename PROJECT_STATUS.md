@@ -564,3 +564,12 @@
 - 대표 이미지 업로드/R2는 아직 연결 전이므로 카드 비주얼은 CSS 기반 임시 그래픽이며 실제 게시글 이미지를 가장한 콘텐츠는 넣지 않음
 - **검증 대기:** Cloudflare preview workflow의 OpenNext 빌드/배포 및 `/blog`, `/en/blog` smoke test. PC·모바일 실기기 시각 검증도 필요
 - main 병합 및 운영 사이트 배포 없음
+
+
+## 2026-11-10 블로그 게시글 상세 디자인 1차
+- `components/BlogArticle.tsx`를 저널형 읽기 화면으로 재구성하고 한국어·영어 공통 적용
+- 브랜드 헤더/언어 전환/도구 링크, breadcrumb, 카테고리·발행일·조회수, 제목·요약, 작성 주체, 대표 비주얼, 본문 읽기 레이아웃, 블로그 복귀 링크, 도구 탐색 CTA 추가
+- Markdown 렌더링은 기존 `BlogMarkdown`을 그대로 사용해 안전한 제한 문법을 유지
+- PC·모바일 전용 CSS를 `app/globals.css`에 추가. 실제 이미지 업로드 전까지 추상 그래픽 사용
+- **검증 대기:** 최신 브랜치 Cloudflare build/deploy 및 한국어·영어 smoke test. 게시글 실제 데이터가 있는 상세 URL로 PC/모바일 시각 확인 필요
+- main 병합 및 운영 배포 없음
