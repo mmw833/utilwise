@@ -484,3 +484,10 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - Production의 `BLOG_DB`는 기존 `utilwise-blog`를 사용해야 하며 Preview DB와 혼용하지 않는다.
 - Preview URL 생성 후 인증 없는 요청 401, 정상 인증 200, `X-Robots-Tag` noindex, D1 staging read/write를 확인한다.
 - 새 Preview 모델 적용 후 첫 빌드가 완료되기 전에는 Preview 준비 완료로 간주하지 않는다.
+
+
+## Preview 배포 확인 대기
+- 브랜치 Preview URL: `https://feature-staging-environment-utilwise.mmw833.workers.dev`
+- URL은 생성됐으나 확인 시점에는 Cloudflare 기본 "There is nothing here yet" 페이지를 반환했다. 앱이 Preview Worker에 배포된 것으로 간주하지 않는다.
+- 정상 완료 후 검증 순서: 무인증 401 → 오인증 401 → `preview` 계정 정상 인증 200 → `/api/admin/*` 등 API 보호 → `X-Robots-Tag` 확인 → D1 `utilwise-blog-staging` 대상 확인.
+- 위 검증을 통과하기 전 Preview 보호 완료 또는 개발 환경 사용 가능으로 보고하지 않는다.
