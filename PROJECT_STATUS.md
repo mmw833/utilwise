@@ -553,3 +553,15 @@
 - 홈 한국어/영어 데스크톱·모바일 메뉴에 블로그 링크 추가, sitemap에 블로그 메인 2개 URL 등록
 - 대표 이미지(R2 업로드), 관리자 미리보기, 카테고리 편집/삭제, 게시글 페이지네이션, 실제 게시글 테스트는 후속
 - CI 최신 결과 확인 필요. PR #10 draft, main 병합/운영 배포 없음
+
+
+## 2026-11-10 Preview 전용 접근 보호 및 개발 DB 분리 설정
+- 작업 브랜치: `feature/staging-environment` (기존 블로그 구현 커밋에서 분기)
+- `middleware.ts` 추가: 운영 도메인 `utilwise.kr`, `www.utilwise.kr`와 로컬 개발을 제외한 모든 호스트에 HTTP Basic 인증 적용
+- Preview 인증 계정명은 `preview`; 비밀번호는 `PREVIEW_ACCESS_PASSWORD` Cloudflare Secret에서만 읽음
+- Preview Secret은 Cloudflare Worker의 **Preview Default** 환경에만 등록 완료. Production 환경은 수정하지 않음
+- Cloudflare Worker **Preview Default** 환경에 D1 binding `BLOG_DB` → `utilwise-blog-staging` 등록 및 대시보드 목록에서 확인 완료
+- Preview 응답에는 `X-Robots-Tag: noindex, nofollow, noarchive`와 비공개 캐시 방지 헤더 적용
+- Preview secret 누락/길이 부족 시 503으로 차단(fail-closed). 운영 도메인 및 localhost는 기존 동작 유지
+- **미완료 검증:** GitHub Actions 빌드, Cloudflare Worker Preview 빌드/URL 생성, 무인증 401·오인증 401·정상 인증 통과, 실제 D1 staging 연결, 운영 도메인 무변경 확인
+- **배포 상태:** main 병합 및 운영 배포 없음. Preview 환경 설정만 변경
