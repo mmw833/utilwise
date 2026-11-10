@@ -1,3 +1,13 @@
+## 2026-11-10 Playwright 브라우저 테스트 1차 도입 (작업 브랜치)
+- 작업 브랜치: `feature/playwright-e2e` (main 기준, 운영 브랜치와 분리)
+- `@playwright/test` 개발 의존성 및 `npm run test:e2e`, `npm run test:e2e:ui` 스크립트 추가
+- Chromium 데스크톱 및 iPhone 13 모바일 에뮬레이션 프로젝트 구성
+- 한국어/영어 홈, 한국어 검색 필터, 모바일 접이식 메뉴, 주요 공개 경로 HTTP 응답을 확인하는 E2E 테스트 추가
+- GitHub Actions 전용 Playwright workflow 추가: PR 및 feature 브랜치 push 시 Chromium 테스트 실행
+- **검증 대기:** GitHub Actions 최초 실행, npm 의존성 설치, Playwright 테스트 결과 및 필요 시 selector 보정
+- **주의:** 로컬 설치/브라우저 실행을 이 작업 환경에서 직접 수행하지 못했으므로 테스트 성공으로 간주하지 않음
+- **배포 상태:** PR 생성 및 main 병합 전. Cloudflare Production 설정/배포는 변경하지 않음
+
 ## 2026-11-10 영어 홈페이지 SEO 안내 콘텐츠 위치 조정
 - 영어 홈페이지 하단에 길게 노출되던 SEO 안내 문단을 홈페이지에서 제거하고 `/en/about` 서비스 소개 페이지로 이동
 - 검색 의도에 필요한 계산기·QR·이미지·PDF·텍스트 도구 관련 설명과 내부 링크는 소개 페이지에 유지
