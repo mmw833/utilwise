@@ -1,3 +1,9 @@
+### 최초 CI 검증 결과 (2026-11-10)
+- PR #11의 Playwright E2E workflow가 Chromium 설치와 브라우저 테스트 단계를 포함해 성공했다.
+- 같은 커밋의 Next.js production build도 성공했다.
+- 실행 상세: https://github.com/mmw833/utilwise/actions/runs/42763513163
+- 이후 신규 페이지/기능의 테스트는 이 설정을 기반으로 확장한다. 새 테스트 추가 후에는 PR CI 결과를 별도로 확인한다.
+
 ## Playwright 브라우저 테스트
 - 테스트 프레임워크: `@playwright/test` (개발 의존성)
 - 설정: `playwright.config.ts`
