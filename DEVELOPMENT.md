@@ -415,3 +415,26 @@ npm run preview
 - `next.config.ts`의 `initOpenNextCloudflareForDev()`는 `next dev`에서 Cloudflare 바인딩을 사용할 수 있게 한다.
 - 현재 구현은 데이터 접근 계층만 포함한다. 관리자 인증, 쿠키 발급/갱신 API, 게시글 CRUD, 공개 화면, R2는 별도 구현 및 검증이 필요하다.
 
+
+
+## 블로그 관리자 인증 설정
+
+관리자 인증은 저장소에 비밀번호나 세션 서명키를 저장하지 않는다. Cloudflare Worker의 secret으로 등록한다.
+
+프로덕션 Worker에 다음 두 값을 각각 등록한다.
+
+```bash
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put ADMIN_SESSION_SECRET
+```
+
+- `ADMIN_PASSWORD`: 관리자가 직접 정하는 12자 이상의 강력한 비밀번호
+- `ADMIN_SESSION_SECRET`: 최소 32자 이상의 무작위 비밀값. 예: `openssl rand -base64 48`로 생성
+- secret 등록 후 Worker에 새 버전 배포가 필요하다. 운영 Worker 배포 전 PR 검토 및 사용자 승인 필요.
+- 로컬 개발은 저장소에 커밋하지 않는 `.env.local`에 같은 이름으로 값을 설정할 수 있다. 이 파일을 Git에 추가하지 않는다.
+- 로그인 주소: `/admin/blog/login`; 인증 후 관리자 경로: `/admin/blog`
+- 세션은 8시간 후 만료되며 HttpOnly, SameSite=Strict 쿠키로 전달된다. 운영 환경에서는 Secure 속성이 활성화된다.
+- 관리자 페이지는 검색엔진 색인에서 제외된다.
+- 배포 전 Cloudflare WAF/Rate Limiting에서 `/api/admin/login`의 반복 요청 제한을 설정하고, 실패 횟수/차단 동작을 확인한다. 현재 애플리케이션 코드 자체의 분산 환경 로그인 시도 제한은 아직 구현되지 않았다.
+- 인증 구현은 로그인/로그아웃과 페이지 보호까지다. 관리자 게시글 CRUD 및 카테고리 편집 기능은 별도 단계다.
+
