@@ -576,3 +576,11 @@
 - Preview Default의 `PREVIEW_ACCESS_PASSWORD` Secret 및 `BLOG_DB` → `utilwise-blog-staging` binding을 별도 탭에서 확인 완료
 - 이전 Preview 모델에서 실행된 빌드는 아직 완료된 버전을 생성하지 못함. 새 Preview 모델 설정 이후 브랜치 재빌드 및 인증 테스트 대기
 - Production Worker 버전 및 `main` 운영 배포는 변경하지 않음
+
+
+## 2026-11-10 Preview 배포 검증 현황
+- Worker Previews 활성화 후 Preview URL이 생성됨: `https://feature-staging-environment-utilwise.mmw833.workers.dev`
+- 최신 브랜치 커밋 `d4c0fc6`의 Preview 빌드는 대기/처리 중으로 확인됨. 완료된 Worker 버전은 아직 확인되지 않음
+- Preview URL을 무인증으로 열었을 때 앱 대신 Cloudflare 기본 안내 페이지("There is nothing here yet")가 표시됨. HTTP 401 및 `X-Robots-Tag`는 아직 확인되지 않음
+- 따라서 Basic 인증이 실제 Preview Worker에서 작동한다고 보고하지 않음. 앱 버전이 배포된 뒤 무인증 401, 정상 인증 200, API 차단, noindex 및 staging DB 연결을 재검증해야 함
+- 현재 Production 도메인 및 Worker 버전은 변경하지 않음
