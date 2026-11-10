@@ -3,6 +3,10 @@ import AdminLoginForm from "@/components/AdminLoginForm";
 import { isAdminAuthenticated, isAdminAuthConfigured } from "@/lib/blog/admin-auth";
 
 export const dynamic = "force-dynamic";
+export const metadata = {
+  title: "관리자 로그인 | UTILWISE",
+  robots: { index: false, follow: false },
+};
 
 export default async function AdminBlogLoginPage() {
   if (await isAdminAuthenticated()) redirect("/admin/blog");
