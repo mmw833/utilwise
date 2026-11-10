@@ -469,3 +469,5 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - Preview 응답은 `X-Robots-Tag: noindex, nofollow, noarchive`, `Cache-Control: private, no-store`를 설정한다.
 - 테스트: 무인증/잘못된 인증은 401, 올바른 인증은 페이지·API·정적 리소스까지 통과, Preview 응답은 noindex, Production 도메인은 기존 정상 응답, D1 쓰기/읽기는 staging DB에서만 수행되는지 확인한다.
 - 운영 배포 명령 `npm run deploy` 또는 main 병합은 별도 사용자 승인 전 실행하지 않는다.
+
+- Production 호스트 예외에는 `utilwise.kr`, `www.utilwise.kr`, `utilwise.mmw833.workers.dev`가 포함된다. 다른 비운영 Preview 호스트는 인증 대상이다.
