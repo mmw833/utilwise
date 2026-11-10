@@ -1,3 +1,9 @@
+## 2026-11-10 Playwright 계산기 상호작용 테스트 확장
+- `tests/e2e/calculators.spec.ts` 추가
+- 부피 계산기: 초기 직육면체 결과, 입력 변경에 따른 부피·리터 재계산, 원기둥 전환 확인
+- 팁 계산기: 초기 총액/1인당 금액, 결제 금액 변경, 팁 비율 및 통화 변경 확인
+- **검증 대기:** 확장된 테스트의 GitHub Actions 실행 결과 확인
+
 ## 2026-11-10 Playwright 1차 자동 검증 결과
 - PR #11 브랜치 `feature/playwright-e2e`에서 GitHub Actions 실행 확인
 - Playwright E2E: 성공 (Chromium 브라우저 설치 및 전체 정의 테스트 통과)
