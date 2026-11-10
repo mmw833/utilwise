@@ -12,10 +12,14 @@ type AdminSecrets = {
   ADMIN_SESSION_SECRET?: string;
 };
 
-function getSecrets(): AdminSecrets {
+/**
+ * Resolve Worker secrets in async mode. This also works when OpenNext executes
+ * the route through its Node.js compatibility runtime.
+ */
+async function getSecrets(): Promise<AdminSecrets> {
   let workerEnv: AdminSecrets = {};
   try {
-    const context = getCloudflareContext();
+    const context = await getCloudflareContext({ async: true });
     workerEnv = context.env as unknown as AdminSecrets;
   } catch {
     // Local Next.js development can use uncommitted .env.local values.
@@ -28,8 +32,8 @@ function getSecrets(): AdminSecrets {
   };
 }
 
-function requireSessionSecret(): string {
-  const secret = getSecrets().ADMIN_SESSION_SECRET;
+async function requireSessionSecret(): Promise<string> {
+  const secret = (await getSecrets()).ADMIN_SESSION_SECRET;
   if (!secret || secret.length < 32) {
     throw new Error("ADMIN_SESSION_SECRET must contain at least 32 characters.");
   }
@@ -39,7 +43,7 @@ function requireSessionSecret(): string {
 function toBase64Url(bytes: Uint8Array): string {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+  return btoa(binary).replace(/=/g, "").replace(/\\+/g, "-").replace(/\\//g, "_");
 }
 
 function fromBase64Url(value: string): Uint8Array {
@@ -52,7 +56,7 @@ function fromBase64Url(value: string): Uint8Array {
 async function hmac(value: string): Promise<Uint8Array> {
   const key = await crypto.subtle.importKey(
     "raw",
-    encoder.encode(requireSessionSecret()),
+    encoder.encode(await requireSessionSecret()),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],
@@ -69,8 +73,8 @@ function constantTimeEqual(left: Uint8Array, right: Uint8Array): boolean {
   return difference === 0;
 }
 
-export function getAdminAuthStatus() {
-  const { ADMIN_PASSWORD, ADMIN_SESSION_SECRET } = getSecrets();
+export async function getAdminAuthStatus() {
+  const { ADMIN_PASSWORD, ADMIN_SESSION_SECRET } = await getSecrets();
   return {
     passwordPresent: Boolean(ADMIN_PASSWORD),
     passwordLengthValid: Boolean(ADMIN_PASSWORD && ADMIN_PASSWORD.length >= 12),
@@ -79,13 +83,13 @@ export function getAdminAuthStatus() {
   };
 }
 
-export function isAdminAuthConfigured(): boolean {
-  const status = getAdminAuthStatus();
+export async function isAdminAuthConfigured(): Promise<boolean> {
+  const status = await getAdminAuthStatus();
   return status.passwordLengthValid && status.sessionSecretLengthValid;
 }
 
 export async function verifyAdminPassword(candidate: string): Promise<boolean> {
-  const { ADMIN_PASSWORD } = getSecrets();
+  const { ADMIN_PASSWORD } = await getSecrets();
   if (!ADMIN_PASSWORD || ADMIN_PASSWORD.length < 12 || !candidate) return false;
 
   const [expected, supplied] = await Promise.all([
