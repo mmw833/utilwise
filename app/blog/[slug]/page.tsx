@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import BlogArticle from "@/components/BlogArticle";
+import BlogViewTracker from "@/components/BlogViewTracker";
 import { getPublishedPostBySlug } from "@/lib/blog/posts";
 
 export const dynamic = "force-dynamic";
@@ -23,5 +24,5 @@ export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
   const post = await getPublishedPostBySlug("ko", slug);
   if (!post) notFound();
-  return <><BlogArticle post={post} language="ko" /><script dangerouslySetInnerHTML={{ __html: `fetch("/api/blog/view",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({language:"ko",slug:${JSON.stringify(slug)}})}).catch(()=>{});` }} /></>;
+  return <><BlogArticle post={post} language="ko" /><BlogViewTracker language="ko" slug={slug} /></>;
 }
