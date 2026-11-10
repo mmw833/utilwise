@@ -56,9 +56,9 @@ function dateLabel(timestamp: number | null) {
 function slugify(value: string) {
   return value.trim().toLowerCase()
     .normalize("NFKD")
-    .replace(/[^a-z0-9가-힣]+/g, "-")
+    .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
-    .slice(0, 120);
+    .slice(0, 120) || `post-${new Date().toISOString().slice(0, 10)}`;
 }
 
 export default function AdminBlogManager() {
