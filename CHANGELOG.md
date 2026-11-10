@@ -411,3 +411,5 @@
 - Preview 응답에 noindex 및 private/no-store 헤더 적용
 - 운영 도메인 및 Production Worker 설정은 변경하지 않음
 - CI/Preview 실환경 테스트 및 운영 무영향 확인 대기
+
+- 기존 Production workers.dev 호스트 `utilwise.mmw833.workers.dev`를 인증 예외에 추가해 운영 별칭이 잠기지 않도록 보완.
