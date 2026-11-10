@@ -1,3 +1,8 @@
+### 계산기 상호작용 테스트
+- `tests/e2e/calculators.spec.ts`는 부피 계산기 입력/도형 변경과 팁 계산기 금액·팁 비율·통화·인원별 분배 결과를 브라우저에서 검증한다.
+- 계산기 UI를 수정할 때 초기 표시뿐 아니라 사용자 입력 변경 후 결과 갱신도 테스트한다.
+- 테스트 실행 결과는 GitHub Actions에서 확인하며, 실패 시 trace/screenshot을 기준으로 원인을 수정한다.
+
 ### 최초 CI 검증 결과 (2026-11-10)
 - PR #11의 Playwright E2E workflow가 Chromium 설치와 브라우저 테스트 단계를 포함해 성공했다.
 - 같은 커밋의 Next.js production build도 성공했다.
