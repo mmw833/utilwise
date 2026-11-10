@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_PRODUCTION_HOSTS = new Set(["utilwise.kr", "www.utilwise.kr"]);
+const PUBLIC_PRODUCTION_HOSTS = new Set(["utilwise.kr", "www.utilwise.kr", "utilwise.mmw833.workers.dev"]);
 const LOCAL_DEVELOPMENT_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 const PREVIEW_USERNAME = "preview";
 
