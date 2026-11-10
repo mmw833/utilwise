@@ -1,3 +1,14 @@
+## 2026-11-10 블로그 D1 기반 구조 준비
+- Cloudflare D1 `utilwise-blog` 생성 확인: database ID `607946e3-d4cd-4cce-b7e9-eaf515244cb4`
+- 작업 브랜치 `feature/blog-d1-foundation` 생성 (main 기준, 운영 코드와 분리)
+- `wrangler.jsonc`에 서버 전용 D1 binding `BLOG_DB`와 migrations 경로 추가
+- 초기 migration `migrations/0001_blog_initial.sql` 설계: 카테고리, 언어별 게시글/번역 연결, 발행 상태, 조회수 및 24시간 중복 집계 테이블/트리거
+- 익명 방문자는 서버 생성 토큰의 해시만 저장하도록 설계하고 IP 원문 저장은 제외
+- 블로그 요구사항을 `BLOG_SPEC.md`로 정리. 전체 통합 피드/인기글/최신순, 카테고리는 글의 태그만 표시
+- **미완료:** D1 migration 원격 적용, Worker 타입 생성, 서버 데이터 접근 계층, 관리자 인증 및 UI, R2, 공개 블로그 화면
+- **검증 상태:** SQL 구조와 조회수 트리거를 SQLite에서 검증. GitHub Actions 빌드 및 Cloudflare D1 원격 적용은 미완료
+- **배포 상태:** PR #10 초안 작성. main 병합 및 운영 배포 없음
+
 ## 2026-11-10 영어 홈페이지 SEO 안내 콘텐츠 위치 조정
 - 영어 홈페이지 하단에 길게 노출되던 SEO 안내 문단을 홈페이지에서 제거하고 `/en/about` 서비스 소개 페이지로 이동
 - 검색 의도에 필요한 계산기·QR·이미지·PDF·텍스트 도구 관련 설명과 내부 링크는 소개 페이지에 유지
@@ -496,14 +507,3 @@
 - 개별 응답은 브라우저 상태로만 처리하며 결과 URL에는 3개 축 요약 코드만 포함
 - 결과는 재미·자기성찰 콘텐츠이며 실제 생존 능력 또는 전문 심리 진단이 아님을 명시
 - **검증 대기:** TypeScript/Next.js 빌드, 12문항 이동·이전·점수 분기, 8개 결과 링크 직접 접속/공유, 모바일 UI, GitHub Actions 및 Cloudflare 운영 배포 확인
-
-
-## 2026-11-10 블로그 D1 기반 구조 준비
-- Cloudflare D1 `utilwise-blog` 생성 확인: database ID `607946e3-d4cd-4cce-b7e9-eaf515244cb4`
-- 작업 브랜치 `feature/blog-d1-foundation` 생성 (main 기준, 운영 코드와 분리)
-- `wrangler.jsonc`에 서버 전용 D1 binding `BLOG_DB`와 migrations 경로 추가
-- 초기 migration `migrations/0001_blog_initial.sql` 설계: 카테고리, 언어별 게시글/번역 연결, 발행 상태, 조회수 및 24시간 중복 집계 테이블/트리거
-- 익명 방문자는 서버 생성 토큰의 해시만 저장하도록 설계하고 IP 원문 저장은 제외
-- 블로그 상세 요구사항을 `BLOG_SPEC.md`로 정리. 전체 통합 피드/인기글/최신순, 카테고리는 글의 태그만 표시
-- **미완료:** D1 migration 원격 적용, Worker 타입 생성, 서버 데이터 접근 계층, 관리자 인증 및 UI, R2, 공개 블로그 화면
-- **검증 상태:** GitHub Actions 빌드 및 Cloudflare D1 migration 적용 전. main 병합/운영 배포 없음
