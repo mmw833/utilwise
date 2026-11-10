@@ -20,6 +20,7 @@ type Post = {
   view_count: number;
   published_at: number | null;
   updated_at: number;
+  cover_image_key: string | null;
 };
 
 type Editor = {
@@ -34,6 +35,7 @@ type Editor = {
   seo_title: string;
   seo_description: string;
   status: PostStatus;
+  cover_image_key: string | null;
 };
 
 const emptyEditor = (): Editor => ({
@@ -46,6 +48,7 @@ const emptyEditor = (): Editor => ({
   seo_title: "",
   seo_description: "",
   status: "draft",
+  cover_image_key: null,
 });
 
 function dateLabel(timestamp: number | null) {
@@ -67,6 +70,7 @@ export default function AdminBlogManager() {
   const [editor, setEditor] = useState<Editor>(emptyEditor);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [categoryName, setCategoryName] = useState("");
@@ -119,10 +123,26 @@ export default function AdminBlogManager() {
       seo_title: post.seo_title || "",
       seo_description: post.seo_description || "",
       status: post.status,
+      cover_image_key: post.cover_image_key || null,
     });
     setNotice("");
     setError("");
     setShowEditor(true);
+  }
+
+
+  async function uploadCoverImage(file?: File) {
+    if (!file) return;
+    setError(""); setNotice(""); setUploadingImage(true);
+    try {
+      const form = new FormData(); form.set("file", file);
+      const response = await fetch("/api/admin/blog-images", { method: "POST", body: form });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "이미지를 업로드하지 못했습니다.");
+      setEditor((current) => ({ ...current, cover_image_key: data.key }));
+      setNotice("대표 이미지를 업로드했습니다. 게시글 저장을 눌러 적용하세요.");
+    } catch (e) { setError(e instanceof Error ? e.message : "이미지 업로드 중 오류가 발생했습니다."); }
+    finally { setUploadingImage(false); }
   }
 
   async function savePost(event: React.FormEvent<HTMLFormElement>) {
@@ -234,8 +254,11 @@ export default function AdminBlogManager() {
                 {categories.map((category) => <option key={category.id} value={category.id}>{category.name_ko}</option>)}
               </select>
             </label>
-            <label>대표 이미지 키 (선택)
-              <input value="" placeholder="R2 연결 단계에서 설정" disabled />
+            <label className="blog-admin-full">대표 이미지 (선택)
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadCoverImage(e.target.files?.[0]); e.currentTarget.value = ""; }} />
+              <small>JPG, PNG, WebP, AVIF · 최대 5MB</small>
+              {editor.cover_image_key ? <div><img src={`/api/blog/images/${editor.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt="대표 이미지 미리보기" style={{ display:"block",width:"100%",maxWidth:360,maxHeight:220,objectFit:"cover",borderRadius:12,marginTop:8 }} /><button type="button" className="blog-admin-text-button" onClick={() => setEditor((current) => ({ ...current, cover_image_key: null }))}>이미지 제거</button></div> : <small>이미지를 선택하면 안전하게 업로드됩니다.</small>}
+              {uploadingImage ? <small>이미지 업로드 중...</small> : null}
             </label>
             <label className="blog-admin-full">짧은 소개
               <textarea rows={2} maxLength={500} value={editor.excerpt} onChange={(e) => setEditor({ ...editor, excerpt: e.target.value })} />
