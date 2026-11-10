@@ -1,3 +1,8 @@
+## 2026-11-10 Cloudflare 미리보기 배포 워크플로 추가
+- PR 전용 GitHub Actions workflow `.github/workflows/preview-deploy.yml` 추가
+- OpenNext 빌드 결과를 운영 Worker와 별개인 `utilwise-preview` Worker로 배포하도록 구성
+- GitHub Actions secrets `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`가 필요하며 실제 미리보기 배포는 인증정보 등록 후 검증
+
 ## 2026-11-10 Playwright 계산기 상호작용 테스트 확장
 - 부피 계산기의 입력값 변경 및 직육면체/원기둥 전환 테스트 추가
 - 팁 계산기의 결제 금액, 팁 비율, 통화 변경 및 인당 분할 결과 테스트 추가
