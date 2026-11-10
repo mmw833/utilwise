@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "utilwise-preview",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-11-05",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "d1_databases": [{
+    "binding": "BLOG_DB",
+    "database_name": "utilwise-blog",
+    "database_id": "607946e3-d4cd-4cce-b7e9-eaf515244cb4",
+    "migrations_dir": "migrations"
+  }],
+  "r2_buckets": [{ "binding": "BLOG_IMAGES", "bucket_name": "utilwise-blog-images" }]
+}
