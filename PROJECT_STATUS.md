@@ -1,3 +1,11 @@
+## 2026-11-10 Cloudflare 독립 미리보기 배포 구성
+- PR #11의 개발 브랜치에 `.github/workflows/preview-deploy.yml` 추가
+- PR이 열리거나 새 커밋이 올라오면 OpenNext 빌드 후 `utilwise-preview`라는 별도 Cloudflare Worker로 배포하도록 구성
+- 운영 Worker `utilwise`와 분리하며 운영 도메인/DNS/운영 Worker를 변경하지 않음
+- 미리보기 URL은 Cloudflare가 배포 후 출력하는 `workers.dev` 주소를 사용
+- **사용자 설정 필요:** GitHub 저장소 Settings → Secrets and variables → Actions에 `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` 등록
+- 현재는 Cloudflare 인증정보 등록 여부와 실제 배포 URL이 확인되지 않아 미리보기 접속 가능 상태로 간주하지 않음
+
 ## 2026-11-10 Playwright 계산기 상호작용 테스트 확장
 - `tests/e2e/calculators.spec.ts` 추가
 - 부피 계산기: 초기 직육면체 결과, 입력 변경에 따른 부피·리터 재계산, 원기둥 전환 확인
