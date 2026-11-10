@@ -565,3 +565,5 @@
 - Preview secret 누락/길이 부족 시 503으로 차단(fail-closed). 운영 도메인 및 localhost는 기존 동작 유지
 - **미완료 검증:** GitHub Actions 빌드, Cloudflare Worker Preview 빌드/URL 생성, 무인증 401·오인증 401·정상 인증 통과, 실제 D1 staging 연결, 운영 도메인 무변경 확인
 - **배포 상태:** main 병합 및 운영 배포 없음. Preview 환경 설정만 변경
+
+- 추가 확인: Cloudflare의 기존 Production 접속 호스트 `utilwise.mmw833.workers.dev`도 운영 도메인이므로 Preview 인증 예외 목록에 포함. 운영 도메인 `utilwise.kr`, `www.utilwise.kr`과 함께 공개 유지.
