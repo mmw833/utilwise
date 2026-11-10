@@ -438,3 +438,14 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 배포 전 Cloudflare WAF/Rate Limiting에서 `/api/admin/login`의 반복 요청 제한을 설정하고, 실패 횟수/차단 동작을 확인한다. 현재 애플리케이션 코드 자체의 분산 환경 로그인 시도 제한은 아직 구현되지 않았다.
 - 인증 구현은 로그인/로그아웃과 페이지 보호까지다. 관리자 게시글 CRUD 및 카테고리 편집 기능은 별도 단계다.
 
+
+
+### 블로그 관리자 CMS 1차 구현
+- `app/admin/blog/page.tsx`는 서버에서 `isAdminAuthenticated()`를 확인한 뒤 `components/AdminBlogManager.tsx`를 렌더링한다.
+- `GET/POST/DELETE /api/admin/posts`는 세션 인증된 관리자만 게시글을 조회/저장/삭제할 수 있다. 저장 입력은 언어, slug, 제목, 소개, Markdown 본문, 카테고리, SEO 메타데이터, 상태를 검증한다.
+- `GET/POST /api/admin/categories`는 관리자용 카테고리 태그 조회/추가를 제공한다. 공개 카테고리별 피드는 만들지 않는다.
+- `lib/blog/admin-posts.ts`가 D1 쿼리를 담당한다. D1의 `blog_posts`와 `blog_categories` 테이블을 사용한다.
+- 게시글 상태는 `draft`, `published`, `archived`. 발행 시 `published_at`을 최초 발행 시각으로 설정하고, 발행 취소 시 null 처리한다.
+- Markdown은 원문으로 저장한다. 공개 화면에서 HTML로 렌더링할 때 반드시 안전한 Markdown 파서/HTML sanitization을 적용하고 원문을 신뢰 가능한 HTML로 직접 삽입하지 않는다.
+- 현재 관리자 화면은 작성/수정/삭제/상태 관리/조회수 확인을 제공하지만, 공개 블로그 화면·미리보기·R2 이미지 업로드·카테고리 수정/삭제는 아직 제공하지 않는다.
+- API는 인증 후에만 응답하며 `Cache-Control: no-store`를 적용한다. 변경 요청은 Origin을 확인하고 입력값 크기/형식을 제한한다.
