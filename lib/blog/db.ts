@@ -24,7 +24,13 @@ interface D1Database {
 
 type BlogCloudflareEnv = {
   BLOG_DB: D1Database;
+  BLOG_IMAGES?: R2BucketLike;
 };
+
+export interface R2BucketLike {
+  put(key: string, value: ArrayBuffer | ArrayBufferView | ReadableStream, options?: { httpMetadata?: { contentType?: string; cacheControl?: string } }): Promise<unknown>;
+  get(key: string): Promise<{ body: ReadableStream; httpMetadata?: { contentType?: string }; httpEtag?: string; etag?: string } | null>;
+}
 
 /**
  * Resolve the D1 binding at request time. Never call this at module scope:
@@ -39,4 +45,11 @@ export function getBlogDatabase(): D1Database {
   }
 
   return blogEnv.BLOG_DB;
+}
+
+export function getBlogImageBucket(): R2BucketLike {
+  const { env } = getCloudflareContext();
+  const bucket = (env as unknown as BlogCloudflareEnv).BLOG_IMAGES;
+  if (!bucket) throw new Error("Cloudflare R2 binding BLOG_IMAGES is not configured.");
+  return bucket;
 }
