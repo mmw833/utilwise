@@ -1,3 +1,13 @@
+## Cloudflare PR 미리보기 배포
+- Workflow: `.github/workflows/preview-deploy.yml`
+- PR이 열리거나 업데이트되면 `npx opennextjs-cloudflare build` 후 `npx wrangler deploy --name utilwise-preview` 실행
+- 운영 Worker 이름은 `utilwise`, 미리보기 Worker 이름은 `utilwise-preview`로 분리한다. 미리보기 workflow는 운영 Worker 및 운영 도메인 설정을 수정하지 않는다.
+- GitHub 저장소 Settings → Secrets and variables → Actions에 다음 secrets를 등록해야 한다.
+  - `CLOUDFLARE_API_TOKEN`: 해당 Cloudflare 계정의 Workers 배포 권한이 있는 API Token
+  - `CLOUDFLARE_ACCOUNT_ID`: Cloudflare Account ID
+- 배포가 성공하면 Wrangler 로그에 표시되는 `https://utilwise-preview.<workers-subdomain>.workers.dev` 주소를 PR의 Actions 실행 로그에서 확인한다. 실제 계정의 workers.dev 활성화 상태에 따라 URL 사용 가능 여부가 달라질 수 있다.
+- 인증정보 등록 전 또는 workflow 성공 전에는 미리보기 URL을 완료된 것으로 안내하지 않는다.
+
 ### 계산기 상호작용 테스트
 - `tests/e2e/calculators.spec.ts`는 부피 계산기 입력/도형 변경과 팁 계산기 금액·팁 비율·통화·인원별 분배 결과를 브라우저에서 검증한다.
 - 계산기 UI를 수정할 때 초기 표시뿐 아니라 사용자 입력 변경 후 결과 갱신도 테스트한다.
