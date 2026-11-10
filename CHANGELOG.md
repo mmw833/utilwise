@@ -349,3 +349,12 @@
 - 한국어·영어 홈 심리테스트 카드 및 sitemap 등록
 - 진행/결과 페이지는 noindex, 소개 페이지를 검색 유입 랜딩으로 구성
 - 빌드·브라우저 테스트·Cloudflare 배포 확인 대기
+
+
+## 2026-11-10 블로그 D1 기반 구조 준비
+- Cloudflare D1 `utilwise-blog`를 생성하고 database ID를 확인
+- `feature/blog-d1-foundation` 작업 브랜치에서 `BLOG_DB` Worker binding 및 migration 경로 추가
+- `migrations/0001_blog_initial.sql`에 카테고리, 게시글, 언어별 번역 그룹, 발행 상태, 조회수 중복 방지 구조 추가
+- 조회수는 익명 방문자 토큰 해시 기준으로 24시간 이내 중복을 방지하도록 설계. IP 원문 미저장
+- 블로그 제품 범위 및 보안 원칙을 `BLOG_SPEC.md`에 문서화
+- D1 원격 migration 적용, 빌드/기능 테스트, 관리자/공개 페이지 구현은 후속 작업
