@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { getBlogImageBucket } from "@/lib/blog/db";
-export const runtime = "edge";
 export const dynamic = "force-dynamic";
 type Context = { params: Promise<{ key: string[] }> };
 export async function GET(_request: NextRequest, context: Context) {
