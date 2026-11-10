@@ -38,7 +38,8 @@ function validPost(value: unknown): value is AdminPostInput {
     post.content_md.length <= 100_000 &&
     (post.status === "draft" || post.status === "published" || post.status === "archived") &&
     (!post.id || typeof post.id === "string") &&
-    (!post.category_id || typeof post.category_id === "string")
+    (!post.category_id || typeof post.category_id === "string") &&
+    (post.cover_image_key === undefined || post.cover_image_key === null || (typeof post.cover_image_key === "string" && /^blog\/[0-9a-f-]{36}\.(jpg|png|webp|avif)$/.test(post.cover_image_key)))
   );
 }
 
