@@ -1,3 +1,8 @@
+## 2026-11-10 Cloudflare Worker Previews Wrangler 최소 버전 상향
+- Worker Previews 공식 최소 요구사항( Wrangler 4.135.0 )에 맞춰 package.json devDependency를 `^4.36.0`에서 `^4.135.0`으로 상향
+- Cloudflare 빌드 실패의 상세 원인은 아직 확인되지 않아, 이번 변경은 호환성 요건을 맞추는 선제 조치이며 빌드 재검증 필요
+- 운영 브랜치 및 운영 배포 변경 없음
+
 
 
 ## 2026-11-10 블로그 관리자 인증 1차 구현
