@@ -398,7 +398,7 @@ npm run preview
 - D1 데이터베이스: `utilwise-blog` / ID: `607946e3-d4cd-4cce-b7e9-eaf515244cb4`
 - Wrangler binding: `BLOG_DB`; migration directory: `migrations/`
 - 최초 스키마: `migrations/0001_blog_initial.sql`
-- D1 migration은 로컬/원격 환경에 명시적으로 적용해야 한다. 코드 설정만 추가했다고 원격 테이블이 생성된 것은 아니다.
+- 최초 D1 SQL은 2026-11-10 Cloudflare Console에서 직접 실행해 원격 테이블/트리거/인덱스 생성까지 확인했다. 이 경로는 Wrangler migration ledger를 자동 등록하지 않으므로, Wrangler 원격 migration을 사용하기 전 `d1_migrations` 상태를 확인하고 중복 실행 여부를 판단한다.
 - 원격 적용 전에는 migration SQL과 대상 database ID를 다시 확인하고 `wrangler d1 migrations apply utilwise-blog --remote` 실행 결과를 검증한다.
 - D1 binding은 서버 측 코드에서만 사용한다. Worker 배포 전 `npm run cf-typegen`으로 Cloudflare binding 타입을 갱신하고 TypeScript/Next.js 빌드를 수행한다.
 - 조회수 API는 `blog_view_dedup`에 (post_id, visitor_hash) 복합 키를 사용하고, 마지막 집계 시각에서 86,400초가 지난 경우에만 UPSERT가 반영되도록 구현한다. 트리거가 게시글 누적 조회수를 갱신한다.
