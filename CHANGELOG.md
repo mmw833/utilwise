@@ -358,3 +358,12 @@
 - 조회수는 익명 방문자 토큰 해시 기준으로 24시간 이내 중복을 방지하도록 설계. IP 원문 미저장
 - 블로그 제품 범위 및 보안 원칙을 `BLOG_SPEC.md`에 문서화
 - D1 원격 migration 적용, 빌드/기능 테스트, 관리자/공개 페이지 구현은 후속 작업
+
+
+## 2026-11-10 블로그 D1 원격 스키마 적용
+- Cloudflare D1 Console에서 `migrations/0001_blog_initial.sql`과 동일한 초기 SQL을 실행
+- `blog_categories`, `blog_posts`, `blog_view_dedup` 3개 테이블 생성 확인
+- 24시간 조회수 집계용 트리거 2개와 조회/피드용 인덱스 4개 생성 확인
+- SQL 실행 오류 없음. Cloudflare 내부 `_cf_KV` 외 블로그용 객체 생성 확인
+- Console 직접 실행이므로 Wrangler migration ledger 등록 여부는 미확인. 향후 Wrangler 적용 전 ledger와 기존 객체를 확인할 것
+- Worker 연결/배포 및 애플리케이션 기능 구현은 아직 미완료
