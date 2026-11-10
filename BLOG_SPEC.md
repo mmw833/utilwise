@@ -61,3 +61,14 @@
 5. 공개 한국어·영어 목록/상세 및 SEO
 6. R2 이미지 저장/업로드
 7. 모바일·보안·기능 테스트, PR 검토 및 배포 확인
+
+
+## 관리자 인증 구현 상태
+
+- 관리자 비밀번호는 Cloudflare Worker secret `ADMIN_PASSWORD`로 관리한다(12자 이상).
+- 세션 서명키는 Worker secret `ADMIN_SESSION_SECRET`로 관리한다(32자 이상).
+- HMAC-SHA256 서명 세션, 8시간 만료, HttpOnly/SameSite=Strict 쿠키를 사용한다. 운영 환경은 Secure 쿠키.
+- 로그인/로그아웃: `/api/admin/login`, `/api/admin/logout`; 로그인 화면: `/admin/blog/login`; 보호된 관리자 진입: `/admin/blog`.
+- 로그인 시도 제한은 배포 전 Cloudflare WAF/Rate Limiting 정책으로 설정·검증해야 한다.
+- 인증 기능 코드는 추가됐지만 실제 Worker secrets 등록 및 운영 로그인 테스트는 아직 완료되지 않았다.
+
