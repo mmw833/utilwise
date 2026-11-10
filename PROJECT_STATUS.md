@@ -5,8 +5,10 @@
 - 초기 migration `migrations/0001_blog_initial.sql` 설계: 카테고리, 언어별 게시글/번역 연결, 발행 상태, 조회수 및 24시간 중복 집계 테이블/트리거
 - 익명 방문자는 서버 생성 토큰의 해시만 저장하도록 설계하고 IP 원문 저장은 제외
 - 블로그 요구사항을 `BLOG_SPEC.md`로 정리. 전체 통합 피드/인기글/최신순, 카테고리는 글의 태그만 표시
-- **미완료:** D1 migration 원격 적용, Worker 타입 생성, 서버 데이터 접근 계층, 관리자 인증 및 UI, R2, 공개 블로그 화면
-- **검증 상태:** SQL 구조와 조회수 트리거를 SQLite에서 검증. GitHub Actions 빌드 및 Cloudflare D1 원격 적용은 미완료
+- **완료:** Cloudflare D1 Console에서 초기 SQL migration 실행 및 원격 확인. `blog_categories`, `blog_posts`, `blog_view_dedup` 3개 테이블, 2개 조회수 트리거, 4개 인덱스 생성 확인. Cloudflare 내부 테이블 `_cf_KV`는 기존 항목
+- **주의:** Console에서 SQL을 직접 실행했으므로 Wrangler migration ledger 등록 여부는 미확인. 이후 `wrangler d1 migrations apply utilwise-blog --remote` 실행 전 기존 객체와 migration ledger를 확인해야 함. SQL은 `IF NOT EXISTS`로 재실행 안전성 확보
+- **미완료:** Worker 타입 생성, 서버 데이터 접근 계층, 관리자 인증 및 UI, R2, 공개 블로그 화면
+- **검증 상태:** 원격 D1 객체 생성 및 sqlite_master 확인 완료. GitHub Actions 빌드/Cloudflare Worker 배포는 미완료
 - **배포 상태:** PR #10 초안 작성. main 병합 및 운영 배포 없음
 
 ## 2026-11-10 영어 홈페이지 SEO 안내 콘텐츠 위치 조정
