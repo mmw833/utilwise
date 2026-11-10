@@ -39,7 +39,7 @@ jobs:
             echo "::error::Cloudflare repository secrets are missing."
             exit 1
           fi
-          npx wrangler deploy --name utilwise-preview
+          npx wrangler deploy --config wrangler.preview.jsonc
       - name: Smoke test Korean and English blog pages
         run: |
           for path in /blog /en/blog; do
