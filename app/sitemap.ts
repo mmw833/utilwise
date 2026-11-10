@@ -8,7 +8,7 @@ const englishOnlineToolPages = onlineToolPages.map((route) => `/en${route}`);
 const textToolPages = ["/text-tools","/text-tools/character-counter","/text-tools/text-compare","/text-tools/remove-duplicates","/text-tools/speech-time"];
 const englishTextToolPages = textToolPages.map((route) => `/en${route}`);
 const mbtiTypes = ["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"];
-const pages = [
+const pages = [\n{route:"/blog",priority:0.75,changeFrequency:"daily" as const},\n{route:"/en/blog",priority:0.7,changeFrequency:"daily" as const},
 {route:"/",priority:1,changeFrequency:"weekly" as const},
 {route:"/about",priority:0.6,changeFrequency:"yearly" as const},
 {route:"/privacy",priority:0.4,changeFrequency:"yearly" as const},
