@@ -11,8 +11,8 @@ export const metadata = {
 export default async function AdminBlogLoginPage() {
   if (await isAdminAuthenticated()) redirect("/admin/blog");
 
-  const configured = isAdminAuthConfigured();
-  const authStatus = getAdminAuthStatus();
+  const configured = await isAdminAuthConfigured();
+  const authStatus = await getAdminAuthStatus();
   return (
     <main className="admin-login-page">
       <section className="admin-login-card">
