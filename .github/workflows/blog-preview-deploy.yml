@@ -32,6 +32,16 @@ jobs:
         run: npm install
       - name: Build OpenNext Worker
         run: npx opennextjs-cloudflare build
+      - name: Apply pending Preview D1 migrations
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Cloudflare repository secrets are missing."
+            exit 1
+          fi
+          npx wrangler d1 migrations apply utilwise-blog --remote --config wrangler.preview.jsonc
       - name: Deploy isolated preview Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
