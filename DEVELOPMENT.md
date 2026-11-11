@@ -491,3 +491,11 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 인증 값은 OpenNext의 `getCloudflareContext({ async: true })`에서 요청 시점에 조회한다.
 - 로그인 페이지는 `/admin/blog/login`, 관리자 화면은 `/admin/blog`이다.
 - Secret 값 자체는 페이지/로그/진단 출력에 표시하지 않는다.
+
+
+## 블로그 편집기 개선 작업 (2026-11-11)
+- 작업 브랜치: `feat/blog-editor-improvements`
+- 복수 태그는 D1 `blog_posts.tags_json`에 JSON 배열로 저장한다. migration: `migrations/0002_blog_post_tags.sql`
+- 기존 게시글 보존을 위해 컬럼은 `NOT NULL DEFAULT '[]'`로 추가한다. 원격 D1 적용 전 `d1_migrations` ledger 및 대상 database ID를 확인하고 Preview DB에만 적용한다.
+- 관리자 본문은 Markdown 원문으로 저장하고 `BlogMarkdown`에서 허용한 문법만 렌더링한다. 미리보기 역시 동일 렌더러를 사용한다.
+- 운영 main 및 운영 Worker에는 Preview 검증과 사용자 승인 전 반영하지 않는다.
