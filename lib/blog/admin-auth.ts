@@ -1,7 +1,6 @@
 import "server-only";
 
 import { cookies } from "next/headers";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 const COOKIE_NAME = "uw_admin_session";
 const SESSION_SECONDS = 8 * 60 * 60;
@@ -17,18 +16,11 @@ type AdminSecrets = {
  * the route through its Node.js compatibility runtime.
  */
 async function getSecrets(): Promise<AdminSecrets> {
-  let workerEnv: AdminSecrets = {};
-  try {
-    const context = await getCloudflareContext({ async: true });
-    workerEnv = context.env as unknown as AdminSecrets;
-  } catch {
-    // Local Next.js development can use uncommitted .env.local values.
-  }
-
+  // OpenNext exposes Worker dashboard variables and Secrets through process.env.
+  // Keep this lookup centralized so no secret is ever copied into client code or logs.
   return {
-    ADMIN_PASSWORD: workerEnv.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD,
-    ADMIN_SESSION_SECRET:
-      workerEnv.ADMIN_SESSION_SECRET || process.env.ADMIN_SESSION_SECRET,
+    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
+    ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET,
   };
 }
 
