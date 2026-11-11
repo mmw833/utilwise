@@ -34,6 +34,7 @@ type Editor = {
   excerpt: string;
   content_md: string;
   category_id: string;
+  category_name: string;
   tags: string[];
   seo_title: string;
   seo_description: string;
@@ -48,6 +49,7 @@ const emptyEditor = (): Editor => ({
   excerpt: "",
   content_md: "",
   category_id: "",
+  category_name: "",
   tags: [],
   seo_title: "",
   seo_description: "",
@@ -61,11 +63,16 @@ function dateLabel(timestamp: number | null) {
 }
 
 function slugify(value: string) {
-  return value.trim().toLowerCase()
-    .normalize("NFKD")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 120) || `post-${new Date().toISOString().slice(0, 10)}`;
+  const initial = ["g","kk","n","d","tt","r","m","b","pp","s","ss","","j","jj","ch","k","t","p","h"];
+  const vowel = ["a","ae","ya","yae","eo","e","yeo","ye","o","wa","wae","oe","yo","u","wo","we","wi","yu","eu","ui","i"];
+  const final = ["","k","k","ks","n","nj","nh","t","l","lk","lm","lb","ls","lt","lp","lh","m","p","ps","t","t","ng","t","t","k","t","p","t"];
+  const latin = Array.from(value.normalize("NFC")).map((char) => {
+    const code = char.charCodeAt(0) - 0xac00;
+    if (code < 0 || code > 11171) return char;
+    return initial[Math.floor(code / 588)] + vowel[Math.floor((code % 588) / 28)] + final[code % 28];
+  }).join("");
+  return latin.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 120)
+    || `post-${new Date().toISOString().slice(0, 10)}`;
 }
 
 export default function AdminBlogManager() {
@@ -125,6 +132,7 @@ export default function AdminBlogManager() {
       excerpt: post.excerpt || "",
       content_md: post.content_md || "",
       category_id: post.category_id || "",
+      category_name: post.category_name || "",
       tags: (() => { try { return JSON.parse(post.tags_json || "[]") as string[]; } catch { return []; } })(),
       seo_title: post.seo_title || "",
       seo_description: post.seo_description || "",
@@ -164,6 +172,7 @@ export default function AdminBlogManager() {
         body: JSON.stringify({
           ...editor,
           category_id: editor.category_id || null,
+          category_name: editor.category_name.trim(),
           tags: editor.tags,
           seo_title: null,
           seo_description: editor.seo_description || null,
@@ -255,11 +264,9 @@ export default function AdminBlogManager() {
               <input required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={120} value={editor.slug} onChange={(e) => setEditor({ ...editor, slug: e.target.value })} />
               <small>영문 소문자, 숫자, 하이픈만 사용할 수 있습니다.</small>
             </label>
-            <label>카테고리 태그
-              <select value={editor.category_id} onChange={(e) => setEditor({ ...editor, category_id: e.target.value })}>
-                <option value="">선택 안 함</option>
-                {categories.map((category) => <option key={category.id} value={category.id}>{category.name_ko}</option>)}
-              </select>
+            <label>카테고리 (직접 입력)
+              <input maxLength={40} value={editor.category_name} onChange={(e) => setEditor({ ...editor, category_name: e.target.value, category_id: "" })} placeholder="예: 생활정보" list="blog-category-suggestions" />
+              <datalist id="blog-category-suggestions">{categories.map((category) => <option key={category.id} value={category.name_ko} />)}</datalist>
             </label>
             <label className="blog-admin-full">태그 (쉼표로 구분)
               <input value={editor.tags.join(", ")} maxLength={400} onChange={(e) => setEditor({ ...editor, tags: e.target.value.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12) })} placeholder="생활정보, 가이드, 팁" />
