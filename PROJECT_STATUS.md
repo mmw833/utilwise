@@ -631,3 +631,13 @@
 - 짧은 소개를 비워두면 본문에서 텍스트를 추출해 자동 생성
 - 1차 작업과 함께 PR #13에 반영. GitHub Actions 후속 빌드 및 Preview 화면/이미지 업로드 테스트 대기
 - 원격 D1 migration은 아직 적용하지 않음. 운영 DB 및 운영 Worker 변경 없음
+
+
+## 2026-11-12 블로그 작성 화면 UX 후속 개선
+- 본문 Markdown 도구를 커서/선택 영역 삽입 방식으로 개선
+- 편집/미리보기/나란히 보기 모드와 단어·문자 수 표시 추가
+- 데스크톱/모바일 작성 영역과 미리보기 스타일 보강
+- 신규 카테고리 slug 중복 충돌 방지
+- `feat/blog-editor-improvements` 브랜치를 Preview 배포 workflow에 추가
+- 미완료: GitHub Actions 결과, Preview 반영 여부, 실제 저장/이미지 업로드/모바일 테스트 확인
+- 주의: `0002_blog_post_tags.sql` 원격 Preview D1 적용 여부 미확인. 운영 main/DB/Worker 변경 없음
