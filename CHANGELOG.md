@@ -430,3 +430,10 @@
 - OpenNext Cloudflare 컨텍스트를 비동기 API로 읽고, 런타임 환경변수는 보조 경로로만 사용
 - 진단 화면은 비밀값을 노출하지 않고 Worker 컨텍스트/설정 존재 여부만 표시
 - 작업 브랜치: `fix/admin-single-password-auth`; 빌드·Preview 실로그인 검증 전 운영 반영 금지
+
+
+## 2026-11-11 블로그 편집기 개선 1차
+- 게시글 복수 태그 저장 필드와 공개 상세 태그 표시 추가, 기존 게시글 호환 기본값 migration 작성
+- Markdown 서식 도구와 본문 미리보기 UI 추가
+- SEO 제목 별도 입력 제거, SEO 설명 미입력 시 소개글 fallback 유지
+- 작업 브랜치 `feat/blog-editor-improvements`; Preview D1 migration 및 CI 검증 대기
