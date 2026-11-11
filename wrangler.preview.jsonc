@@ -3,7 +3,7 @@
   "name": "utilwise-preview",
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-11-05",
-  "compatibility_flags": ["nodejs_compat"],
+  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "d1_databases": [{
     "binding": "BLOG_DB",
