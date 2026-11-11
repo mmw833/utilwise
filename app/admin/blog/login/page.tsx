@@ -30,6 +30,10 @@ export default async function AdminBlogLoginPage() {
               {!authStatus.sessionSecretPresent && <li>ADMIN_SESSION_SECRET 값이 Worker에 전달되지 않았습니다.</li>}
               {authStatus.sessionSecretPresent && !authStatus.sessionSecretLengthValid && <li>ADMIN_SESSION_SECRET은 32자 이상이어야 합니다.</li>}
             </ul>
+            <details style={{ marginTop: "1rem" }}>
+              <summary>안전 진단 정보</summary>
+              <pre style={{ whiteSpace: "pre-wrap", fontSize: "0.8rem" }}>{JSON.stringify(authStatus.diagnostics, null, 2)}</pre>
+            </details>
             비밀값 자체는 화면이나 로그에 표시하지 않습니다.
           </div>
         )}
