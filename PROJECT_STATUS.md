@@ -1,3 +1,12 @@
+
+## 2026-11-11 관리자 인증 단일 비밀번호 구조 변경 (검증 진행 중)
+- 별도 `ADMIN_SESSION_SECRET` 설정을 제거하고 Cloudflare Worker Secret `ADMIN_PASSWORD` 하나만 사용하도록 인증 모듈 단순화
+- 세션 서명 키는 관리자 비밀번호에서 파생하며 8시간 만료 HttpOnly/SameSite=Strict 쿠키 유지
+- OpenNext Cloudflare context를 `getCloudflareContext({ async: true })`로 요청 시점에 조회하도록 변경
+- 비밀값은 화면/로그에 노출하지 않고 boolean 진단 정보만 제공
+- 작업 브랜치: `fix/admin-single-password-auth`
+- **검증 대기:** GitHub Actions 빌드, Preview 로그인 성공/실패, 관리자 페이지 접근 제어, 로그아웃 및 세션 만료 확인
+- **운영 반영:** 미실시
 ## 2026-11-11 블로그 에디토리얼 디자인 1차 수정
 - 블로그 메인에서 주제/카테고리 탐색 메뉴와 영역 제거. 인기글·최신글 중심 구성으로 변경
 - 인기글 1위를 메인 히어로의 대표 스토리로 연결하고 등록된 대표 이미지가 있으면 사진 중심으로 표시, 이미지가 없을 때는 절제된 브랜드 그래픽으로 대체
