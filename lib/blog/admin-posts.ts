@@ -64,6 +64,23 @@ export async function listAdminCategories(): Promise<AdminCategoryRecord[]> {
   return result.results ?? [];
 }
 
+export async function findOrCreateAdminCategory(name: string, language: BlogLanguage): Promise<string | null> {
+  const normalized = name.trim();
+  if (!normalized) return null;
+  const db = getBlogDatabase();
+  const existing = await db.prepare(
+    "SELECT id FROM blog_categories WHERE lower(name_ko) = lower(?) OR lower(COALESCE(name_en, '')) = lower(?) LIMIT 1"
+  ).bind(normalized, normalized).first<{ id: string }>();
+  if (existing) return existing.id;
+  const slugBase = normalized.toLowerCase().normalize("NFKD")
+    .replace(/[^a-z0-9가-힣]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50);
+  const slug = slugBase || `category-${crypto.randomUUID().slice(0, 8)}`;
+  const id = crypto.randomUUID();
+  await db.prepare("INSERT INTO blog_categories (id, slug, name_ko, name_en) VALUES (?, ?, ?, ?)")
+    .bind(id, slug, normalized, language === "en" ? normalized : null).run();
+  return id;
+}
+
 export async function saveAdminPost(input: AdminPostInput): Promise<string> {
   const db = getBlogDatabase();
   const id = input.id || crypto.randomUUID();
