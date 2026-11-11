@@ -94,6 +94,7 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
         <div className="journal-empty-art" aria-hidden="true"><span>U.</span><i>✳</i></div>
         <div><span className="journal-eyebrow">{query || selectedCategory !== "all" ? (en ? "NO MATCHES" : "검색 결과 없음") : "COMING SOON"}</span><h3>{query || selectedCategory !== "all" ? (en ? "No articles found." : "조건에 맞는 게시글이 없습니다.") : (en ? "Something useful is on its way." : "유용한 이야기를 준비하고 있어요.")}</h3><p>{query || selectedCategory !== "all" ? (en ? "Try another keyword or category." : "검색어를 바꾸거나 전체 카테고리를 선택해 보세요.") : (en ? "We’re preparing practical stories and guides for your everyday. In the meantime, discover the tools that make life a little easier." : "일상에 도움이 되는 실용적인 콘텐츠를 준비하고 있습니다. 그동안 UTILWISE의 다양한 도구를 둘러보세요.")}</p><Link href={tools}>{en ? "Explore UTILWISE tools" : "UTILWISE 도구 둘러보기"} ↗</Link></div>
       </div>}
+      </section>
     </section>
 
     <footer className="journal-footer"><Link href={home} className="journal-brand">UTIL<span>WISE</span></Link><p>{en ? "Useful tools and thoughtful ideas for everyday life." : "일상에 필요한 유용한 도구와 더 나은 아이디어."}</p><div><Link href={home}>{en ? "Home" : "홈"}</Link><Link href={tools}>{en ? "Tools" : "도구"}</Link><Link href="/about">{en ? "About" : "소개"}</Link></div><small>© {new Date().getFullYear()} UTILWISE · Simple Tools for Everyday Life.</small></footer>
