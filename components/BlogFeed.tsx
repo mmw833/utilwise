@@ -58,13 +58,13 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
       </div>
     </section>
 
-    {popular.length > 0 && <section className="journal-section journal-popular">
-      <div className="journal-section-heading"><div><span className="journal-eyebrow">{en ? "READER FAVORITES" : "READERS' PICKS"}</span><h2>{en ? "Popular reads" : "많이 읽은 이야기"}</h2></div><p>{en ? "The articles readers come back to." : "독자들이 많이 찾는 콘텐츠"}</p></div>
-      <div className="journal-feature-grid">{popular.slice(0, 3).map((post, index) => card(post, index, index === 0))}</div>
-    </section>}
+    <section className="journal-section journal-popular">
+      <div className="journal-section-heading"><div><span className="journal-eyebrow">{en ? "READER FAVORITES" : "READERS' PICKS"}</span><h2>{en ? "Popular reads" : "인기글"}</h2></div><p>{en ? "The articles readers come back to." : "많이 읽힌 콘텐츠를 모아 보여드립니다."}</p></div>
+      {popular.length > 0 ? <div className="journal-feature-grid">{popular.slice(0, 3).map((post, index) => card(post, index, index === 0))}</div> : <div className="journal-section-empty">{en ? "Popular articles will appear here as readers discover the journal." : "게시글이 발행되고 독자들의 조회가 쌓이면 인기글을 이곳에 보여드립니다."}</div>}
+    </section>
 
     <section className="journal-section journal-latest" id="latest">
-      <div className="journal-section-heading"><div><span className="journal-eyebrow">{en ? "FRESH FROM THE JOURNAL" : "FRESH FROM THE JOURNAL"}</span><h2>{en ? "The latest stories" : "새로운 이야기"}</h2></div><p>{en ? "New ideas, guides and useful reads." : "새롭게 업데이트되는 정보와 가이드"}</p></div>
+      <div className="journal-section-heading"><div><span className="journal-eyebrow">{en ? "FRESH FROM THE JOURNAL" : "FRESH FROM THE JOURNAL"}</span><h2>{en ? "Latest articles" : "최신글"}</h2></div><p>{en ? "New ideas, guides and useful reads." : "새롭게 업데이트되는 정보와 가이드"}</p></div>
       {posts.filter((post) => !popular.some((item) => item.id === post.id)).length > 0 ? <div className="journal-latest-grid">{posts.filter((post) => !popular.some((item) => item.id === post.id)).map((post, index) => card(post, index + 3))}</div> : <div className="journal-empty">
         <div className="journal-empty-art" aria-hidden="true"><span>U.</span><i>✳</i></div>
         <div><span className="journal-eyebrow">{en ? "GOOD THINGS TAKE A LITTLE TIME" : "COMING SOON"}</span><h3>{en ? "Something useful is on its way." : "유용한 이야기를 준비하고 있어요."}</h3><p>{en ? "We’re preparing practical stories and guides for your everyday. In the meantime, discover the tools that make life a little easier." : "일상에 도움이 되는 실용적인 콘텐츠를 준비하고 있습니다. 그동안 UTILWISE의 다양한 도구를 둘러보세요."}</p><Link href={tools}>{en ? "Explore UTILWISE tools" : "UTILWISE 도구 둘러보기"} ↗</Link></div>
