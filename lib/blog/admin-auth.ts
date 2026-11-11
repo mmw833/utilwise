@@ -18,9 +18,12 @@ type AdminSecrets = {
 async function getSecrets(): Promise<AdminSecrets> {
   // OpenNext exposes Worker dashboard variables and Secrets through process.env.
   // Keep this lookup centralized so no secret is ever copied into client code or logs.
+  // Use dynamic indexing: Next.js statically inlines direct process.env.KEY
+  // expressions during build, when Cloudflare runtime secrets are not present.
+  const runtimeEnv = process.env as Record<string, string | undefined>;
   return {
-    ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
-    ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET,
+    ADMIN_PASSWORD: runtimeEnv["ADMIN_PASSWORD"],
+    ADMIN_SESSION_SECRET: runtimeEnv["ADMIN_SESSION_SECRET"],
   };
 }
 
