@@ -641,3 +641,12 @@
 - `feat/blog-editor-improvements` 브랜치를 Preview 배포 workflow에 추가
 - 미완료: GitHub Actions 결과, Preview 반영 여부, 실제 저장/이미지 업로드/모바일 테스트 확인
 - 주의: `0002_blog_post_tags.sql` 원격 Preview D1 적용 여부 미확인. 운영 main/DB/Worker 변경 없음
+
+## 2026-11-12 블로그 메인 검색 및 콘텐츠 큐레이션
+- 한국어·영어 공통 BlogFeed에 제목/소개/카테고리/태그 검색 추가
+- 게시글 카테고리 칩 필터, 최신순/인기순 정렬 추가
+- 인기글·최신글에 동일 검색/필터를 적용하고 인기글 중복을 최신글 목록에서 제외
+- PC/태블릿/모바일 검색·카테고리 컨트롤 및 콘텐츠 카드 레이아웃 보강
+- 별도 서버 API, D1 schema, 게시글 URL은 변경하지 않음
+- 검증 대기: GitHub Actions 빌드, Preview 배포, 한국어/영어 검색·필터·정렬 브라우저 테스트
+- 운영 main/DB/Worker 변경 없음
