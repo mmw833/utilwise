@@ -15,6 +15,7 @@ export interface AdminPostInput {
   content_md?: string;
   cover_image_key?: string | null;
   category_id?: string | null;
+  category_name?: string;
   tags?: string[];
   seo_title?: string | null;
   seo_description?: string | null;
@@ -118,7 +119,7 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
     input.language,
     input.slug,
     input.title,
-    input.excerpt ?? "",
+    (input.excerpt?.trim() || (input.content_md ?? "").replace(/!\[[^\]]*\]\([^)]+\)/g, "").replace(/^#{1,3}\s+/gm, "").replace(/[>*_`\[\]()#-]/g, " ").replace(/\s+/g, " ").trim().slice(0, 160)),
     input.content_md ?? "",
     input.cover_image_key ?? null,
     input.category_id ?? null,
