@@ -320,14 +320,21 @@ export default function AdminBlogManager() {
             </label>
             <div className="blog-admin-full">
               <div className="blog-admin-editor-head">
-                <strong>본문 편집</strong>
-                <button type="button" className="blog-admin-text-button" onClick={() => setShowPreview((value) => !value)}>{showPreview ? "편집으로 돌아가기" : "미리보기"}</button>
+                <div><strong>본문 편집</strong><small className="blog-admin-count">{wordCount.toLocaleString("ko-KR")} 단어 · {characterCount.toLocaleString("ko-KR")}자</small></div>
+                <div className="blog-admin-view-switch">
+                  <button type="button" className={!showPreview ? "is-active" : ""} onClick={() => setShowPreview(false)}>편집</button>
+                  <button type="button" className={showPreview && previewMode === "preview" ? "is-active" : ""} onClick={() => { setShowPreview(true); setPreviewMode("preview"); }}>미리보기</button>
+                  <button type="button" className={showPreview && previewMode === "split" ? "is-active" : ""} onClick={() => { setShowPreview(true); setPreviewMode("split"); }}>나란히 보기</button>
+                </div>
               </div>
               {showPreview ? (
-                <div className="blog-admin-preview">
-                  <h1>{editor.title || "게시글 제목 미리보기"}</h1>
-                  {editor.excerpt ? <p className="blog-admin-preview-excerpt">{editor.excerpt}</p> : null}
-                  <BlogMarkdown content={editor.content_md || "본문을 입력하면 여기에 미리 표시됩니다."} />
+                <div className={`blog-admin-preview-layout ${previewMode === "split" ? "is-split" : ""}`}>
+                  <div className="blog-admin-preview">
+                    <h1>{editor.title || "게시글 제목 미리보기"}</h1>
+                    {editor.excerpt ? <p className="blog-admin-preview-excerpt">{editor.excerpt}</p> : null}
+                    <BlogMarkdown content={editor.content_md || "본문을 입력하면 여기에 미리 표시됩니다."} />
+                  </div>
+                  {previewMode === "split" ? <textarea aria-label="본문 Markdown 편집" className="blog-admin-content blog-admin-content-split" rows={20} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} /> : null}
                 </div>
               ) : (
                 <>
