@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cookies } from "next/headers";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 const COOKIE_NAME = "uw_admin_session";
 const SESSION_SECONDS = 8 * 60 * 60;
@@ -16,14 +17,21 @@ type AdminSecrets = {
  * the route through its Node.js compatibility runtime.
  */
 async function getSecrets(): Promise<AdminSecrets> {
-  // OpenNext exposes Worker dashboard variables and Secrets through process.env.
-  // Keep this lookup centralized so no secret is ever copied into client code or logs.
-  // Use dynamic indexing: Next.js statically inlines direct process.env.KEY
-  // expressions during build, when Cloudflare runtime secrets are not present.
+  // In a Worker request, secrets are available on the Cloudflare env object.
+  // process.env is retained as a fallback for Node.js-compatible deployments.
+  let workerEnv: AdminSecrets = {};
+  try {
+    const context = getCloudflareContext();
+    workerEnv = context.env as unknown as AdminSecrets;
+  } catch {
+    // Fall back to process.env for local or alternate OpenNext runtimes.
+  }
+
   const runtimeEnv = process.env as Record<string, string | undefined>;
   return {
-    ADMIN_PASSWORD: runtimeEnv["ADMIN_PASSWORD"],
-    ADMIN_SESSION_SECRET: runtimeEnv["ADMIN_SESSION_SECRET"],
+    ADMIN_PASSWORD: workerEnv.ADMIN_PASSWORD || runtimeEnv["ADMIN_PASSWORD"],
+    ADMIN_SESSION_SECRET:
+      workerEnv.ADMIN_SESSION_SECRET || runtimeEnv["ADMIN_SESSION_SECRET"],
   };
 }
 
