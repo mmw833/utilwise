@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - preview/blog-system
+      - fix/admin-single-password-auth
 
 permissions:
   contents: read
@@ -18,14 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Checkout blog preview branch
+      - name: Checkout current preview source
         uses: actions/checkout@v4
         with:
-          ref: preview/blog-system
+          ref: ${{ github.ref }}
       - name: Set up Node.js
         uses: actions/setup-node@v4
-        with:
-          node-version: 22
       - name: Install dependencies
         run: npm install
       - name: Build OpenNext Worker
