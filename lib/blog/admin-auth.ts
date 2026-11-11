@@ -5,75 +5,66 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 const COOKIE_NAME = "uw_admin_session";
 const SESSION_SECONDS = 8 * 60 * 60;
+const MIN_PASSWORD_LENGTH = 12;
 const encoder = new TextEncoder();
 
 type AdminSecrets = {
   ADMIN_PASSWORD?: string;
-  ADMIN_SESSION_SECRET?: string;
 };
 
-/**
- * Resolve Worker secrets in async mode. This also works when OpenNext executes
- * the route through its Node.js compatibility runtime.
- */
 type SecretDiagnostics = {
   cloudflareContextAvailable: boolean;
   cloudflarePasswordPresent: boolean;
-  cloudflareSessionSecretPresent: boolean;
   processPasswordPresent: boolean;
-  processSessionSecretPresent: boolean;
   contextError?: string;
 };
 
-async function getSecretDiagnostics(): Promise<SecretDiagnostics> {
+/**
+ * Read the secret from the current Worker request context.
+ * Async mode is supported by OpenNext and avoids relying on build-time env inlining.
+ */
+async function getSecrets(): Promise<AdminSecrets> {
+  let workerPassword: string | undefined;
+
+  try {
+    const context = await getCloudflareContext({ async: true });
+    workerPassword = (context.env as unknown as AdminSecrets).ADMIN_PASSWORD;
+  } catch {
+    // Local/alternate runtime fallback only. Never expose secret values.
+  }
+
   const runtimeEnv = process.env as Record<string, string | undefined>;
+  return {
+    ADMIN_PASSWORD: workerPassword || runtimeEnv["ADMIN_PASSWORD"],
+  };
+}
+
+async function getSecretDiagnostics(): Promise<SecretDiagnostics> {
   let cloudflareContextAvailable = false;
   let cloudflarePasswordPresent = false;
-  let cloudflareSessionSecretPresent = false;
   let contextError: string | undefined;
 
   try {
-    const context = getCloudflareContext();
-    const workerEnv = context.env as unknown as AdminSecrets;
+    const context = await getCloudflareContext({ async: true });
     cloudflareContextAvailable = true;
-    cloudflarePasswordPresent = Boolean(workerEnv.ADMIN_PASSWORD);
-    cloudflareSessionSecretPresent = Boolean(workerEnv.ADMIN_SESSION_SECRET);
+    cloudflarePasswordPresent = Boolean(
+      (context.env as unknown as AdminSecrets).ADMIN_PASSWORD,
+    );
   } catch (error) {
     contextError = error instanceof Error ? error.name : "UnknownError";
   }
 
+  const runtimeEnv = process.env as Record<string, string | undefined>;
   return {
     cloudflareContextAvailable,
     cloudflarePasswordPresent,
-    cloudflareSessionSecretPresent,
     processPasswordPresent: Boolean(runtimeEnv["ADMIN_PASSWORD"]),
-    processSessionSecretPresent: Boolean(runtimeEnv["ADMIN_SESSION_SECRET"]),
     contextError,
   };
 }
 
-async function getSecrets(): Promise<AdminSecrets> {
-  const runtimeEnv = process.env as Record<string, string | undefined>;
-  let workerEnv: AdminSecrets = {};
-  try {
-    workerEnv = getCloudflareContext().env as unknown as AdminSecrets;
-  } catch {
-    // Fall back to process.env for local or alternate OpenNext runtimes.
-  }
-
-  return {
-    ADMIN_PASSWORD: workerEnv.ADMIN_PASSWORD || runtimeEnv["ADMIN_PASSWORD"],
-    ADMIN_SESSION_SECRET:
-      workerEnv.ADMIN_SESSION_SECRET || runtimeEnv["ADMIN_SESSION_SECRET"],
-  };
-}
-
-async function requireSessionSecret(): Promise<string> {
-  const secret = (await getSecrets()).ADMIN_SESSION_SECRET;
-  if (!secret || secret.length < 32) {
-    throw new Error("ADMIN_SESSION_SECRET must contain at least 32 characters.");
-  }
-  return secret;
+async function getAdminPassword(): Promise<string | undefined> {
+  return (await getSecrets()).ADMIN_PASSWORD;
 }
 
 function toBase64Url(bytes: Uint8Array): string {
@@ -89,15 +80,23 @@ function fromBase64Url(value: string): Uint8Array {
   return Uint8Array.from(binary, (character) => character.charCodeAt(0));
 }
 
+/** The single admin password also keys session signatures; no second secret is needed. */
 async function hmac(value: string): Promise<Uint8Array> {
+  const password = await getAdminPassword();
+  if (!password || password.length < MIN_PASSWORD_LENGTH) {
+    throw new Error("ADMIN_PASSWORD must contain at least 12 characters.");
+  }
+
   const key = await crypto.subtle.importKey(
     "raw",
-    encoder.encode(await requireSessionSecret()),
+    encoder.encode(password),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],
   );
-  return new Uint8Array(await crypto.subtle.sign("HMAC", key, encoder.encode(value)));
+  return new Uint8Array(
+    await crypto.subtle.sign("HMAC", key, encoder.encode(value)),
+  );
 }
 
 function constantTimeEqual(left: Uint8Array, right: Uint8Array): boolean {
@@ -110,29 +109,27 @@ function constantTimeEqual(left: Uint8Array, right: Uint8Array): boolean {
 }
 
 export async function getAdminAuthStatus() {
-  const { ADMIN_PASSWORD, ADMIN_SESSION_SECRET } = await getSecrets();
+  const password = await getAdminPassword();
   const diagnostics = await getSecretDiagnostics();
   return {
-    passwordPresent: Boolean(ADMIN_PASSWORD),
-    passwordLengthValid: Boolean(ADMIN_PASSWORD && ADMIN_PASSWORD.length >= 12),
-    sessionSecretPresent: Boolean(ADMIN_SESSION_SECRET),
-    sessionSecretLengthValid: Boolean(ADMIN_SESSION_SECRET && ADMIN_SESSION_SECRET.length >= 32),
+    passwordPresent: Boolean(password),
+    passwordLengthValid: Boolean(password && password.length >= MIN_PASSWORD_LENGTH),
     diagnostics,
   };
 }
 
 export async function isAdminAuthConfigured(): Promise<boolean> {
-  const status = await getAdminAuthStatus();
-  return status.passwordLengthValid && status.sessionSecretLengthValid;
+  const password = await getAdminPassword();
+  return Boolean(password && password.length >= MIN_PASSWORD_LENGTH);
 }
 
 export async function verifyAdminPassword(candidate: string): Promise<boolean> {
-  const { ADMIN_PASSWORD } = await getSecrets();
-  if (!ADMIN_PASSWORD || ADMIN_PASSWORD.length < 12 || !candidate) return false;
+  const password = await getAdminPassword();
+  if (!password || password.length < MIN_PASSWORD_LENGTH || !candidate) return false;
 
   const [expected, supplied] = await Promise.all([
-    hmac(`admin-password:${ADMIN_PASSWORD}`),
-    hmac(`admin-password:${candidate}`),
+    hmac("admin-password:" + password),
+    hmac("admin-password:" + candidate),
   ]);
   return constantTimeEqual(expected, supplied);
 }
@@ -140,9 +137,15 @@ export async function verifyAdminPassword(candidate: string): Promise<boolean> {
 export async function createAdminSession(): Promise<string> {
   const expiresAt = Math.floor(Date.now() / 1000) + SESSION_SECONDS;
   const payload = toBase64Url(
-    encoder.encode(JSON.stringify({ role: "admin", exp: expiresAt, nonce: crypto.randomUUID() })),
+    encoder.encode(
+      JSON.stringify({
+        role: "admin",
+        exp: expiresAt,
+        nonce: crypto.randomUUID(),
+      }),
+    ),
   );
-  const signature = toBase64Url(await hmac(payload));
+  const signature = toBase64Url(await hmac("admin-session:" + payload));
   return `${payload}.${signature}`;
 }
 
@@ -153,10 +156,10 @@ export async function verifyAdminSession(token: string | undefined): Promise<boo
 
   try {
     const [payload, signature] = parts;
-    const [expectedSignature, decoded] = await Promise.all([
-      hmac(payload),
-      Promise.resolve(JSON.parse(new TextDecoder().decode(fromBase64Url(payload)))),
-    ]);
+    const decoded = JSON.parse(
+      new TextDecoder().decode(fromBase64Url(payload)),
+    );
+    const expectedSignature = await hmac("admin-session:" + payload);
 
     if (!constantTimeEqual(expectedSignature, fromBase64Url(signature))) return false;
     return (
