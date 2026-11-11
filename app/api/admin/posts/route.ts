@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/blog/admin-auth";
 import {
   deleteAdminPost,
+  findOrCreateAdminCategory,
   listAdminPosts,
   saveAdminPost,
   type AdminPostInput,
@@ -39,6 +40,7 @@ function validPost(value: unknown): value is AdminPostInput {
     (post.status === "draft" || post.status === "published" || post.status === "archived") &&
     (!post.id || typeof post.id === "string") &&
     (!post.category_id || typeof post.category_id === "string") &&
+    (post.category_name === undefined || (typeof post.category_name === "string" && post.category_name.length <= 40)) &&
     (post.tags === undefined || (Array.isArray(post.tags) && post.tags.length <= 12 && post.tags.every((tag) => typeof tag === "string" && tag.trim().length > 0 && tag.length <= 30))) &&
     (post.cover_image_key === undefined || post.cover_image_key === null || (typeof post.cover_image_key === "string" && /^blog\/[0-9a-f-]{36}\.(jpg|png|webp|avif)$/.test(post.cover_image_key)))
   );
@@ -66,7 +68,10 @@ export async function POST(request: NextRequest) {
   if (!validPost(body)) return noStoreJson({ error: "입력값을 확인해 주세요." }, 400);
 
   try {
-    const id = await saveAdminPost(body);
+    const categoryId = body.category_name
+      ? await findOrCreateAdminCategory(body.category_name, body.language)
+      : body.category_id ?? null;
+    const id = await saveAdminPost({ ...body, category_id: categoryId });
     return noStoreJson({ success: true, id });
   } catch {
     return noStoreJson({ error: "저장에 실패했습니다. 주소(slug)가 이미 사용 중인지 확인해 주세요." }, 409);
