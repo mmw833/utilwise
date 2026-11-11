@@ -698,3 +698,6 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
  .journal-empty h3{font-size:19px}
  .journal-latest{margin-top:22px;padding-top:38px}
 }
+
+.journal-section-empty{padding:22px 24px;border:1px solid var(--journal-line);background:#f7f8fa;color:#778397;font-size:13px;line-height:1.75}
+@media(max-width:620px){.journal-section-empty{padding:17px;font-size:12px}}
