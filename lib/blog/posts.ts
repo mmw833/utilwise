@@ -14,6 +14,7 @@ export interface BlogPostSummary {
   cover_image_key: string | null;
   category_name: string | null;
   category_slug: string | null;
+  tags_json?: string;
   view_count: number;
   published_at: number;
 }
@@ -34,6 +35,7 @@ const POST_SUMMARY_SELECT = `
     p.slug,
     p.title,
     p.excerpt,
+    p.tags_json,
     p.cover_image_key,
     CASE WHEN p.language = 'en' THEN COALESCE(c.name_en, c.name_ko) ELSE c.name_ko END AS category_name,
     c.slug AS category_slug,
@@ -98,6 +100,7 @@ export async function getPublishedPostBySlug(
         p.slug,
         p.title,
         p.excerpt,
+        p.tags_json,
         p.content_md,
         p.cover_image_key,
         CASE WHEN p.language = 'en' THEN COALESCE(c.name_en, c.name_ko) ELSE c.name_ko END AS category_name,
