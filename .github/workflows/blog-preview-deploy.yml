@@ -5,6 +5,7 @@ on:
     branches:
       - preview/blog-system
       - fix/admin-single-password-auth
+      - feat/blog-editor-improvements
 
 permissions:
   contents: read
