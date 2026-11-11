@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BlogMarkdown from "@/components/BlogMarkdown";
 
 type PostStatus = "draft" | "published" | "archived";
@@ -87,6 +87,8 @@ export default function AdminBlogManager() {
   const [categoryName, setCategoryName] = useState("");
   const [showEditor, setShowEditor] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [previewMode, setPreviewMode] = useState<"preview" | "split">("preview");
+  const contentRef = useRef<HTMLTextAreaElement>(null);
   const [inlineImageWidth, setInlineImageWidth] = useState("100%");
   const [inlineImageAlign, setInlineImageAlign] = useState("center");
 
@@ -176,6 +178,23 @@ export default function AdminBlogManager() {
     } catch (e) { setError(e instanceof Error ? e.message : "이미지 업로드 중 오류가 발생했습니다."); }
     finally { setUploadingImage(false); }
   }
+
+  function insertMarkdown(snippet: string) {
+    const textarea = contentRef.current;
+    const start = textarea?.selectionStart ?? editor.content_md.length;
+    const end = textarea?.selectionEnd ?? editor.content_md.length;
+    const next = editor.content_md.slice(0, start) + snippet + editor.content_md.slice(end);
+    setEditor((current) => ({ ...current, content_md: next }));
+    requestAnimationFrame(() => {
+      if (!textarea) return;
+      textarea.focus();
+      const cursor = start + snippet.length;
+      textarea.setSelectionRange(cursor, cursor);
+    });
+  }
+
+  const wordCount = editor.content_md.trim() ? editor.content_md.trim().split(/\\s+/).length : 0;
+  const characterCount = editor.content_md.length;
 
   async function savePost(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -312,24 +331,22 @@ export default function AdminBlogManager() {
                 </div>
               ) : (
                 <>
-                  <div className="blog-admin-format-tools">
+                  <div className="blog-admin-format-tools" role="toolbar" aria-label="본문 서식 도구">
                     {[
-                      ["소제목", "## 소제목\n\n"],
-                      ["작은 제목", "### 작은 제목\n\n"],
-                      ["굵게", "**굵은 글씨**"],
-                      ["기울임", "*기울임 글씨*"],
-                      ["목록", "\n- 목록 항목\n"],
-                      ["인용", "\n> 인용 문구\n"],
-                      ["링크", "[링크 문구](https://example.com)"],
-                    ].map(([label, snippet]) => <button type="button" className="blog-admin-secondary" key={label} onClick={() => setEditor((current) => ({ ...current, content_md: current.content_md ? current.content_md + "\n" + snippet : snippet }))}>{label}</button>)}
+                      ["H2", "## 소제목\n\n"], ["H3", "### 작은 제목\n\n"],
+                      ["굵게", "**굵은 글씨**"], ["기울임", "*기울임 글씨*"],
+                      ["목록", "\n- 목록 항목"], ["번호 목록", "\n1. 첫 번째 항목"],
+                      ["인용", "\n> 인용 문구"], ["링크", "[링크 문구](https://example.com)"],
+                      ["구분선", "\n\n---\n\n"],
+                    ].map(([label, snippet]) => <button type="button" className="blog-admin-secondary" key={label} onClick={() => insertMarkdown(snippet)}>{label}</button>)}
                   </div>
                   <div className="blog-admin-inline-image-tools">
                     <label>이미지 너비<select value={inlineImageWidth} onChange={(e) => setInlineImageWidth(e.target.value)}><option value="100%">100%</option><option value="80%">80%</option><option value="60%">60%</option><option value="40%">40%</option></select></label>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => setInlineImageAlign(e.target.value)}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadInlineImage(e.target.files?.[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
-                  <textarea aria-label="본문 Markdown 편집" className="blog-admin-content" rows={16} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} placeholder={"## 소제목\n\n본문을 Markdown 형식으로 작성하세요."} />
-                  <small>서식 버튼을 누르면 본문 끝에 문법이 추가됩니다. 저장 전 미리보기로 확인할 수 있습니다.</small>
+                  <textarea ref={contentRef} aria-label="본문 Markdown 편집" className="blog-admin-content" rows={20} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} placeholder={"## 소제목\n\n본문을 Markdown 형식으로 작성하세요."} />
+                  <small>서식 버튼은 커서 또는 선택한 영역에 삽입됩니다. 미리보기와 나란히 보기를 지원합니다.</small>
                 </>
               )}
             </div>
