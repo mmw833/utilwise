@@ -16,18 +16,51 @@ type AdminSecrets = {
  * Resolve Worker secrets in async mode. This also works when OpenNext executes
  * the route through its Node.js compatibility runtime.
  */
-async function getSecrets(): Promise<AdminSecrets> {
-  // In a Worker request, secrets are available on the Cloudflare env object.
-  // process.env is retained as a fallback for Node.js-compatible deployments.
-  let workerEnv: AdminSecrets = {};
+type SecretDiagnostics = {
+  cloudflareContextAvailable: boolean;
+  cloudflarePasswordPresent: boolean;
+  cloudflareSessionSecretPresent: boolean;
+  processPasswordPresent: boolean;
+  processSessionSecretPresent: boolean;
+  contextError?: string;
+};
+
+async function getSecretDiagnostics(): Promise<SecretDiagnostics> {
+  const runtimeEnv = process.env as Record<string, string | undefined>;
+  let cloudflareContextAvailable = false;
+  let cloudflarePasswordPresent = false;
+  let cloudflareSessionSecretPresent = false;
+  let contextError: string | undefined;
+
   try {
     const context = getCloudflareContext();
-    workerEnv = context.env as unknown as AdminSecrets;
+    const workerEnv = context.env as unknown as AdminSecrets;
+    cloudflareContextAvailable = true;
+    cloudflarePasswordPresent = Boolean(workerEnv.ADMIN_PASSWORD);
+    cloudflareSessionSecretPresent = Boolean(workerEnv.ADMIN_SESSION_SECRET);
+  } catch (error) {
+    contextError = error instanceof Error ? error.name : "UnknownError";
+  }
+
+  return {
+    cloudflareContextAvailable,
+    cloudflarePasswordPresent,
+    cloudflareSessionSecretPresent,
+    processPasswordPresent: Boolean(runtimeEnv["ADMIN_PASSWORD"]),
+    processSessionSecretPresent: Boolean(runtimeEnv["ADMIN_SESSION_SECRET"]),
+    contextError,
+  };
+}
+
+async function getSecrets(): Promise<AdminSecrets> {
+  const runtimeEnv = process.env as Record<string, string | undefined>;
+  let workerEnv: AdminSecrets = {};
+  try {
+    workerEnv = getCloudflareContext().env as unknown as AdminSecrets;
   } catch {
     // Fall back to process.env for local or alternate OpenNext runtimes.
   }
 
-  const runtimeEnv = process.env as Record<string, string | undefined>;
   return {
     ADMIN_PASSWORD: workerEnv.ADMIN_PASSWORD || runtimeEnv["ADMIN_PASSWORD"],
     ADMIN_SESSION_SECRET:
@@ -78,11 +111,13 @@ function constantTimeEqual(left: Uint8Array, right: Uint8Array): boolean {
 
 export async function getAdminAuthStatus() {
   const { ADMIN_PASSWORD, ADMIN_SESSION_SECRET } = await getSecrets();
+  const diagnostics = await getSecretDiagnostics();
   return {
     passwordPresent: Boolean(ADMIN_PASSWORD),
     passwordLengthValid: Boolean(ADMIN_PASSWORD && ADMIN_PASSWORD.length >= 12),
     sessionSecretPresent: Boolean(ADMIN_SESSION_SECRET),
     sessionSecretLengthValid: Boolean(ADMIN_SESSION_SECRET && ADMIN_SESSION_SECRET.length >= 32),
+    diagnostics,
   };
 }
 
