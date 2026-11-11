@@ -642,3 +642,59 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
  .blog-admin-view-switch button{flex:1;padding:9px 5px}
  .blog-admin-inline-image-tools{align-items:stretch}
 }
+
+
+/* UTILWISE Journal refresh: clean sans-serif typography and clear content hierarchy */
+.journal-page{
+  font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  letter-spacing:-.015em;
+}
+.journal-page h1,.journal-page h2,.journal-page h3,.journal-page p,
+.journal-page .journal-art-paper,.journal-page .journal-empty h3,
+.journal-page .journal-article-cta h2{
+  font-family:inherit;
+}
+.journal-hero h1{font-weight:800;letter-spacing:-.055em;line-height:1.2}
+.journal-hero h1 em{font-style:normal;font-weight:750}
+.journal-section{padding-top:58px}
+.journal-section-heading{align-items:flex-end;margin-bottom:22px}
+.journal-section-heading h2{font-size:clamp(23px,2.3vw,30px);font-weight:800;letter-spacing:-.045em}
+.journal-section-heading>p{font-size:12px;line-height:1.6}
+.journal-feature-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+.journal-feature-grid .journal-card-featured{grid-column:auto}
+.journal-feature-grid .journal-card-featured .journal-card-art,
+.journal-feature-grid .journal-card-art{height:190px}
+.journal-card h3,.journal-card-featured h3{font-family:inherit;font-size:18px;font-weight:750;letter-spacing:-.04em;line-height:1.5}
+.journal-card p{font-size:13px;line-height:1.8}
+.journal-card-meta{font-size:11px}
+.journal-read{font-size:11px}
+.journal-latest{border-top:1px solid var(--journal-line);margin-top:30px;padding-top:48px}
+.journal-latest-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:28px 22px}
+.journal-latest-grid .journal-card-art{height:180px}
+.journal-empty{grid-template-columns:190px minmax(0,1fr);gap:30px;padding:32px 5%;background:#f5f7fa;border:1px solid var(--journal-line)}
+.journal-empty h3{font-size:22px;font-weight:750;letter-spacing:-.04em}
+.journal-empty p{font-size:13px;line-height:1.85}
+.journal-art-paper{font-family:inherit}
+.journal-footer{font-family:inherit}
+.journal-article-heading h1,.journal-article-content .blog-markdown h2,
+.journal-article-content .blog-markdown h3{font-family:inherit}
+.journal-article-cta h2{font-size:23px;font-weight:750}
+@media(max-width:900px){
+ .journal-feature-grid,.journal-latest-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .journal-feature-grid .journal-card-featured{grid-column:auto}
+ .journal-feature-grid .journal-card-featured .journal-card-art,
+ .journal-feature-grid .journal-card-art{height:175px}
+}
+@media(max-width:620px){
+ .journal-hero h1{font-size:34px;line-height:1.22;letter-spacing:-.05em}
+ .journal-section{padding-top:40px}
+ .journal-section-heading h2{font-size:24px}
+ .journal-feature-grid,.journal-latest-grid{grid-template-columns:1fr;gap:18px}
+ .journal-feature-grid .journal-card-art,.journal-feature-grid .journal-card-featured .journal-card-art,
+ .journal-latest-grid .journal-card-art{height:185px}
+ .journal-card h3,.journal-card-featured h3{font-size:18px}
+ .journal-empty{grid-template-columns:1fr;padding:20px;gap:18px}
+ .journal-empty-art{height:115px}
+ .journal-empty h3{font-size:19px}
+ .journal-latest{margin-top:22px;padding-top:38px}
+}
