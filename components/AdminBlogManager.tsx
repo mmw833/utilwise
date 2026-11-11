@@ -87,6 +87,8 @@ export default function AdminBlogManager() {
   const [categoryName, setCategoryName] = useState("");
   const [showEditor, setShowEditor] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [inlineImageWidth, setInlineImageWidth] = useState("100%");
+  const [inlineImageAlign, setInlineImageAlign] = useState("center");
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -155,6 +157,22 @@ export default function AdminBlogManager() {
       if (!response.ok) throw new Error(data.error || "이미지를 업로드하지 못했습니다.");
       setEditor((current) => ({ ...current, cover_image_key: data.key }));
       setNotice("대표 이미지를 업로드했습니다. 게시글 저장을 눌러 적용하세요.");
+    } catch (e) { setError(e instanceof Error ? e.message : "이미지 업로드 중 오류가 발생했습니다."); }
+    finally { setUploadingImage(false); }
+  }
+
+  async function uploadInlineImage(file?: File) {
+    if (!file) return;
+    setError(""); setUploadingImage(true);
+    try {
+      const form = new FormData(); form.set("file", file);
+      const response = await fetch("/api/admin/blog-images", { method: "POST", body: form });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "본문 이미지를 업로드하지 못했습니다.");
+      const alt = file.name.replace(/\.[^.]+$/, "").replace(/[\[\]|]/g, " ").trim() || "본문 이미지";
+      const markdown = `![${alt}|width=${inlineImageWidth}|align=${inlineImageAlign}](/api/blog/images/${data.key})`;
+      setEditor((current) => ({ ...current, content_md: current.content_md ? current.content_md + "\n\n" + markdown + "\n\n" : markdown + "\n\n" }));
+      setNotice("본문 이미지를 업로드하고 본문에 삽입했습니다. 게시글 저장을 눌러 적용하세요.");
     } catch (e) { setError(e instanceof Error ? e.message : "이미지 업로드 중 오류가 발생했습니다."); }
     finally { setUploadingImage(false); }
   }
@@ -304,6 +322,11 @@ export default function AdminBlogManager() {
                       ["인용", "\n> 인용 문구\n"],
                       ["링크", "[링크 문구](https://example.com)"],
                     ].map(([label, snippet]) => <button type="button" className="blog-admin-secondary" key={label} onClick={() => setEditor((current) => ({ ...current, content_md: current.content_md ? current.content_md + "\n" + snippet : snippet }))}>{label}</button>)}
+                  </div>
+                  <div className="blog-admin-inline-image-tools">
+                    <label>이미지 너비<select value={inlineImageWidth} onChange={(e) => setInlineImageWidth(e.target.value)}><option value="100%">100%</option><option value="80%">80%</option><option value="60%">60%</option><option value="40%">40%</option></select></label>
+                    <label>정렬<select value={inlineImageAlign} onChange={(e) => setInlineImageAlign(e.target.value)}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
+                    <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadInlineImage(e.target.files?.[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
                   <textarea aria-label="본문 Markdown 편집" className="blog-admin-content" rows={16} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} placeholder={"## 소제목\n\n본문을 Markdown 형식으로 작성하세요."} />
                   <small>서식 버튼을 누르면 본문 끝에 문법이 추가됩니다. 저장 전 미리보기로 확인할 수 있습니다.</small>
