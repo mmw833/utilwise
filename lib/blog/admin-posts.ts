@@ -22,7 +22,7 @@ export interface AdminPostInput {
   status: AdminPostStatus;
 }
 
-export interface AdminPostRecord extends AdminPostInput {
+export interface AdminPostRecord extends Omit<AdminPostInput, "category_name"> {
   id: string;
   translation_group_id: string;
   view_count: number;
