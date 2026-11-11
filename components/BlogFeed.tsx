@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import type { BlogPostSummary } from "@/lib/blog/posts";
 
 function dateLabel(timestamp: number, locale: "ko-KR" | "en-US") {
@@ -13,6 +14,21 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
   const base = en ? "/en/blog" : "/blog";
   const home = en ? "/en" : "/";
   const tools = en ? "/en/online-tools" : "/online-tools";
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortOrder, setSortOrder] = useState<"latest" | "popular">("latest");
+  const categories = useMemo(() => Array.from(new Set(posts.map((post) => post.category_name).filter((name): name is string => Boolean(name)))).sort((a, b) => a.localeCompare(b, locale)), [posts, locale]);
+  const query = search.trim().toLocaleLowerCase(en ? "en-US" : "ko-KR");
+  const matches = (post: BlogPostSummary) => {
+    let tags = "";
+    try { const parsed = JSON.parse(post.tags_json || "[]"); tags = Array.isArray(parsed) ? parsed.join(" ") : ""; } catch {}
+    const haystack = [post.title, post.excerpt, post.category_name || "", tags].join(" ").toLocaleLowerCase(en ? "en-US" : "ko-KR");
+    return (!query || haystack.includes(query)) && (selectedCategory === "all" || post.category_name === selectedCategory);
+  };
+  const filteredPosts = useMemo(() => posts.filter(matches), [posts, query, selectedCategory]);
+  const filteredPopular = useMemo(() => popular.filter(matches), [popular, query, selectedCategory]);
+  const sortedPosts = useMemo(() => [...filteredPosts].sort((a, b) => sortOrder === "latest" ? b.published_at - a.published_at : b.view_count - a.view_count), [filteredPosts, sortOrder]);
+  const visibleLatest = sortedPosts.filter((post) => !filteredPopular.some((item) => item.id === post.id));
   const card = (post: BlogPostSummary, index: number, featured = false) => (
     <article className={`journal-card journal-card-tone-${index % 4}${featured ? " journal-card-featured" : ""}`} key={post.id}>
       <Link href={`${base}/${post.slug}`} className="journal-card-link">
