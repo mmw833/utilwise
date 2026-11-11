@@ -15,6 +15,7 @@ export interface AdminPostInput {
   content_md?: string;
   cover_image_key?: string | null;
   category_id?: string | null;
+  tags?: string[];
   seo_title?: string | null;
   seo_description?: string | null;
   status: AdminPostStatus;
@@ -41,7 +42,7 @@ export async function listAdminPosts(): Promise<AdminPostRecord[]> {
   const db = getBlogDatabase();
   const result = await db.prepare(`
     SELECT p.id, p.translation_group_id, p.language, p.slug, p.title,
-      p.excerpt, p.content_md, p.cover_image_key, p.category_id,
+      p.excerpt, p.content_md, p.cover_image_key, p.category_id, p.tags_json AS tags_json,
       p.seo_title, p.seo_description, p.status, p.view_count,
       p.published_at, p.created_at, p.updated_at,
       c.name_ko AS category_name
@@ -70,9 +71,9 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
   await db.prepare(`
     INSERT INTO blog_posts (
       id, translation_group_id, language, slug, title, excerpt, content_md,
-      cover_image_key, category_id, seo_title, seo_description, status,
+      cover_image_key, category_id, tags_json, seo_title, seo_description, status,
       published_at, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
       CASE WHEN ? = 'published' THEN unixepoch() ELSE NULL END,
       unixepoch(), unixepoch()
     )
@@ -84,6 +85,7 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
       content_md = excluded.content_md,
       cover_image_key = excluded.cover_image_key,
       category_id = excluded.category_id,
+      tags_json = excluded.tags_json,
       seo_title = excluded.seo_title,
       seo_description = excluded.seo_description,
       status = excluded.status,
@@ -103,6 +105,7 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
     input.content_md ?? "",
     input.cover_image_key ?? null,
     input.category_id ?? null,
+    JSON.stringify((input.tags ?? []).map((tag) => tag.trim()).filter(Boolean).slice(0, 12)),
     input.seo_title ?? null,
     input.seo_description ?? null,
     input.status,
