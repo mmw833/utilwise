@@ -499,3 +499,11 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 기존 게시글 보존을 위해 컬럼은 `NOT NULL DEFAULT '[]'`로 추가한다. 원격 D1 적용 전 `d1_migrations` ledger 및 대상 database ID를 확인하고 Preview DB에만 적용한다.
 - 관리자 본문은 Markdown 원문으로 저장하고 `BlogMarkdown`에서 허용한 문법만 렌더링한다. 미리보기 역시 동일 렌더러를 사용한다.
 - 운영 main 및 운영 Worker에는 Preview 검증과 사용자 승인 전 반영하지 않는다.
+
+
+### 본문 이미지 및 카테고리 입력
+- 관리자 본문 이미지 업로드는 기존 `POST /api/admin/blog-images`를 재사용하며, R2 객체 키를 Markdown에 기록한다.
+- 공개 렌더러는 `/api/blog/images/blog/{uuid}.{ext}` 형식의 내부 경로만 이미지로 허용한다. HTML 및 임의 외부 이미지 주소는 허용하지 않는다.
+- 이미지 표기 확장 문법: `![대체 텍스트|width=80%|align=center](/api/blog/images/blog/{uuid}.webp)`. 너비는 100/80/60/40%, 정렬은 left/center/right만 허용한다.
+- 카테고리 이름은 게시글 저장 API에서 기존 항목을 찾아 연결하고, 없으면 신규 카테고리를 생성한다.
+- 한글 slug 자동 생성은 단순 로마자 변환이므로 고유명사/발음이 복잡한 단어는 저장 전에 운영자가 직접 수정한다.
