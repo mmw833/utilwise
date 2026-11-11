@@ -13,7 +13,6 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
   const base = en ? "/en/blog" : "/blog";
   const home = en ? "/en" : "/";
   const tools = en ? "/en/online-tools" : "/online-tools";
-  const featured = popular[0];
   const card = (post: BlogPostSummary, index: number, featured = false) => (
     <article className={`journal-card journal-card-tone-${index % 4}${featured ? " journal-card-featured" : ""}`} key={post.id}>
       <Link href={`${base}/${post.slug}`} className="journal-card-link">
