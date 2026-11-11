@@ -14,6 +14,7 @@ type Post = {
   content_md: string;
   category_id: string | null;
   category_name: string | null;
+  tags_json?: string;
   seo_title: string | null;
   seo_description: string | null;
   status: PostStatus;
@@ -32,6 +33,7 @@ type Editor = {
   excerpt: string;
   content_md: string;
   category_id: string;
+  tags: string[];
   seo_title: string;
   seo_description: string;
   status: PostStatus;
@@ -45,6 +47,7 @@ const emptyEditor = (): Editor => ({
   excerpt: "",
   content_md: "",
   category_id: "",
+  tags: [],
   seo_title: "",
   seo_description: "",
   status: "draft",
@@ -120,6 +123,7 @@ export default function AdminBlogManager() {
       excerpt: post.excerpt || "",
       content_md: post.content_md || "",
       category_id: post.category_id || "",
+      tags: (() => { try { return JSON.parse(post.tags_json || "[]") as string[]; } catch { return []; } })(),
       seo_title: post.seo_title || "",
       seo_description: post.seo_description || "",
       status: post.status,
@@ -158,7 +162,8 @@ export default function AdminBlogManager() {
         body: JSON.stringify({
           ...editor,
           category_id: editor.category_id || null,
-          seo_title: editor.seo_title || null,
+          tags: editor.tags,
+          seo_title: null,
           seo_description: editor.seo_description || null,
         }),
       });
@@ -254,6 +259,10 @@ export default function AdminBlogManager() {
                 {categories.map((category) => <option key={category.id} value={category.id}>{category.name_ko}</option>)}
               </select>
             </label>
+            <label className="blog-admin-full">태그 (쉼표로 구분)
+              <input value={editor.tags.join(", ")} maxLength={400} onChange={(e) => setEditor({ ...editor, tags: e.target.value.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12) })} placeholder="생활정보, 가이드, 팁" />
+              <small>최대 12개까지 입력할 수 있습니다.</small>
+            </label>
             <label className="blog-admin-full">대표 이미지 (선택)
               <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadCoverImage(e.target.files?.[0]); e.currentTarget.value = ""; }} />
               <small>JPG, PNG, WebP, AVIF · 최대 5MB</small>
@@ -265,10 +274,7 @@ export default function AdminBlogManager() {
             </label>
             <label className="blog-admin-full">본문 (Markdown)
               <textarea className="blog-admin-content" rows={16} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} placeholder={"## 소제목\n\n본문을 Markdown 형식으로 작성하세요."} />
-              <small>현재는 Markdown 원문을 저장합니다. 공개 페이지 렌더링은 다음 구현 단계에서 연결합니다.</small>
-            </label>
-            <label className="blog-admin-full">SEO 제목 (선택)
-              <input maxLength={180} value={editor.seo_title} onChange={(e) => setEditor({ ...editor, seo_title: e.target.value })} />
+              <small>제목·소제목(##, ###), 굵게(**글자**), 기울임(*글자*), 목록(- 항목), 링크([문구](https://...)) 문법을 지원합니다.</small>
             </label>
             <label className="blog-admin-full">SEO 설명 (선택)
               <textarea rows={2} maxLength={300} value={editor.seo_description} onChange={(e) => setEditor({ ...editor, seo_description: e.target.value })} />
