@@ -74,8 +74,15 @@ export async function findOrCreateAdminCategory(name: string, language: BlogLang
   ).bind(normalized, normalized).first<{ id: string }>();
   if (existing) return existing.id;
   const slugBase = normalized.toLowerCase().normalize("NFKD")
-    .replace(/[^a-z0-9가-힣]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50);
-  const slug = slugBase || `category-${crypto.randomUUID().slice(0, 8)}`;
+    .replace(/[^a-z0-9가-힣]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50)
+    || "category";
+  // Different category names can normalize to the same slug. Keep the
+  // category table's UNIQUE constraint from turning that into a save error.
+  let slug = slugBase;
+  const slugExists = await db.prepare(
+    "SELECT id FROM blog_categories WHERE slug = ? LIMIT 1"
+  ).bind(slug).first<{ id: string }>();
+  if (slugExists) slug = `${slugBase}-${crypto.randomUUID().slice(0, 8)}`;
   const id = crypto.randomUUID();
   await db.prepare("INSERT INTO blog_categories (id, slug, name_ko, name_en) VALUES (?, ?, ?, ?)")
     .bind(id, slug, normalized, language === "en" ? normalized : null).run();
