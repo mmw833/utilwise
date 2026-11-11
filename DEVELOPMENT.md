@@ -482,3 +482,12 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 공개 GET API는 blog UUID 키만 허용하고 `nosniff` 및 immutable cache 헤더를 설정한다.
 - 관리자 UI에서 업로드/미리보기/키 제거가 가능하며 게시글 저장 시 D1의 `cover_image_key`에 반영한다. 공개 한국어·영어 피드와 상세 페이지에서 실제 이미지가 표시된다.
 - 검증: GitHub Actions preview build/deploy 및 실제 업로드·표시 테스트 대기. 운영 배포 및 main 병합은 하지 않는다.
+
+## 블로그 관리자 인증
+- 관리자 비밀번호는 Cloudflare Worker Secret `ADMIN_PASSWORD` 하나로 관리한다.
+- 비밀번호는 최소 12자 이상으로 설정한다. 소스 코드, GitHub 파일, 클라이언트 번들에 비밀번호를 저장하지 않는다.
+- 별도의 `ADMIN_SESSION_SECRET`은 사용하지 않는다. 세션 서명은 서버에서 관리자 비밀번호를 HMAC 키로 사용한다.
+- 로그인 성공 시 8시간 만료 HttpOnly, SameSite=Strict 쿠키를 발급한다. 로그아웃 시 쿠키를 만료한다.
+- 인증 값은 OpenNext의 `getCloudflareContext({ async: true })`에서 요청 시점에 조회한다.
+- 로그인 페이지는 `/admin/blog/login`, 관리자 화면은 `/admin/blog`이다.
+- Secret 값 자체는 페이지/로그/진단 출력에 표시하지 않는다.
