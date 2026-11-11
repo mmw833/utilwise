@@ -507,3 +507,10 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 이미지 표기 확장 문법: `![대체 텍스트|width=80%|align=center](/api/blog/images/blog/{uuid}.webp)`. 너비는 100/80/60/40%, 정렬은 left/center/right만 허용한다.
 - 카테고리 이름은 게시글 저장 API에서 기존 항목을 찾아 연결하고, 없으면 신규 카테고리를 생성한다.
 - 한글 slug 자동 생성은 단순 로마자 변환이므로 고유명사/발음이 복잡한 단어는 저장 전에 운영자가 직접 수정한다.
+
+
+### 작성 화면 UX 후속 개선 (2026-11-12)
+- Markdown 서식 도구는 본문 textarea의 현재 커서 또는 선택 영역에 삽입한다.
+- 편집/미리보기/나란히 보기 모드를 제공하고 본문 단어·문자 수를 표시한다.
+- `feat/blog-editor-improvements` 브랜치도 Preview 배포 workflow 대상이다.
+- Preview D1 migration과 배포/브라우저 검증을 완료하기 전 운영 환경에 적용하지 않는다.
