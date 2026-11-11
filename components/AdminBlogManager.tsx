@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import BlogMarkdown from "@/components/BlogMarkdown";
 
 type PostStatus = "draft" | "published" | "archived";
 type Category = { id: string; slug: string; name_ko: string; name_en: string | null };
@@ -78,6 +79,7 @@ export default function AdminBlogManager() {
   const [error, setError] = useState("");
   const [categoryName, setCategoryName] = useState("");
   const [showEditor, setShowEditor] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -272,10 +274,35 @@ export default function AdminBlogManager() {
             <label className="blog-admin-full">짧은 소개
               <textarea rows={2} maxLength={500} value={editor.excerpt} onChange={(e) => setEditor({ ...editor, excerpt: e.target.value })} />
             </label>
-            <label className="blog-admin-full">본문 (Markdown)
-              <textarea className="blog-admin-content" rows={16} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} placeholder={"## 소제목\n\n본문을 Markdown 형식으로 작성하세요."} />
-              <small>제목·소제목(##, ###), 굵게(**글자**), 기울임(*글자*), 목록(- 항목), 링크([문구](https://...)) 문법을 지원합니다.</small>
-            </label>
+            <div className="blog-admin-full">
+              <div className="blog-admin-editor-head">
+                <strong>본문 편집</strong>
+                <button type="button" className="blog-admin-text-button" onClick={() => setShowPreview((value) => !value)}>{showPreview ? "편집으로 돌아가기" : "미리보기"}</button>
+              </div>
+              {showPreview ? (
+                <div className="blog-admin-preview">
+                  <h1>{editor.title || "게시글 제목 미리보기"}</h1>
+                  {editor.excerpt ? <p className="blog-admin-preview-excerpt">{editor.excerpt}</p> : null}
+                  <BlogMarkdown content={editor.content_md || "본문을 입력하면 여기에 미리 표시됩니다."} />
+                </div>
+              ) : (
+                <>
+                  <div className="blog-admin-format-tools">
+                    {[
+                      ["소제목", "## 소제목\n\n"],
+                      ["작은 제목", "### 작은 제목\n\n"],
+                      ["굵게", "**굵은 글씨**"],
+                      ["기울임", "*기울임 글씨*"],
+                      ["목록", "\n- 목록 항목\n"],
+                      ["인용", "\n> 인용 문구\n"],
+                      ["링크", "[링크 문구](https://example.com)"],
+                    ].map(([label, snippet]) => <button type="button" className="blog-admin-secondary" key={label} onClick={() => setEditor((current) => ({ ...current, content_md: current.content_md ? current.content_md + "\n" + snippet : snippet }))}>{label}</button>)}
+                  </div>
+                  <textarea aria-label="본문 Markdown 편집" className="blog-admin-content" rows={16} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} placeholder={"## 소제목\n\n본문을 Markdown 형식으로 작성하세요."} />
+                  <small>서식 버튼을 누르면 본문 끝에 문법이 추가됩니다. 저장 전 미리보기로 확인할 수 있습니다.</small>
+                </>
+              )}
+            </div>
             <label className="blog-admin-full">SEO 설명 (선택)
               <textarea rows={2} maxLength={300} value={editor.seo_description} onChange={(e) => setEditor({ ...editor, seo_description: e.target.value })} />
             </label>
