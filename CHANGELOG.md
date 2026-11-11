@@ -423,3 +423,10 @@
 - 공개 GET API는 blog UUID 키만 허용하고 `nosniff` 및 immutable cache 헤더를 설정한다.
 - 관리자 UI에서 업로드/미리보기/키 제거가 가능하며 게시글 저장 시 D1의 `cover_image_key`에 반영한다. 공개 한국어·영어 피드와 상세 페이지에서 실제 이미지가 표시된다.
 - 검증: GitHub Actions preview build/deploy 및 실제 업로드·표시 테스트 대기. 운영 배포 및 main 병합은 하지 않는다.
+
+## 2026-11-11 관리자 인증 단일 비밀번호 구조 단순화 (검증 진행 중)
+- 관리자 인증 설정을 `ADMIN_PASSWORD` 하나로 통합하고 별도 `ADMIN_SESSION_SECRET` 요구를 제거
+- 세션 서명은 관리자 비밀번호에서 HMAC 키를 사용해 생성하며, 8시간 만료 HttpOnly/SameSite=Strict 쿠키와 서명 검증 유지
+- OpenNext Cloudflare 컨텍스트를 비동기 API로 읽고, 런타임 환경변수는 보조 경로로만 사용
+- 진단 화면은 비밀값을 노출하지 않고 Worker 컨텍스트/설정 존재 여부만 표시
+- 작업 브랜치: `fix/admin-single-password-auth`; 빌드·Preview 실로그인 검증 전 운영 반영 금지
