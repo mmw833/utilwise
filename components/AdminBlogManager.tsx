@@ -62,19 +62,6 @@ function dateLabel(timestamp: number | null) {
   return new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium" }).format(new Date(timestamp * 1000));
 }
 
-function slugify(value: string) {
-  const initial = ["g","kk","n","d","tt","r","m","b","pp","s","ss","","j","jj","ch","k","t","p","h"];
-  const vowel = ["a","ae","ya","yae","eo","e","yeo","ye","o","wa","wae","oe","yo","u","wo","we","wi","yu","eu","ui","i"];
-  const final = ["","k","k","ks","n","nj","nh","t","l","lk","lm","lb","ls","lt","lp","lh","m","p","ps","t","t","ng","t","t","k","t","p","t"];
-  const latin = Array.from(value.normalize("NFC")).map((char) => {
-    const code = char.charCodeAt(0) - 0xac00;
-    if (code < 0 || code > 11171) return char;
-    return initial[Math.floor(code / 588)] + vowel[Math.floor((code % 588) / 28)] + final[code % 28];
-  }).join("");
-  return latin.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 120)
-    || `post-${new Date().toISOString().slice(0, 10)}`;
-}
-
 
 function escapeEditorHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -130,6 +117,7 @@ export default function AdminBlogManager() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [editor, setEditor] = useState<Editor>(emptyEditor);
+  const [tagsInput, setTagsInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -174,12 +162,15 @@ export default function AdminBlogManager() {
 
   function startNew() {
     setEditor(emptyEditor());
+    setTagsInput("");
     setNotice("");
     setError("");
     setShowEditor(true);
   }
 
   function editPost(post: Post) {
+    const existingTags = (() => { try { return JSON.parse(post.tags_json || "[]") as string[]; } catch { return []; } })();
+    setTagsInput(existingTags.join(", "));
     setEditor({
       id: post.id,
       translation_group_id: post.translation_group_id,
@@ -190,7 +181,7 @@ export default function AdminBlogManager() {
       content_md: post.content_md || "",
       category_id: post.category_id || "",
       category_name: post.category_name || "",
-      tags: (() => { try { return JSON.parse(post.tags_json || "[]") as string[]; } catch { return []; } })(),
+      tags: existingTags,
       seo_title: post.seo_title || "",
       seo_description: post.seo_description || "",
       status: post.status,
@@ -344,7 +335,7 @@ export default function AdminBlogManager() {
           ...editor,
           category_id: editor.category_id || null,
           category_name: editor.category_name.trim(),
-          tags: editor.tags,
+          tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
           seo_title: null,
           seo_description: editor.seo_description || null,
         }),
@@ -428,20 +419,20 @@ export default function AdminBlogManager() {
             <label className="blog-admin-full">제목
               <input required maxLength={180} value={editor.title} onChange={(e) => {
                 const title = e.target.value;
-                setEditor((current) => ({ ...current, title, slug: current.id ? current.slug : slugify(title) }));
+                setEditor((current) => ({ ...current, title }));
               }} />
             </label>
             <label className="blog-admin-full">주소 (slug)
-              <input required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={120} value={editor.slug} onChange={(e) => setEditor({ ...editor, slug: e.target.value })} />
-              <small>영문 소문자, 숫자, 하이픈만 사용할 수 있습니다.</small>
+              <input required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={120} value={editor.slug} onChange={(e) => setEditor({ ...editor, slug: e.target.value })} placeholder="예: simple-life-tips" />
+              <small>자동 변환하지 않습니다. 영문 소문자·숫자·하이픈으로 직접 입력하세요. 비워두면 저장할 수 없습니다.</small>
             </label>
             <label>카테고리 (직접 입력)
               <input maxLength={40} value={editor.category_name} onChange={(e) => setEditor({ ...editor, category_name: e.target.value, category_id: "" })} placeholder="예: 생활정보" list="blog-category-suggestions" />
               <datalist id="blog-category-suggestions">{categories.map((category) => <option key={category.id} value={category.name_ko} />)}</datalist>
             </label>
             <label className="blog-admin-full">태그 (쉼표로 구분)
-              <input value={editor.tags.join(", ")} maxLength={400} onChange={(e) => setEditor({ ...editor, tags: e.target.value.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12) })} placeholder="생활정보, 가이드, 팁" />
-              <small>최대 12개까지 입력할 수 있습니다.</small>
+              <input value={tagsInput} maxLength={400} onChange={(e) => setTagsInput(e.target.value)} onBlur={() => setEditor((current) => ({ ...current, tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12) }))} placeholder="생활정보, 가이드, 팁" />
+              <small>쉼표(,)를 입력해도 지워지지 않습니다. 예: 생활정보, 가이드, 팁 (최대 12개)</small>
             </label>
             <label className="blog-admin-full">대표 이미지 (선택)
               <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadCoverImage(e.target.files?.[0]); e.currentTarget.value = ""; }} />
