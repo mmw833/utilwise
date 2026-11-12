@@ -3,8 +3,8 @@ import Link from "next/link";
 import LanguageSwitcher from "../../components/LanguageSwitcher";
 import ImageTools from "../../components/ImageTools";
 export const metadata: Metadata = {
-  title: "무료 이미지 크기 조절기 | 사진 픽셀·해상도 변경 - UTILWISE",
-  description: "JPG, PNG, WebP 이미지의 가로와 세로 픽셀을 원하는 크기로 변경하세요. 비율 유지와 여러 이미지 처리 기능을 제공하며 파일은 브라우저에서 처리됩니다.",
+  title: "사진 픽셀 크기 조절 | 이미지 가로·세로 크기 변경 - UTILWISE",
+  description: "사진과 이미지의 가로·세로 픽셀을 원하는 크기로 변경하세요. JPG, PNG, WebP 지원, 비율 유지, 여러 이미지 일괄 처리가 가능하며 파일은 브라우저에서 처리됩니다.",
   alternates: { canonical: "/image-resizer", languages: { "ko-KR": "/image-resizer", en: "/en/image-resizer" } },
   openGraph: { title: "무료 이미지 크기 조절기", description: "이미지의 가로·세로 픽셀을 원하는 크기로 간편하게 변경하세요.", url: "https://utilwise.kr/image-resizer", siteName: "UTILWISE", locale: "ko_KR", type: "website" }
 };
