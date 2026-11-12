@@ -141,6 +141,7 @@ export default function AdminBlogManager() {
   const [previewMode, setPreviewMode] = useState<"preview" | "split">("preview");
   const contentRef = useRef<HTMLDivElement>(null);
   const savedSelectionRef = useRef<Range | null>(null);
+  const imageInsertionMarkerRef = useRef<HTMLSpanElement | null>(null);
   const [inlineImageWidth, setInlineImageWidth] = useState("100%");
   const [inlineImageAlign, setInlineImageAlign] = useState("center");
 
@@ -215,49 +216,76 @@ export default function AdminBlogManager() {
     finally { setUploadingImage(false); }
   }
 
+  function placeImageInsertionMarker(range?: Range | null) {
+    const root = contentRef.current;
+    if (!root) return null;
+    const target = range || savedSelectionRef.current;
+    const marker = document.createElement("span");
+    marker.dataset.imageInsertionMarker = "true";
+    marker.textContent = "\u200b";
+    marker.style.display = "inline-block";
+    marker.style.width = "1px";
+    marker.style.height = "1em";
+    if (target && root.contains(target.commonAncestorContainer)) {
+      const insertion = target.cloneRange();
+      insertion.deleteContents();
+      insertion.insertNode(marker);
+    } else {
+      root.appendChild(marker);
+    }
+    imageInsertionMarkerRef.current = marker;
+    savedSelectionRef.current = null;
+    window.getSelection()?.removeAllRanges();
+    return marker;
+  }
+
   async function uploadInlineImage(file?: File) {
     if (!file) return;
-    setError(""); setUploadingImage(true);
+    setError(""); setNotice(""); setUploadingImage(true);
+    const root = contentRef.current;
+    const marker = imageInsertionMarkerRef.current?.isConnected
+      ? imageInsertionMarkerRef.current
+      : placeImageInsertionMarker();
     try {
       const form = new FormData(); form.set("file", file);
       const response = await fetch("/api/admin/blog-images", { method: "POST", body: form });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "본문 이미지를 업로드하지 못했습니다.");
       const alt = file.name.replace(/\.[^.]+$/, "").replace(/[\[\]|]/g, " ").trim() || "본문 이미지";
-      const root = contentRef.current;
-      if (root) {
-        root.focus();
+      const image = document.createElement("img");
+      image.src = "/api/blog/images/" + data.key;
+      image.alt = alt;
+      image.dataset.width = inlineImageWidth;
+      image.dataset.align = inlineImageAlign;
+      image.style.width = inlineImageWidth;
+      image.style.maxWidth = "100%";
+      image.style.height = "auto";
+      image.style.display = "block";
+      image.style.margin = inlineImageAlign === "left" ? "16px auto 16px 0" : inlineImageAlign === "right" ? "16px 0 16px auto" : "16px auto";
+      if (marker?.isConnected) {
+        marker.replaceWith(image);
+        const after = document.createElement("p");
+        after.append(document.createElement("br"));
+        image.after(after);
         const selection = window.getSelection();
-        if (savedSelectionRef.current && selection) {
-          selection.removeAllRanges();
-          selection.addRange(savedSelectionRef.current);
-        }
-        const image = document.createElement("img");
-        image.src = "/api/blog/images/" + data.key;
-        image.alt = alt;
-        image.dataset.width = inlineImageWidth;
-        image.dataset.align = inlineImageAlign;
-        image.style.width = inlineImageWidth;
-        image.style.maxWidth = "100%";
-        image.style.display = "block";
-        image.style.margin = inlineImageAlign === "left" ? "16px auto 16px 0" : inlineImageAlign === "right" ? "16px 0 16px auto" : "16px auto";
-        const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
-        if (range && root.contains(range.commonAncestorContainer)) {
-          range.deleteContents();
-          range.insertNode(image);
-          range.setStartAfter(image);
-          range.collapse(true);
-          selection?.removeAllRanges();
-          selection?.addRange(range);
-        } else {
-          root.append(image, document.createElement("p"));
-        }
-        savedSelectionRef.current = null;
-        setEditor((current) => ({ ...current, content_md: editorHtmlToMarkdown(root) }));
+        const range = document.createRange();
+        range.selectNodeContents(after);
+        range.collapse(true);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+        root?.focus();
+        rememberEditorSelection();
+      } else if (root) {
+        root.append(image);
       }
-      setNotice("본문 이미지를 업로드해 커서 위치에 삽입했습니다.");
-    } catch (e) { setError(e instanceof Error ? e.message : "이미지 업로드 중 오류가 발생했습니다."); }
-    finally { setUploadingImage(false); }
+      imageInsertionMarkerRef.current = null;
+      if (root) setEditor((current) => ({ ...current, content_md: editorHtmlToMarkdown(root) }));
+      setNotice("본문 이미지가 지정한 위치에 삽입됐습니다.");
+    } catch (e) {
+      marker?.remove();
+      imageInsertionMarkerRef.current = null;
+      setError(e instanceof Error ? e.message : "본문 이미지 업로드 중 오류가 발생했습니다.");
+    } finally { setUploadingImage(false); }
   }
 
   function rememberEditorSelection() {
@@ -286,15 +314,15 @@ export default function AdminBlogManager() {
     const files = Array.from(event.dataTransfer.files).filter((file) => file.type.startsWith("image/"));
     if (!files.length) return;
     event.preventDefault();
+    const doc = document as Document & { caretRangeFromPoint?: (x: number, y: number) => Range | null };
+    const dropRange = doc.caretRangeFromPoint?.(event.clientX, event.clientY) || null;
     const selection = window.getSelection();
-    if (selection?.rangeCount && contentRef.current?.contains(selection.anchorNode)) {
+    if (dropRange && contentRef.current?.contains(dropRange.commonAncestorContainer)) {
+      savedSelectionRef.current = dropRange.cloneRange();
+    } else if (selection?.rangeCount && contentRef.current?.contains(selection.anchorNode)) {
       savedSelectionRef.current = selection.getRangeAt(0).cloneRange();
-    } else if (contentRef.current) {
-      const range = document.createRange();
-      range.selectNodeContents(contentRef.current);
-      range.collapse(false);
-      savedSelectionRef.current = range;
     }
+    placeImageInsertionMarker(savedSelectionRef.current);
     void uploadInlineImage(files[0]);
   }
 
@@ -421,9 +449,7 @@ export default function AdminBlogManager() {
               {editor.cover_image_key ? <div><img src={`/api/blog/images/${editor.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt="대표 이미지 미리보기" style={{ display:"block",width:"100%",maxWidth:360,maxHeight:220,objectFit:"cover",borderRadius:12,marginTop:8 }} /><button type="button" className="blog-admin-text-button" onClick={() => setEditor((current) => ({ ...current, cover_image_key: null }))}>이미지 제거</button></div> : <small>이미지를 선택하면 안전하게 업로드됩니다.</small>}
               {uploadingImage ? <small>이미지 업로드 중...</small> : null}
             </label>
-            <label className="blog-admin-full">짧은 소개
-              <textarea rows={2} maxLength={500} value={editor.excerpt} onChange={(e) => setEditor({ ...editor, excerpt: e.target.value })} />
-            </label>
+            
             <div className="blog-admin-full">
               <div className="blog-admin-editor-head">
                 <div><strong>본문 편집</strong><small className="blog-admin-count">{wordCount.toLocaleString("ko-KR")} 단어 · {characterCount.toLocaleString("ko-KR")}자</small></div>
@@ -457,7 +483,7 @@ export default function AdminBlogManager() {
                   <div className="blog-admin-inline-image-tools">
                     <label>이미지 너비<select value={inlineImageWidth} onChange={(e) => setInlineImageWidth(e.target.value)}><option value="100%">100%</option><option value="80%">80%</option><option value="60%">60%</option><option value="40%">40%</option></select></label>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => setInlineImageAlign(e.target.value)}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
-                    <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadInlineImage(e.target.files?.[0]); e.currentTarget.value = ""; }} /></label>
+                    <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onClick={rememberEditorSelection} onChange={(e) => { placeImageInsertionMarker(); void uploadInlineImage(e.currentTarget.files?.[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
                   <div
                     key={editor.id || "new-post"}
@@ -477,7 +503,7 @@ export default function AdminBlogManager() {
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={handleEditorDrop}
                   />
-                  <small>굵게·제목 등은 작성 영역에 바로 표시됩니다. 이미지 파일을 원하는 위치로 끌어다 놓으면 업로드 후 그 자리에 삽입됩니다.</small>
+                  <small>굵게·제목 등은 작성 영역에 바로 표시됩니다. 이미지 삽입 버튼을 누르면 마지막 커서 위치에 들어갑니다. 파일을 본문 원하는 위치에 끌어다 놓아도 됩니다. 업로드 중에는 저장할 수 없습니다.</small>
                 </>
               )}
             </div>
@@ -486,7 +512,7 @@ export default function AdminBlogManager() {
             </label>
           </div>
           <div className="blog-admin-editor-actions">
-            <button className="blog-admin-primary" type="submit" disabled={saving}>{saving ? "저장 중..." : editor.status === "published" ? "저장하고 발행" : "저장"}</button>
+            <button className="blog-admin-primary" type="submit" disabled={saving || uploadingImage}>{saving ? "저장 중..." : editor.status === "published" ? "저장하고 발행" : "저장"}</button>
             <button type="button" className="blog-admin-secondary" onClick={() => setShowEditor(false)}>취소</button>
           </div>
         </form>
