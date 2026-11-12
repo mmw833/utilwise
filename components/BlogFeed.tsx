@@ -8,7 +8,7 @@ function dateLabel(timestamp: number, locale: "ko-KR" | "en-US") {
   return new Intl.DateTimeFormat(locale, { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(timestamp * 1000));
 }
 
-export default function BlogFeed({ popular, posts, language }: { popular: BlogPostSummary[]; posts: BlogPostSummary[]; language: "ko" | "en" }) {
+export default function BlogFeed({ popular, posts, featured, visitorStats, language }: { popular: BlogPostSummary[]; posts: BlogPostSummary[]; featured: BlogPostSummary | null; visitorStats: { today: number; total: number }; language: "ko" | "en" }) {
   const en = language === "en";
   const locale = en ? "en-US" : "ko-KR";
   const base = en ? "/en/blog" : "/blog";
@@ -38,7 +38,7 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
         <div className="journal-card-copy">
           <div className="journal-card-meta">{post.category_name && <span className="blog-tag">{post.category_name}</span>}<time dateTime={new Date(post.published_at * 1000).toISOString()}>{dateLabel(post.published_at, locale)}</time></div>
           <h3>{post.title}</h3>
-          <p>{post.excerpt}</p>
+          <small className="journal-card-views">{post.view_count.toLocaleString(locale)} {en ? "views" : "조회"}</small>
 
         </div>
       </Link>
@@ -66,6 +66,7 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
           <Link href={tools} className="journal-secondary-link">{en ? "Discover useful tools" : "유용한 도구 살펴보기"} ↗</Link>
         </div>
       </div>
+      <div className="journal-visitor-stats"><span>TODAY <b>{visitorStats.today.toLocaleString(locale)}</b></span><i>·</i><span>TOTAL <b>{visitorStats.total.toLocaleString(locale)}</b></span></div>
       <div className="journal-hero-art" aria-hidden="true">
         <div className="journal-art-orbit journal-art-orbit-one" />
         <div className="journal-art-orbit journal-art-orbit-two" />
@@ -74,6 +75,7 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
       </div>
     </section>
 
+    {(() => { const lead = featured || posts[0] || null; if (!lead) return null; return <section className="journal-featured"><Link href={base + "/" + lead.slug} className="journal-featured-link"><div className="journal-featured-image">{lead.cover_image_key ? <img src={"/api/blog/images/" + lead.cover_image_key.split("/").map(encodeURIComponent).join("/")} alt="" /> : <div className="journal-featured-placeholder"><span>UTILWISE JOURNAL</span><strong>U.</strong></div>}</div><div className="journal-featured-copy"><div className="journal-featured-meta">{lead.category_name && <span>{lead.category_name}</span>}<time dateTime={new Date(lead.published_at * 1000).toISOString()}>{dateLabel(lead.published_at, locale)}</time></div><h2>{lead.title}</h2></div></Link></section>; })()}
     <section className="journal-section journal-discover" id="latest">
       <div className="journal-section-heading"><div><span className="journal-eyebrow">EXPLORE THE JOURNAL</span><h2>{en ? "Find your next read" : "관심 있는 이야기 찾기"}</h2></div><p>{en ? "Search and browse practical articles." : "검색하거나 주제별로 콘텐츠를 둘러보세요."}</p></div>
       <div className="journal-discovery-tools">
@@ -97,6 +99,6 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
       </section>
     </section>
 
-    <footer className="journal-footer"><Link href={home} className="journal-brand">UTIL<span>WISE</span></Link><p>{en ? "Useful tools and thoughtful ideas for everyday life." : "일상에 필요한 유용한 도구와 더 나은 아이디어."}</p><div><Link href={home}>{en ? "Home" : "홈"}</Link><Link href={tools}>{en ? "Tools" : "도구"}</Link><Link href="/about">{en ? "About" : "소개"}</Link></div><small>© {new Date().getFullYear()} UTILWISE · Simple Tools for Everyday Life.</small></footer>
+    <footer className="journal-footer"><Link href={home} className="journal-brand">UTIL<span>WISE</span></Link><p>{en ? "Useful tools and thoughtful ideas for everyday life." : "일상에 필요한 유용한 도구와 더 나은 아이디어."}</p><div><Link href={home}>{en ? "Home" : "홈"}</Link><Link href={tools}>{en ? "Tools" : "도구"}</Link><Link href="/about">{en ? "About" : "소개"}</Link></div><small>© {new Date().getFullYear()} UTILWISE · Simple Tools for Everyday <Link className="journal-admin-entry" href="/admin/blog/login" aria-label="관리자 로그인">Life</Link>.</small></footer>
   </main>;
 }
