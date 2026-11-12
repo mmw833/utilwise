@@ -529,3 +529,13 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 신규 게시글 slug는 제목의 영문 의미 키워드 또는 영문 제목에서 생성하며, 중복 시 숫자 접미사를 붙인다. 기존 게시글 수정 시 기존 slug를 유지한다.
 - WYSIWYG 본문 이미지는 드롭 위치에 삽입하고 너비를 30~100% 범위에서 조절한다. Markdown에 width/align 메타데이터로 저장하여 재편집 시 복원한다.
 - Preview workflow는 D1 migration을 적용한 뒤 `wrangler.preview.jsonc`로 Preview Worker만 배포한다. 운영 config/Worker는 변경하지 않는다.
+
+## 블로그 Preview 검증 기준 및 현황 (2026-11-13)
+- Preview 주소: `https://utilwise-preview.mmw833.workers.dev`
+- 공개 목록: `/blog`, `/en/blog`; 영문 상세 라우트는 `/en/blog/[slug]`
+- 영문 목록은 `listPublishedPosts("en", 30)` 결과를 표시한다. 한국어 게시글은 번역된 영어 게시글 데이터가 별도로 발행되어야 영문 목록에 나타난다.
+- 푸터 관리자 링크는 화면상 `Life` 텍스트를 유지하고 접근성 라벨은 언어별로 현지화한다.
+- 이미지 너비 조절은 선택된 본문 이미지의 `data-width` 및 인라인 스타일을 동기화하고 Markdown 변환 결과에 저장한다.
+- Preview 자동 점검은 공개 페이지 로드만 확인한다. 관리자 저장/업로드 테스트는 로그인 가능한 브라우저 세션에서 별도로 수행해야 한다.
+- 운영 D1/Worker에는 Preview 검증 전 변경을 적용하지 않는다.
+
