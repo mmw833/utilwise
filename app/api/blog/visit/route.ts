@@ -13,10 +13,8 @@ export async function POST(request: NextRequest) {
     const now = Math.floor(Date.now() / 1000);
     const day = Math.floor((now + 32400) / 86400) * 86400 - 32400;
     const db = getBlogDatabase();
-    await db.batch([
-      db.prepare("INSERT OR IGNORE INTO blog_site_visitors (visitor_hash, first_seen_at) VALUES (?, ?)").bind(visitorHash, now),
-      db.prepare("INSERT OR IGNORE INTO blog_site_visits (visitor_hash, visit_date) VALUES (?, ?)").bind(visitorHash, day),
-    ]);
+    await db.prepare("INSERT OR IGNORE INTO blog_site_visitors (visitor_hash, first_seen_at) VALUES (?, ?)").bind(visitorHash, now).run();
+    await db.prepare("INSERT OR IGNORE INTO blog_site_visits (visitor_hash, visit_date) VALUES (?, ?)").bind(visitorHash, day).run();
     const response = NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
     if (!current || current !== visitor) response.cookies.set(COOKIE, visitor, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax", path: "/", maxAge: 60 * 60 * 24 * 365 });
     return response;
