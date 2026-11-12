@@ -7,6 +7,7 @@ on:
       - fix/admin-single-password-auth
       - feat/blog-editor-improvements
       - feat/blog-mobile-wysiwyg-editor
+      - feat/blog-inline-image-placement
 
 permissions:
   contents: read
