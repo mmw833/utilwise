@@ -354,6 +354,15 @@ export default function AdminBlogManager() {
     }
   }
 
+  async function featurePost(post: Post) {
+    if (post.status !== "published") return;
+    try {
+      const response = await fetch("/api/admin/posts/feature", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: post.id, language: post.language }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "대표글을 설정하지 못했습니다.");
+      await loadData(); setNotice("대표글을 변경했습니다.");
+    } catch (e) { setError(e instanceof Error ? e.message : "대표글 설정 중 오류가 발생했습니다."); }
+  }
   async function deletePost(post: Post) {
     if (!window.confirm(`“${post.title}” 게시글을 삭제할까요? 삭제 후 복구할 수 없습니다.`)) return;
     setError("");
