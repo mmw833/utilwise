@@ -650,3 +650,12 @@
 - 별도 서버 API, D1 schema, 게시글 URL은 변경하지 않음
 - 검증 대기: GitHub Actions 빌드, Preview 배포, 한국어/영어 검색·필터·정렬 브라우저 테스트
 - 운영 main/DB/Worker 변경 없음
+
+
+## 2026-11-12 Preview 배포 인증 설정 점검
+- Cloudflare 대시보드의 로그인된 계정에서 계정 ID를 읽기 전용으로 확인: `22d2885f057f1bde31d4638a26c107bb`
+- GitHub Actions의 `CLOUDFLARE_ACCOUNT_ID` Secret에 저장된 값은 확인할 수 없으므로, Preview workflow에서 검증된 계정 ID를 명시적으로 사용하도록 변경
+- `CLOUDFLARE_API_TOKEN`만 GitHub Secret으로 유지하며 토큰 값은 조회/노출하지 않음
+- 변경 브랜치: `feat/blog-editor-improvements`
+- 재실행 workflow에서 Preview D1 migration → Worker deploy → 한국어/영어 smoke test 결과 확인 필요
+- 운영 `wrangler.jsonc`, 운영 Worker 및 운영 DB는 변경하지 않음
