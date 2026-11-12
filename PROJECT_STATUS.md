@@ -659,3 +659,12 @@
 - 변경 브랜치: `feat/blog-editor-improvements`
 - 재실행 workflow에서 Preview D1 migration → Worker deploy → 한국어/영어 smoke test 결과 확인 필요
 - 운영 `wrangler.jsonc`, 운영 Worker 및 운영 DB는 변경하지 않음
+
+
+## 2026-11-12 모바일 블로그 정렬 및 WYSIWYG 편집기 개선
+- 모바일 블로그 메인 히어로, 섹션 제목/설명, 검색·정렬·카테고리 필터 및 빈 상태 문구를 중앙 정렬해 시각적 일관성 개선
+- 관리자 본문 입력을 실제 서식이 표시되는 편집 영역으로 전환: 제목, 굵게, 기울임, 목록, 인용, 링크 적용
+- 기존 Markdown 저장 형식을 유지하도록 편집 영역의 서식을 Markdown으로 변환
+- 이미지 파일을 편집 영역으로 드래그하면 기존 관리자 업로드 API/R2를 이용해 업로드하고 현재 커서 위치에 삽입
+- 기존 대표 이미지 업로드, 글 데이터, 게시 API 및 공개 Markdown 렌더러 구조 유지
+- 작업 브랜치 `feat/blog-mobile-wysiwyg-editor`; 빌드/Preview 브라우저 검증 대기. 운영 반영 없음
