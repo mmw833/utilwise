@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const visitor = current && /^[a-f0-9]{64}$/.test(current) ? current : token();
     const visitorHash = await hash(visitor);
     const now = Math.floor(Date.now() / 1000);
-    const day = now - (now % 86400);
+    const day = Math.floor((now + 32400) / 86400) * 86400 - 32400;
     const db = getBlogDatabase();
     await db.batch([
       db.prepare("INSERT OR IGNORE INTO blog_site_visitors (visitor_hash, first_seen_at) VALUES (?, ?)").bind(visitorHash, now),
