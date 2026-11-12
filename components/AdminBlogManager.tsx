@@ -303,6 +303,18 @@ export default function AdminBlogManager() {
   function syncEditorContent() {
     if (contentRef.current) setEditor((current) => ({ ...current, content_md: editorHtmlToMarkdown(contentRef.current!) }));
   }
+
+  function resizeSelectedInlineImage(width: string) {
+    const image = selectedInlineImageRef.current;
+    if (!image || !contentRef.current?.contains(image)) return;
+    const normalizedWidth = `${Math.min(100, Math.max(30, Number.parseInt(width, 10) || 100))}%`;
+    image.dataset.width = normalizedWidth;
+    image.style.width = normalizedWidth;
+    image.style.maxWidth = "100%";
+    image.style.height = "auto";
+    setInlineImageWidth(normalizedWidth);
+    syncEditorContent();
+  }
   function handleEditorDrop(event: React.DragEvent<HTMLDivElement>) {
     const files = Array.from(event.dataTransfer.files).filter((file) => file.type.startsWith("image/"));
     if (!files.length) return;
