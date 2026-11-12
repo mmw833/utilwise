@@ -39,7 +39,7 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
           <div className="journal-card-meta">{post.category_name && <span className="blog-tag">{post.category_name}</span>}<time dateTime={new Date(post.published_at * 1000).toISOString()}>{dateLabel(post.published_at, locale)}</time></div>
           <h3>{post.title}</h3>
           <p>{post.excerpt}</p>
-          <span className="journal-read">{en ? "Read article" : "글 읽기"} <span aria-hidden="true">↗</span></span>
+
         </div>
       </Link>
     </article>
