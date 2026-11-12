@@ -20,6 +20,7 @@ type Post = {
   seo_description: string | null;
   status: PostStatus;
   view_count: number;
+  is_featured: number;
   published_at: number | null;
   updated_at: number;
   cover_image_key: string | null;
@@ -130,6 +131,7 @@ export default function AdminBlogManager() {
   const contentRef = useRef<HTMLDivElement>(null);
   const savedSelectionRef = useRef<Range | null>(null);
   const imageInsertionMarkerRef = useRef<HTMLSpanElement | null>(null);
+  const selectedInlineImageRef = useRef<HTMLImageElement | null>(null);
   const [inlineImageWidth, setInlineImageWidth] = useState("100%");
   const [inlineImageAlign, setInlineImageAlign] = useState("center");
 
