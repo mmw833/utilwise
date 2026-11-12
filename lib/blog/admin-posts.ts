@@ -156,6 +156,13 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
   return id;
 }
 
+export async function setFeaturedPost(id: string, language: BlogLanguage): Promise<void> {
+  const db = getBlogDatabase();
+  const post = await db.prepare("SELECT id FROM blog_posts WHERE id = ? AND language = ? AND status = 'published' LIMIT 1").bind(id, language).first<{ id: string }>();
+  if (!post) throw new Error("Published post not found");
+  await db.prepare("UPDATE blog_posts SET is_featured = CASE WHEN id = ? THEN 1 ELSE 0 END WHERE language = ? AND status = 'published'").bind(id, language).run();
+}
+
 export async function deleteAdminPost(id: string): Promise<void> {
   const db = getBlogDatabase();
   await db.prepare("DELETE FROM blog_posts WHERE id = ?").bind(id).run();
