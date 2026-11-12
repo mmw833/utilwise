@@ -3,8 +3,8 @@ import Link from "next/link";
 import LanguageSwitcher from "../../components/LanguageSwitcher";
 import ImageTools from "../../components/ImageTools";
 export const metadata: Metadata = {
-  title: "무료 이미지 압축기 | JPG·PNG·WebP 용량 줄이기 - UTILWISE",
-  description: "JPG, PNG, WebP 이미지 용량을 무료로 줄이세요. 압축 품질을 조절하고 여러 이미지를 한 번에 처리할 수 있으며 파일은 브라우저에서만 처리됩니다.",
+  title: "사진 용량 줄이기 | JPG·PNG·WebP 이미지 무료 압축 - UTILWISE",
+  description: "JPG, PNG, WebP 사진과 이미지 파일 용량을 무료로 줄이세요. 압축 품질과 저장 형식을 선택하고 여러 이미지를 한 번에 처리할 수 있습니다. 파일은 브라우저에서만 처리됩니다.",
   alternates: { canonical: "/image-compressor", languages: { "ko-KR": "/image-compressor", en: "/en/image-compressor" } },
   openGraph: { title: "무료 이미지 압축기", description: "JPG, PNG, WebP 이미지 용량을 브라우저에서 간편하게 줄이세요.", url: "https://utilwise.kr/image-compressor", siteName: "UTILWISE", locale: "ko_KR", type: "website" }
 };
