@@ -520,3 +520,12 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 카테고리 필터는 현재 페이지에 로드된 최신 게시글 집합에서 구성한다.
 - 최신순/인기순 정렬은 현재 공개 피드 데이터 범위 안에서 수행한다. 별도 검색 API나 D1 변경은 없다.
 - 한국어 `/blog`와 영어 `/en/blog`는 동일한 컴포넌트를 사용하며 언어별 텍스트/검색 대소문자 정규화를 적용한다.
+
+
+### 블로그 대표글·방문자·이미지 편집 (2026-11-12)
+- `blog_posts.is_featured`는 언어별 발행 게시글 중 1개만 선택되도록 partial unique index를 둔다. `migrations/0003_blog_featured_and_visitors.sql` 적용 필요
+- 대표글 선택 API는 관리자 인증과 same-origin을 검사한다. 메인 피드는 선택된 대표글을 우선하고 미지정 시 최신 발행글을 표시한다.
+- 블로그 방문자 쿠키 `uw_blog_visitor`는 HttpOnly/SameSite=Lax로 발급한다. 서버는 토큰 SHA-256만 `blog_site_visitors` 및 `blog_site_visits`에 저장하며 IP 원문은 저장하지 않는다. 일일 집계는 KST 기준이다.
+- 신규 게시글 slug는 제목의 영문 의미 키워드 또는 영문 제목에서 생성하며, 중복 시 숫자 접미사를 붙인다. 기존 게시글 수정 시 기존 slug를 유지한다.
+- WYSIWYG 본문 이미지는 드롭 위치에 삽입하고 너비를 30~100% 범위에서 조절한다. Markdown에 width/align 메타데이터로 저장하여 재편집 시 복원한다.
+- Preview workflow는 D1 migration을 적용한 뒤 `wrangler.preview.jsonc`로 Preview Worker만 배포한다. 운영 config/Worker는 변경하지 않는다.
