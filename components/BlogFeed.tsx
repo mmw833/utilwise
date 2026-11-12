@@ -36,10 +36,8 @@ export default function BlogFeed({ popular, posts, featured, visitorStats, langu
           {post.cover_image_key ? <img src={`/api/blog/images/${post.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt="" loading="lazy" /> : <><span className="journal-art-kicker">UTILWISE JOURNAL</span><span className="journal-art-symbol">{["U.", "✳", "↗", "◎"][index % 4]}</span><span className="journal-art-index">{String(index + 1).padStart(2, "0")}</span></>}
         </div>
         <div className="journal-card-copy">
-          <div className="journal-card-meta">{post.category_name && <span className="blog-tag">{post.category_name}</span>}<time dateTime={new Date(post.published_at * 1000).toISOString()}>{dateLabel(post.published_at, locale)}</time></div>
           <h3>{post.title}</h3>
-          <small className="journal-card-views">{post.view_count.toLocaleString(locale)} {en ? "views" : "조회"}</small>
-
+          <div className="journal-card-meta">{post.category_name && <span className="blog-tag">{post.category_name}</span>}<time dateTime={new Date(post.published_at * 1000).toISOString()}>{dateLabel(post.published_at, locale)}</time><small className="journal-card-views">{post.view_count.toLocaleString(locale)} {en ? "views" : "조회"}</small></div>
         </div>
       </Link>
     </article>
@@ -75,7 +73,7 @@ export default function BlogFeed({ popular, posts, featured, visitorStats, langu
       </div>
     </section>
 
-    {(() => { const lead = featured || posts[0] || null; if (!lead) return null; return <section className="journal-featured"><Link href={base + "/" + lead.slug} className="journal-featured-link"><div className="journal-featured-image">{lead.cover_image_key ? <img src={"/api/blog/images/" + lead.cover_image_key.split("/").map(encodeURIComponent).join("/")} alt="" /> : <div className="journal-featured-placeholder"><span>UTILWISE JOURNAL</span><strong>U.</strong></div>}</div><div className="journal-featured-copy"><div className="journal-featured-meta">{lead.category_name && <span>{lead.category_name}</span>}<time dateTime={new Date(lead.published_at * 1000).toISOString()}>{dateLabel(lead.published_at, locale)}</time></div><h2>{lead.title}</h2></div></Link></section>; })()}
+    {(() => { const lead = featured || posts[0] || null; if (!lead) return null; return <section className="journal-featured"><Link href={base + "/" + lead.slug} className="journal-featured-link"><div className="journal-featured-image">{lead.cover_image_key ? <img src={"/api/blog/images/" + lead.cover_image_key.split("/").map(encodeURIComponent).join("/")} alt="" /> : <div className="journal-featured-placeholder"><span>UTILWISE JOURNAL</span><strong>U.</strong></div>}</div><div className="journal-featured-copy"><h2>{lead.title}</h2><div className="journal-featured-meta">{lead.category_name && <span>{lead.category_name}</span>}<time dateTime={new Date(lead.published_at * 1000).toISOString()}>{dateLabel(lead.published_at, locale)}</time><small className="journal-card-views">{lead.view_count.toLocaleString(locale)} {en ? "views" : "조회"}</small></div></div></Link></section>; })()}
     <section className="journal-section journal-discover" id="latest">
       <div className="journal-section-heading"><div><span className="journal-eyebrow">EXPLORE THE JOURNAL</span><h2>{en ? "Find your next read" : "관심 있는 이야기 찾기"}</h2></div><p>{en ? "Search and browse practical articles." : "검색하거나 주제별로 콘텐츠를 둘러보세요."}</p></div>
       <div className="journal-discovery-tools">
