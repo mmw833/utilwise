@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import BlogMarkdown from "@/components/BlogMarkdown";
 
 type PostStatus = "draft" | "published" | "archived";
 type Category = { id: string; slug: string; name_ko: string; name_en: string | null };
@@ -14,6 +15,7 @@ type Post = {
   content_md: string;
   category_id: string | null;
   category_name: string | null;
+  tags_json?: string;
   seo_title: string | null;
   seo_description: string | null;
   status: PostStatus;
@@ -32,6 +34,8 @@ type Editor = {
   excerpt: string;
   content_md: string;
   category_id: string;
+  category_name: string;
+  tags: string[];
   seo_title: string;
   seo_description: string;
   status: PostStatus;
@@ -45,6 +49,8 @@ const emptyEditor = (): Editor => ({
   excerpt: "",
   content_md: "",
   category_id: "",
+  category_name: "",
+  tags: [],
   seo_title: "",
   seo_description: "",
   status: "draft",
@@ -57,11 +63,16 @@ function dateLabel(timestamp: number | null) {
 }
 
 function slugify(value: string) {
-  return value.trim().toLowerCase()
-    .normalize("NFKD")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 120) || `post-${new Date().toISOString().slice(0, 10)}`;
+  const initial = ["g","kk","n","d","tt","r","m","b","pp","s","ss","","j","jj","ch","k","t","p","h"];
+  const vowel = ["a","ae","ya","yae","eo","e","yeo","ye","o","wa","wae","oe","yo","u","wo","we","wi","yu","eu","ui","i"];
+  const final = ["","k","k","ks","n","nj","nh","t","l","lk","lm","lb","ls","lt","lp","lh","m","p","ps","t","t","ng","t","t","k","t","p","t"];
+  const latin = Array.from(value.normalize("NFC")).map((char) => {
+    const code = char.charCodeAt(0) - 0xac00;
+    if (code < 0 || code > 11171) return char;
+    return initial[Math.floor(code / 588)] + vowel[Math.floor((code % 588) / 28)] + final[code % 28];
+  }).join("");
+  return latin.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 120)
+    || `post-${new Date().toISOString().slice(0, 10)}`;
 }
 
 export default function AdminBlogManager() {
@@ -75,6 +86,11 @@ export default function AdminBlogManager() {
   const [error, setError] = useState("");
   const [categoryName, setCategoryName] = useState("");
   const [showEditor, setShowEditor] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewMode, setPreviewMode] = useState<"preview" | "split">("preview");
+  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const [inlineImageWidth, setInlineImageWidth] = useState("100%");
+  const [inlineImageAlign, setInlineImageAlign] = useState("center");
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -120,6 +136,8 @@ export default function AdminBlogManager() {
       excerpt: post.excerpt || "",
       content_md: post.content_md || "",
       category_id: post.category_id || "",
+      category_name: post.category_name || "",
+      tags: (() => { try { return JSON.parse(post.tags_json || "[]") as string[]; } catch { return []; } })(),
       seo_title: post.seo_title || "",
       seo_description: post.seo_description || "",
       status: post.status,
@@ -145,6 +163,39 @@ export default function AdminBlogManager() {
     finally { setUploadingImage(false); }
   }
 
+  async function uploadInlineImage(file?: File) {
+    if (!file) return;
+    setError(""); setUploadingImage(true);
+    try {
+      const form = new FormData(); form.set("file", file);
+      const response = await fetch("/api/admin/blog-images", { method: "POST", body: form });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "본문 이미지를 업로드하지 못했습니다.");
+      const alt = file.name.replace(/\.[^.]+$/, "").replace(/[\[\]|]/g, " ").trim() || "본문 이미지";
+      const markdown = `![${alt}|width=${inlineImageWidth}|align=${inlineImageAlign}](/api/blog/images/${data.key})`;
+      setEditor((current) => ({ ...current, content_md: current.content_md ? current.content_md + "\n\n" + markdown + "\n\n" : markdown + "\n\n" }));
+      setNotice("본문 이미지를 업로드하고 본문에 삽입했습니다. 게시글 저장을 눌러 적용하세요.");
+    } catch (e) { setError(e instanceof Error ? e.message : "이미지 업로드 중 오류가 발생했습니다."); }
+    finally { setUploadingImage(false); }
+  }
+
+  function insertMarkdown(snippet: string) {
+    const textarea = contentRef.current;
+    const start = textarea?.selectionStart ?? editor.content_md.length;
+    const end = textarea?.selectionEnd ?? editor.content_md.length;
+    const next = editor.content_md.slice(0, start) + snippet + editor.content_md.slice(end);
+    setEditor((current) => ({ ...current, content_md: next }));
+    requestAnimationFrame(() => {
+      if (!textarea) return;
+      textarea.focus();
+      const cursor = start + snippet.length;
+      textarea.setSelectionRange(cursor, cursor);
+    });
+  }
+
+  const wordCount = editor.content_md.trim() ? editor.content_md.trim().split(/\\s+/).length : 0;
+  const characterCount = editor.content_md.length;
+
   async function savePost(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving) return;
@@ -158,7 +209,9 @@ export default function AdminBlogManager() {
         body: JSON.stringify({
           ...editor,
           category_id: editor.category_id || null,
-          seo_title: editor.seo_title || null,
+          category_name: editor.category_name.trim(),
+          tags: editor.tags,
+          seo_title: null,
           seo_description: editor.seo_description || null,
         }),
       });
@@ -248,11 +301,13 @@ export default function AdminBlogManager() {
               <input required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={120} value={editor.slug} onChange={(e) => setEditor({ ...editor, slug: e.target.value })} />
               <small>영문 소문자, 숫자, 하이픈만 사용할 수 있습니다.</small>
             </label>
-            <label>카테고리 태그
-              <select value={editor.category_id} onChange={(e) => setEditor({ ...editor, category_id: e.target.value })}>
-                <option value="">선택 안 함</option>
-                {categories.map((category) => <option key={category.id} value={category.id}>{category.name_ko}</option>)}
-              </select>
+            <label>카테고리 (직접 입력)
+              <input maxLength={40} value={editor.category_name} onChange={(e) => setEditor({ ...editor, category_name: e.target.value, category_id: "" })} placeholder="예: 생활정보" list="blog-category-suggestions" />
+              <datalist id="blog-category-suggestions">{categories.map((category) => <option key={category.id} value={category.name_ko} />)}</datalist>
+            </label>
+            <label className="blog-admin-full">태그 (쉼표로 구분)
+              <input value={editor.tags.join(", ")} maxLength={400} onChange={(e) => setEditor({ ...editor, tags: e.target.value.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12) })} placeholder="생활정보, 가이드, 팁" />
+              <small>최대 12개까지 입력할 수 있습니다.</small>
             </label>
             <label className="blog-admin-full">대표 이미지 (선택)
               <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadCoverImage(e.target.files?.[0]); e.currentTarget.value = ""; }} />
@@ -263,13 +318,45 @@ export default function AdminBlogManager() {
             <label className="blog-admin-full">짧은 소개
               <textarea rows={2} maxLength={500} value={editor.excerpt} onChange={(e) => setEditor({ ...editor, excerpt: e.target.value })} />
             </label>
-            <label className="blog-admin-full">본문 (Markdown)
-              <textarea className="blog-admin-content" rows={16} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} placeholder={"## 소제목\n\n본문을 Markdown 형식으로 작성하세요."} />
-              <small>현재는 Markdown 원문을 저장합니다. 공개 페이지 렌더링은 다음 구현 단계에서 연결합니다.</small>
-            </label>
-            <label className="blog-admin-full">SEO 제목 (선택)
-              <input maxLength={180} value={editor.seo_title} onChange={(e) => setEditor({ ...editor, seo_title: e.target.value })} />
-            </label>
+            <div className="blog-admin-full">
+              <div className="blog-admin-editor-head">
+                <div><strong>본문 편집</strong><small className="blog-admin-count">{wordCount.toLocaleString("ko-KR")} 단어 · {characterCount.toLocaleString("ko-KR")}자</small></div>
+                <div className="blog-admin-view-switch">
+                  <button type="button" className={!showPreview ? "is-active" : ""} onClick={() => setShowPreview(false)}>편집</button>
+                  <button type="button" className={showPreview && previewMode === "preview" ? "is-active" : ""} onClick={() => { setShowPreview(true); setPreviewMode("preview"); }}>미리보기</button>
+                  <button type="button" className={showPreview && previewMode === "split" ? "is-active" : ""} onClick={() => { setShowPreview(true); setPreviewMode("split"); }}>나란히 보기</button>
+                </div>
+              </div>
+              {showPreview ? (
+                <div className={`blog-admin-preview-layout ${previewMode === "split" ? "is-split" : ""}`}>
+                  <div className="blog-admin-preview">
+                    <h1>{editor.title || "게시글 제목 미리보기"}</h1>
+                    {editor.excerpt ? <p className="blog-admin-preview-excerpt">{editor.excerpt}</p> : null}
+                    <BlogMarkdown content={editor.content_md || "본문을 입력하면 여기에 미리 표시됩니다."} />
+                  </div>
+                  {previewMode === "split" ? <textarea aria-label="본문 Markdown 편집" className="blog-admin-content blog-admin-content-split" rows={20} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} /> : null}
+                </div>
+              ) : (
+                <>
+                  <div className="blog-admin-format-tools" role="toolbar" aria-label="본문 서식 도구">
+                    {[
+                      ["H2", "## 소제목\n\n"], ["H3", "### 작은 제목\n\n"],
+                      ["굵게", "**굵은 글씨**"], ["기울임", "*기울임 글씨*"],
+                      ["목록", "\n- 목록 항목"], ["번호 목록", "\n1. 첫 번째 항목"],
+                      ["인용", "\n> 인용 문구"], ["링크", "[링크 문구](https://example.com)"],
+                      ["구분선", "\n\n---\n\n"],
+                    ].map(([label, snippet]) => <button type="button" className="blog-admin-secondary" key={label} onClick={() => insertMarkdown(snippet)}>{label}</button>)}
+                  </div>
+                  <div className="blog-admin-inline-image-tools">
+                    <label>이미지 너비<select value={inlineImageWidth} onChange={(e) => setInlineImageWidth(e.target.value)}><option value="100%">100%</option><option value="80%">80%</option><option value="60%">60%</option><option value="40%">40%</option></select></label>
+                    <label>정렬<select value={inlineImageAlign} onChange={(e) => setInlineImageAlign(e.target.value)}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
+                    <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadInlineImage(e.target.files?.[0]); e.currentTarget.value = ""; }} /></label>
+                  </div>
+                  <textarea ref={contentRef} aria-label="본문 Markdown 편집" className="blog-admin-content" rows={20} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} placeholder={"## 소제목\n\n본문을 Markdown 형식으로 작성하세요."} />
+                  <small>서식 버튼은 커서 또는 선택한 영역에 삽입됩니다. 미리보기와 나란히 보기를 지원합니다.</small>
+                </>
+              )}
+            </div>
             <label className="blog-admin-full">SEO 설명 (선택)
               <textarea rows={2} maxLength={300} value={editor.seo_description} onChange={(e) => setEditor({ ...editor, seo_description: e.target.value })} />
             </label>

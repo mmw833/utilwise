@@ -609,3 +609,53 @@
 - 공개 GET API는 blog UUID 키만 허용하고 `nosniff` 및 immutable cache 헤더를 설정한다.
 - 관리자 UI에서 업로드/미리보기/키 제거가 가능하며 게시글 저장 시 D1의 `cover_image_key`에 반영한다. 공개 한국어·영어 피드와 상세 페이지에서 실제 이미지가 표시된다.
 - 검증: GitHub Actions preview build/deploy 및 실제 업로드·표시 테스트 대기. 운영 배포 및 main 병합은 하지 않는다.
+
+
+## 2026-11-11 블로그 편집기 개선 1차 진행
+- 작업 브랜치: `feat/blog-editor-improvements` (기존 관리자 인증 작업 브랜치 기준)
+- 게시글에 복수 태그를 저장할 `tags_json` 컬럼을 추가하는 additive migration `0002_blog_post_tags.sql` 작성. 기존 글은 기본값 빈 배열을 유지
+- 관리자 작성 화면에 쉼표 구분 태그 입력 추가, 공개 상세 페이지에 태그 표시 연결
+- 본문 Markdown 서식 버튼(소제목/작은 제목/굵게/기울임/목록/인용/링크)과 본문 미리보기 추가
+- SEO 제목 입력은 관리자 화면에서 제거하고 페이지 제목을 기본으로 사용하도록 저장 시 null 처리. SEO 설명은 별도 입력, 미입력 시 소개글을 메타 설명으로 사용
+- 변경은 작업 브랜치에만 반영. 운영 main/Worker 변경 없음
+- **주의:** D1 migration은 파일로 작성했으나 원격 Preview D1에는 아직 적용하지 않음. 적용 전까지 새 태그 컬럼을 참조하는 Preview 기능은 검증 불가
+- **미완료:** 카테고리 자유 입력 전환, 한글 제목의 영문 slug 생성 개선, 본문 이미지 삽입/크기·정렬, PC/모바일 실제 화면 검증
+- **검증:** migration의 기존 데이터 기본값 및 신규 태그 저장 SQL을 로컬 SQLite에서 확인. Next.js 빌드 및 브라우저 테스트는 미실시
+
+
+## 2026-11-11 블로그 편집기 개선 2차
+- 관리자 카테고리를 기존 목록 선택 외에 직접 입력할 수 있도록 변경. 저장 시 기존 카테고리명과 일치하면 재사용하고, 없으면 자동 생성
+- 한글 제목을 로마자 기반 영문 slug로 자동 생성하고 운영자가 직접 수정할 수 있도록 개선
+- 본문 이미지 업로드 기능 추가. 기존 관리자 이미지 업로드 API와 R2를 재사용하며, 업로드 후 Markdown 본문에 자동 삽입
+- 본문 이미지 너비(100/80/60/40%)와 정렬(좌/가운데/우) 지정 지원. 공개 Markdown 렌더러는 내부 R2 이미지 경로만 허용
+- 짧은 소개를 비워두면 본문에서 텍스트를 추출해 자동 생성
+- 1차 작업과 함께 PR #13에 반영. GitHub Actions 후속 빌드 및 Preview 화면/이미지 업로드 테스트 대기
+- 원격 D1 migration은 아직 적용하지 않음. 운영 DB 및 운영 Worker 변경 없음
+
+
+## 2026-11-12 블로그 작성 화면 UX 후속 개선
+- 본문 Markdown 도구를 커서/선택 영역 삽입 방식으로 개선
+- 편집/미리보기/나란히 보기 모드와 단어·문자 수 표시 추가
+- 데스크톱/모바일 작성 영역과 미리보기 스타일 보강
+- 신규 카테고리 slug 중복 충돌 방지
+- `feat/blog-editor-improvements` 브랜치를 Preview 배포 workflow에 추가
+- 미완료: GitHub Actions 결과, Preview 반영 여부, 실제 저장/이미지 업로드/모바일 테스트 확인
+- 주의: `0002_blog_post_tags.sql` 원격 Preview D1 적용 여부 미확인. 운영 main/DB/Worker 변경 없음
+
+## 2026-11-12 블로그 메인 검색 및 콘텐츠 큐레이션
+- 한국어·영어 공통 BlogFeed에 제목/소개/카테고리/태그 검색 추가
+- 게시글 카테고리 칩 필터, 최신순/인기순 정렬 추가
+- 인기글·최신글에 동일 검색/필터를 적용하고 인기글 중복을 최신글 목록에서 제외
+- PC/태블릿/모바일 검색·카테고리 컨트롤 및 콘텐츠 카드 레이아웃 보강
+- 별도 서버 API, D1 schema, 게시글 URL은 변경하지 않음
+- 검증 대기: GitHub Actions 빌드, Preview 배포, 한국어/영어 검색·필터·정렬 브라우저 테스트
+- 운영 main/DB/Worker 변경 없음
+
+
+## 2026-11-12 Preview 배포 인증 설정 점검
+- Cloudflare 대시보드의 로그인된 계정에서 계정 ID를 읽기 전용으로 확인: `22d2885f057f1bde31d4638a26c107bb`
+- GitHub Actions의 `CLOUDFLARE_ACCOUNT_ID` Secret에 저장된 값은 확인할 수 없으므로, Preview workflow에서 검증된 계정 ID를 명시적으로 사용하도록 변경
+- `CLOUDFLARE_API_TOKEN`만 GitHub Secret으로 유지하며 토큰 값은 조회/노출하지 않음
+- 변경 브랜치: `feat/blog-editor-improvements`
+- 재실행 workflow에서 Preview D1 migration → Worker deploy → 한국어/영어 smoke test 결과 확인 필요
+- 운영 `wrangler.jsonc`, 운영 Worker 및 운영 DB는 변경하지 않음

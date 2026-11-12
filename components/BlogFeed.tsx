@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import type { BlogPostSummary } from "@/lib/blog/posts";
 
 function dateLabel(timestamp: number, locale: "ko-KR" | "en-US") {
@@ -13,7 +14,21 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
   const base = en ? "/en/blog" : "/blog";
   const home = en ? "/en" : "/";
   const tools = en ? "/en/online-tools" : "/online-tools";
-  const featured = popular[0];
+  const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortOrder, setSortOrder] = useState<"latest" | "popular">("latest");
+  const categories = useMemo(() => Array.from(new Set(posts.map((post) => post.category_name).filter((name): name is string => Boolean(name)))).sort((a, b) => a.localeCompare(b, locale)), [posts, locale]);
+  const query = search.trim().toLocaleLowerCase(en ? "en-US" : "ko-KR");
+  const matches = (post: BlogPostSummary) => {
+    let tags = "";
+    try { const parsed = JSON.parse(post.tags_json || "[]"); tags = Array.isArray(parsed) ? parsed.join(" ") : ""; } catch {}
+    const haystack = [post.title, post.excerpt, post.category_name || "", tags].join(" ").toLocaleLowerCase(en ? "en-US" : "ko-KR");
+    return (!query || haystack.includes(query)) && (selectedCategory === "all" || post.category_name === selectedCategory);
+  };
+  const filteredPosts = useMemo(() => posts.filter(matches), [posts, query, selectedCategory]);
+  const filteredPopular = useMemo(() => popular.filter(matches), [popular, query, selectedCategory]);
+  const sortedPosts = useMemo(() => [...filteredPosts].sort((a, b) => sortOrder === "latest" ? b.published_at - a.published_at : b.view_count - a.view_count), [filteredPosts, sortOrder]);
+  const visibleLatest = sortedPosts.filter((post) => !filteredPopular.some((item) => item.id === post.id));
   const card = (post: BlogPostSummary, index: number, featured = false) => (
     <article className={`journal-card journal-card-tone-${index % 4}${featured ? " journal-card-featured" : ""}`} key={post.id}>
       <Link href={`${base}/${post.slug}`} className="journal-card-link">
@@ -51,30 +66,35 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
           <Link href={tools} className="journal-secondary-link">{en ? "Discover useful tools" : "유용한 도구 살펴보기"} ↗</Link>
         </div>
       </div>
-      {featured ? <Link href={`${base}/${featured.slug}`} className="journal-hero-art journal-hero-feature" aria-label={featured.title}>
-        <div className="journal-hero-feature-image">
-          {featured.cover_image_key ? <img src={`/api/blog/images/${featured.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt="" /> : <div className="journal-feature-fallback"><span>U.</span><i>✳</i><small>UTILWISE JOURNAL</small></div>}
-        </div>
-        <div className="journal-hero-feature-caption"><span>{en ? "MOST READ" : "이번 주 많이 읽은 글"}</span><strong>{featured.title}</strong><small>{en ? "Read the story" : "이야기 읽기"} ↗</small></div>
-      </Link> : <div className="journal-hero-art" aria-hidden="true">
+      <div className="journal-hero-art" aria-hidden="true">
         <div className="journal-art-orbit journal-art-orbit-one" />
         <div className="journal-art-orbit journal-art-orbit-two" />
         <div className="journal-art-paper"><span>U.</span><small>MAKE EVERYDAY<br />A LITTLE EASIER</small><i>✳</i></div>
         <div className="journal-art-caption">TOOLS · IDEAS · EVERYDAY</div>
-      </div>}
+      </div>
     </section>
 
-    {popular.length > 1 && <section className="journal-section journal-popular">
-      <div className="journal-section-heading"><div><span className="journal-eyebrow">{en ? "READER FAVORITES" : "READERS' PICKS"}</span><h2>{en ? "Popular reads" : "많이 읽은 이야기"}</h2></div><p>{en ? "The articles readers come back to." : "독자들이 많이 찾는 콘텐츠"}</p></div>
-      <div className="journal-feature-grid">{popular.slice(1, 4).map((post, index) => card(post, index + 1))}</div>
-    </section>}
-
-    <section className="journal-section journal-latest" id="latest">
-      <div className="journal-section-heading"><div><span className="journal-eyebrow">{en ? "FRESH FROM THE JOURNAL" : "FRESH FROM THE JOURNAL"}</span><h2>{en ? "The latest stories" : "새로운 이야기"}</h2></div><p>{en ? "New ideas, guides and useful reads." : "새롭게 업데이트되는 정보와 가이드"}</p></div>
-      {posts.length > 0 ? <div className="journal-latest-grid">{posts.map((post, index) => card(post, index + 3))}</div> : <div className="journal-empty">
+    <section className="journal-section journal-discover" id="latest">
+      <div className="journal-section-heading"><div><span className="journal-eyebrow">EXPLORE THE JOURNAL</span><h2>{en ? "Find your next read" : "관심 있는 이야기 찾기"}</h2></div><p>{en ? "Search and browse practical articles." : "검색하거나 주제별로 콘텐츠를 둘러보세요."}</p></div>
+      <div className="journal-discovery-tools">
+        <label className="journal-search"><span aria-hidden="true">⌕</span><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={en ? "Search articles, topics, keywords..." : "게시글 제목, 소개, 태그 검색"} aria-label={en ? "Search blog posts" : "블로그 게시글 검색"} />{search && <button type="button" onClick={() => setSearch("")} aria-label={en ? "Clear search" : "검색어 지우기"}>×</button>}</label>
+        <label className="journal-sort-label"><span>{en ? "Sort" : "정렬"}</span><select value={sortOrder} onChange={(event) => setSortOrder(event.target.value as "latest" | "popular")}><option value="latest">{en ? "Newest" : "최신순"}</option><option value="popular">{en ? "Most viewed" : "인기순"}</option></select></label>
+      </div>
+      <div className="journal-category-filters" aria-label={en ? "Filter by category" : "카테고리 필터"}>
+        <button type="button" className={selectedCategory === "all" ? "is-active" : ""} onClick={() => setSelectedCategory("all")}>{en ? "All articles" : "전체"}</button>
+        {categories.map((category) => <button type="button" key={category} className={selectedCategory === category ? "is-active" : ""} onClick={() => setSelectedCategory(category)}>{category}</button>)}
+      </div>
+      <section className="journal-section journal-popular">
+        <div className="journal-section-heading"><div><span className="journal-eyebrow">{en ? "READER FAVORITES" : "READERS' PICKS"}</span><h2>{en ? "Popular reads" : "인기글"}</h2></div><p>{en ? "The articles readers come back to." : "많이 읽힌 콘텐츠를 모아 보여드립니다."}</p></div>
+        {filteredPopular.length > 0 ? <div className="journal-feature-grid">{filteredPopular.slice(0, 3).map((post, index) => card(post, index, index === 0))}</div> : <div className="journal-section-empty">{query || selectedCategory !== "all" ? (en ? "No popular articles match these filters." : "선택한 조건에 맞는 인기글이 없습니다.") : (en ? "Popular articles will appear here as readers discover the journal." : "게시글이 발행되고 조회가 쌓이면 인기글을 보여드립니다.")}</div>}
+      </section>
+      <section className="journal-section journal-latest">
+        <div className="journal-section-heading"><div><span className="journal-eyebrow">FRESH FROM THE JOURNAL</span><h2>{en ? "Latest articles" : "최신글"}</h2></div><p>{en ? "New ideas, guides and useful reads." : "새롭게 업데이트되는 정보와 가이드"}</p></div>
+      {visibleLatest.length > 0 ? <div className="journal-latest-grid">{visibleLatest.map((post, index) => card(post, index + 3))}</div> : <div className="journal-empty">
         <div className="journal-empty-art" aria-hidden="true"><span>U.</span><i>✳</i></div>
-        <div><span className="journal-eyebrow">{en ? "GOOD THINGS TAKE A LITTLE TIME" : "COMING SOON"}</span><h3>{en ? "Something useful is on its way." : "유용한 이야기를 준비하고 있어요."}</h3><p>{en ? "We’re preparing practical stories and guides for your everyday. In the meantime, discover the tools that make life a little easier." : "일상에 도움이 되는 실용적인 콘텐츠를 준비하고 있습니다. 그동안 UTILWISE의 다양한 도구를 둘러보세요."}</p><Link href={tools}>{en ? "Explore UTILWISE tools" : "UTILWISE 도구 둘러보기"} ↗</Link></div>
+        <div><span className="journal-eyebrow">{query || selectedCategory !== "all" ? (en ? "NO MATCHES" : "검색 결과 없음") : "COMING SOON"}</span><h3>{query || selectedCategory !== "all" ? (en ? "No articles found." : "조건에 맞는 게시글이 없습니다.") : (en ? "Something useful is on its way." : "유용한 이야기를 준비하고 있어요.")}</h3><p>{query || selectedCategory !== "all" ? (en ? "Try another keyword or category." : "검색어를 바꾸거나 전체 카테고리를 선택해 보세요.") : (en ? "We’re preparing practical stories and guides for your everyday. In the meantime, discover the tools that make life a little easier." : "일상에 도움이 되는 실용적인 콘텐츠를 준비하고 있습니다. 그동안 UTILWISE의 다양한 도구를 둘러보세요.")}</p><Link href={tools}>{en ? "Explore UTILWISE tools" : "UTILWISE 도구 둘러보기"} ↗</Link></div>
       </div>}
+      </section>
     </section>
 
     <footer className="journal-footer"><Link href={home} className="journal-brand">UTIL<span>WISE</span></Link><p>{en ? "Useful tools and thoughtful ideas for everyday life." : "일상에 필요한 유용한 도구와 더 나은 아이디어."}</p><div><Link href={home}>{en ? "Home" : "홈"}</Link><Link href={tools}>{en ? "Tools" : "도구"}</Link><Link href="/about">{en ? "About" : "소개"}</Link></div><small>© {new Date().getFullYear()} UTILWISE · Simple Tools for Everyday Life.</small></footer>

@@ -27,6 +27,7 @@ export default function BlogArticle({ post, language }: { post: BlogPost; langua
           <div className="journal-article-meta">{post.category_name && <span className="journal-article-category">{post.category_name}</span>}<time dateTime={new Date(post.published_at * 1000).toISOString()}>{date}</time><span>{post.view_count.toLocaleString(en ? "en-US" : "ko-KR")} {en ? "views" : "조회"}</span></div>
           <h1>{post.title}</h1>
           <p>{post.excerpt}</p>
+          {(() => { let tags: string[] = []; try { tags = JSON.parse(post.tags_json || "[]") as string[]; } catch {} return tags.length ? <div className="journal-article-tags">{tags.map((tag) => <span key={tag}>{tag}</span>)}</div> : null; })()}
           <div className="journal-article-byline"><span className="journal-byline-mark">U.</span><div><strong>UTILWISE</strong><small>{en ? "Simple Tools for Everyday Life." : "일상을 더 편리하게 만드는 유용한 정보"}</small></div></div>
         </div>
         <div className="journal-article-cover" aria-hidden="true">{post.cover_image_key ? <img src={`/api/blog/images/${post.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt="" /> : <><span>UTILWISE JOURNAL</span><strong>U.</strong><i>✳</i><small>IDEAS FOR EVERYDAY</small></>}</div>

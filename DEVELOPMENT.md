@@ -491,3 +491,32 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 인증 값은 OpenNext의 `getCloudflareContext({ async: true })`에서 요청 시점에 조회한다.
 - 로그인 페이지는 `/admin/blog/login`, 관리자 화면은 `/admin/blog`이다.
 - Secret 값 자체는 페이지/로그/진단 출력에 표시하지 않는다.
+
+
+## 블로그 편집기 개선 작업 (2026-11-11)
+- 작업 브랜치: `feat/blog-editor-improvements`
+- 복수 태그는 D1 `blog_posts.tags_json`에 JSON 배열로 저장한다. migration: `migrations/0002_blog_post_tags.sql`
+- 기존 게시글 보존을 위해 컬럼은 `NOT NULL DEFAULT '[]'`로 추가한다. 원격 D1 적용 전 `d1_migrations` ledger 및 대상 database ID를 확인하고 Preview DB에만 적용한다.
+- 관리자 본문은 Markdown 원문으로 저장하고 `BlogMarkdown`에서 허용한 문법만 렌더링한다. 미리보기 역시 동일 렌더러를 사용한다.
+- 운영 main 및 운영 Worker에는 Preview 검증과 사용자 승인 전 반영하지 않는다.
+
+
+### 본문 이미지 및 카테고리 입력
+- 관리자 본문 이미지 업로드는 기존 `POST /api/admin/blog-images`를 재사용하며, R2 객체 키를 Markdown에 기록한다.
+- 공개 렌더러는 `/api/blog/images/blog/{uuid}.{ext}` 형식의 내부 경로만 이미지로 허용한다. HTML 및 임의 외부 이미지 주소는 허용하지 않는다.
+- 이미지 표기 확장 문법: `![대체 텍스트|width=80%|align=center](/api/blog/images/blog/{uuid}.webp)`. 너비는 100/80/60/40%, 정렬은 left/center/right만 허용한다.
+- 카테고리 이름은 게시글 저장 API에서 기존 항목을 찾아 연결하고, 없으면 신규 카테고리를 생성한다.
+- 한글 slug 자동 생성은 단순 로마자 변환이므로 고유명사/발음이 복잡한 단어는 저장 전에 운영자가 직접 수정한다.
+
+
+### 작성 화면 UX 후속 개선 (2026-11-12)
+- Markdown 서식 도구는 본문 textarea의 현재 커서 또는 선택 영역에 삽입한다.
+- 편집/미리보기/나란히 보기 모드를 제공하고 본문 단어·문자 수를 표시한다.
+- `feat/blog-editor-improvements` 브랜치도 Preview 배포 workflow 대상이다.
+- Preview D1 migration과 배포/브라우저 검증을 완료하기 전 운영 환경에 적용하지 않는다.
+
+### 블로그 메인 검색·탐색
+- 공개 피드에 포함된 게시글 요약(제목, 소개, 카테고리, 태그)을 이용해 브라우저에서 검색한다. 검색어는 서버로 전송하지 않는다.
+- 카테고리 필터는 현재 페이지에 로드된 최신 게시글 집합에서 구성한다.
+- 최신순/인기순 정렬은 현재 공개 피드 데이터 범위 안에서 수행한다. 별도 검색 API나 D1 변경은 없다.
+- 한국어 `/blog`와 영어 `/en/blog`는 동일한 컴포넌트를 사용하며 언어별 텍스트/검색 대소문자 정규화를 적용한다.
