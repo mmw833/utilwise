@@ -93,7 +93,7 @@ function editorHtmlToMarkdown(root: HTMLElement) {
       const src = node.getAttribute("src") || "";
       if (!src.startsWith("/api/blog/images/blog/")) return "";
       const alt = (node.getAttribute("alt") || "본문 이미지").replace(/[\[\]]/g, " ");
-      const width = node.dataset.width && ["100%", "80%", "60%", "40%"].includes(node.dataset.width) ? node.dataset.width : "100%";
+      const width = node.dataset.width && /^([3-9][0-9]|100)%$/.test(node.dataset.width) ? node.dataset.width : "100%";
       const align = node.dataset.align && ["left", "center", "right"].includes(node.dataset.align) ? node.dataset.align : "center";
       return "![" + alt + "|width=" + width + "|align=" + align + "](" + src + ")";
     }
@@ -307,8 +307,9 @@ export default function AdminBlogManager() {
     const files = Array.from(event.dataTransfer.files).filter((file) => file.type.startsWith("image/"));
     if (!files.length) return;
     event.preventDefault();
-    const doc = document as Document & { caretRangeFromPoint?: (x: number, y: number) => Range | null };
-    const dropRange = doc.caretRangeFromPoint?.(event.clientX, event.clientY) || null;
+    const doc = document as Document & { caretRangeFromPoint?: (x: number, y: number) => Range | null; caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null };
+    let dropRange = doc.caretRangeFromPoint?.(event.clientX, event.clientY) || null;
+    if (!dropRange && doc.caretPositionFromPoint) { const pos = doc.caretPositionFromPoint(event.clientX, event.clientY); if (pos) { dropRange = document.createRange(); dropRange.setStart(pos.offsetNode, pos.offset); dropRange.collapse(true); } }
     const selection = window.getSelection();
     if (dropRange && contentRef.current?.contains(dropRange.commonAncestorContainer)) {
       savedSelectionRef.current = dropRange.cloneRange();
@@ -479,7 +480,7 @@ export default function AdminBlogManager() {
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("removeFormat")}>서식 지우기</button>
                   </div>
                   <div className="blog-admin-inline-image-tools">
-                    <label>이미지 너비<select value={inlineImageWidth} onChange={(e) => setInlineImageWidth(e.target.value)}><option value="100%">100%</option><option value="80%">80%</option><option value="60%">60%</option><option value="40%">40%</option></select></label>
+                    <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => setInlineImageAlign(e.target.value)}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onClick={rememberEditorSelection} onChange={(e) => { placeImageInsertionMarker(); void uploadInlineImage(e.currentTarget.files?.[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
@@ -498,6 +499,7 @@ export default function AdminBlogManager() {
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
                     onFocus={rememberEditorSelection}
+                    onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { selectedInlineImageRef.current = target; setInlineImageWidth(target.dataset.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } }}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={handleEditorDrop}
                   />
