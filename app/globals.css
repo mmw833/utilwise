@@ -837,7 +837,7 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 .journal-featured-meta{display:flex;gap:12px;align-items:center;color:#89939a;font-size:11px}
 .journal-featured-meta span{color:#526d86;font-weight:700}
 .journal-featured-copy h2{font-size:clamp(28px,4vw,48px);line-height:1.2;letter-spacing:-.055em;margin:18px 0 0;word-break:keep-all}
-.journal-card-views{display:block;margin-top:9px;color:#9aa3a6;font-size:10px}
+.journal-card-views{display:block;margin-top:9px;color:#9aa3a6;font-size:10px}.journal-card-meta .journal-card-views{display:inline;margin:0 0 0 auto;padding-left:2px}.journal-featured-copy h2{margin:0 0 14px}.journal-featured-meta .journal-card-views{display:inline;margin:0 0 0 auto}
 .journal-discover .journal-latest-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 .journal-discover .journal-latest-grid .journal-card-copy{padding:13px 1px 17px}
 .journal-discover .journal-latest-grid .journal-card h3{font-size:16px;line-height:1.5;margin:10px 0 0}
