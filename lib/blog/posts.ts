@@ -156,3 +156,12 @@ export async function getFeaturedPost(language: BlogLanguage): Promise<BlogPostS
   const sql = POST_SUMMARY_SELECT + " WHERE p.language = ? AND p.status = 'published' AND p.is_featured = 1 ORDER BY p.published_at DESC LIMIT 1";
   return db.prepare(sql).bind(language).first<BlogPostSummary>();
 }
+
+export async function getBlogVisitorStats(): Promise<{ today: number; total: number }> {
+  const db = getBlogDatabase();
+  const now = Math.floor(Date.now() / 1000);
+  const start = now - (now % 86400);
+  const daily = await db.prepare("SELECT COUNT(*) AS count FROM blog_site_visits WHERE visit_date = ?").bind(start).first<{ count: number }>();
+  const total = await db.prepare("SELECT COUNT(*) AS count FROM blog_site_visitors").first<{ count: number }>();
+  return { today: Number(daily?.count || 0), total: Number(total?.count || 0) };
+}
