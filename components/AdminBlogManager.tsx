@@ -539,7 +539,7 @@ export default function AdminBlogManager() {
                     <small>수정 {dateLabel(post.updated_at)} · 조회수 {post.view_count.toLocaleString("ko-KR")}</small>
                   </div>
                   <div className="blog-admin-post-actions">
-                    <button type="button" className="blog-admin-secondary" onClick={() => editPost(post)}>수정</button>
+                    <button type="button" className="blog-admin-secondary" onClick={() => void featurePost(post)} disabled={post.status !== "published"}>{post.is_featured ? "대표글 지정됨" : "대표글 설정"}</button><button type="button" className="blog-admin-secondary" onClick={() => editPost(post)}>수정</button>
                     <button type="button" className="blog-admin-danger" onClick={() => void deletePost(post)}>삭제</button>
                   </div>
                 </article>
