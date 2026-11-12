@@ -175,3 +175,36 @@ Notes:
 
 - 파일 처리는 브라우저 내에서 수행하며 서버 업로드를 하지 않는다고 안내한다.
 - 암호화 PDF 지원, OCR, 압축 등 구현되지 않은 기능을 검색 메타데이터에서 약속하지 않는다.
+
+
+## 롱테일 키워드 1차 실행 우선순위 (2026-11-13)
+
+> 아래 우선순위는 현재 구현된 기능과 검색 의도 적합도를 기준으로 한 작업 가설이다. 실제 월간 검색량·난이도·순위 데이터로 검증된 수치가 아니며, Search Console/네이버 서치어드바이저의 검색어 데이터가 쌓이면 재정렬한다.
+
+| 우선순위 | 페이지 | 한국어 롱테일 후보 | English long-tail candidates | 의도 / 적용 기준 |
+|---|---|---|---|---|
+| 1 | /text-tools/character-counter | 자소서 글자수 세기, 공백 포함 글자수, 공백 제외 글자수, 이력서 글자수 세기 | character counter for essays, resume character counter, count characters with spaces | 입력 즉시 글자·단어 수를 확인하려는 목적. 제출처별 집계 방식이 다를 수 있음을 안내 |
+| 2 | /image-compressor | 사진 용량 줄이기, JPG 용량 줄이기, PNG 이미지 압축, 여러 사진 용량 줄이기 | reduce image file size, compress JPG online, PNG image compressor, batch image compression | 파일 크기를 줄이려는 목적. 특정 KB 목표 압축을 보장한다고 표현하지 않음 |
+| 3 | /image-resizer | 사진 픽셀 크기 조절, 이미지 가로 세로 변경, 사진 크기 변경 | resize image to exact pixels, change photo dimensions, image width and height resizer | 픽셀 단위 크기 변경 목적. 비율 유지 및 일괄 처리 지원 범위 안에서 안내 |
+| 4 | /qr-code-generator | 와이파이 QR코드 만들기, URL QR코드 만들기, 텍스트 QR코드 생성 | Wi-Fi QR code generator, URL QR code maker, text QR code generator | 연결/공유용 QR 생성 목적. 실제 지원하는 Wi-Fi·URL·텍스트·이메일·전화번호만 언급 |
+| 5 | /date | 날짜 차이 계산, 두 날짜 사이 며칠, 디데이 계산, 근무일 계산 | days between dates calculator, date difference calculator, D-Day countdown, business days calculator | 기간 및 일정 계산 목적. 공휴일/근무일 계산의 적용 범위를 명시 |
+| 6 | /text-tools/speech-time | 5분 발표 원고 글자수, 10분 발표 원고, 발표시간 계산 | 5 minute speech word count, presentation time calculator, speech time estimator | 예상 시간 계산 목적. 실제 말하기 속도에 따른 추정치라고 안내 |
+| 7 | /pdf-merge 및 관련 PDF 도구 | PDF 파일 합치기, PDF 페이지 순서 변경, PDF 페이지 분리 | merge PDF files, reorder PDF pages, split PDF pages | 실제 지원하는 PDF 작업별로 각 독립 페이지의 검색 의도를 유지 |
+
+### 영어권 키워드 운영
+- 영어 키워드는 한국어 검색어를 직역하지 않고, 영어권에서 쓰이는 자연스러운 표현과 페이지의 실제 사용 목적을 별도로 관리한다.
+- 한국 법령·급여·부동산·금융 도구는 Korea 또는 South Korea 맥락을 제목/설명/본문에서 명확히 한다. 글로벌 도구처럼 오인시키지 않는다.
+- 영어 블로그 콘텐츠는 한국어 블로그 게시글의 자동 번역·복제가 아니라 별도 영문 콘텐츠로 운영한다.
+
+### 1차 적용 완료 범위
+- 한국어/영어 글자수 계산기: 자소서·이력서/essay·resume 검색 의도 반영
+- 한국어/영어 이미지 압축기: 사진·이미지 파일 용량 줄이기 의도 반영
+- 한국어/영어 이미지 크기 조절기: 픽셀 단위 크기 변경 의도 반영
+- 한국어/영어 QR 생성기: Wi-Fi QR 생성 의도 반영
+- 한국어/영어 날짜 계산기: 날짜 차이·days between dates 의도 반영
+
+### 금지 및 검증 규칙
+- 기능에 없는 옵션을 키워드나 메타 설명에 약속하지 않는다. 예: 목표 용량(KB) 지정 압축, 인스타그램 전용 줄바꿈, PDF 편집 기능, 지원하지 않는 이자 복리 계산.
+- 검색어만 바꾼 유사 페이지를 대량 생성하지 않는다. 별도 페이지는 독립된 기능과 고유한 사용자 목적이 있을 때만 만든다.
+- 제목·설명 수정 후 실제 페이지 H1, 본문, canonical/hreflang, sitemap 포함 여부, 모바일 화면을 함께 확인한다.
+- Search Console과 네이버 데이터가 없는 상태에서 검색량·순위 상승을 단정하지 않는다.
