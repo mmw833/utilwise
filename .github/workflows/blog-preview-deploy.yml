@@ -6,6 +6,7 @@ on:
       - preview/blog-system
       - fix/admin-single-password-auth
       - feat/blog-editor-improvements
+      - feat/blog-mobile-wysiwyg-editor
 
 permissions:
   contents: read
