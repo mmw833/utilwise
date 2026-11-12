@@ -785,3 +785,31 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 .blog-admin-wysiwyg img{height:auto;border-radius:8px;max-width:100%;cursor:move}
 .blog-admin-wysiwyg:focus{outline:0;border-color:#7da4d0;box-shadow:0 0 0 3px #3268a81a}
 @media(max-width:760px){.blog-admin-wysiwyg{min-height:360px;padding:16px!important;font-size:15px!important}}
+
+
+/* Blog popular posts: horizontal swipe row; the full article collection stays a grid. */
+.journal-discover .journal-popular-scroller{
+  display:flex;
+  gap:18px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:2px 2px 14px;
+  scroll-snap-type:x mandatory;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;
+}
+.journal-discover .journal-popular-scroller>.journal-card{
+  flex:0 0 300px;
+  min-width:0;
+  scroll-snap-align:start;
+}
+.journal-discover .journal-popular-scroller .journal-card-art,
+.journal-discover .journal-popular-scroller .journal-card-featured .journal-card-art{height:190px}
+.journal-discover .journal-popular-scroller .journal-card-copy{padding:17px}
+@media(max-width:620px){
+  .journal-discover .journal-popular-scroller{gap:14px;margin-right:-17px;padding-right:17px}
+  .journal-discover .journal-popular-scroller>.journal-card{flex-basis: min(78vw, 270px)}
+  .journal-discover .journal-popular-scroller .journal-card-art{height:165px}
+  .journal-discover .journal-popular-scroller .journal-card h3{font-size:16px}
+}
