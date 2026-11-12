@@ -28,7 +28,7 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
   const filteredPosts = useMemo(() => posts.filter(matches), [posts, query, selectedCategory]);
   const filteredPopular = useMemo(() => popular.filter(matches), [popular, query, selectedCategory]);
   const sortedPosts = useMemo(() => [...filteredPosts].sort((a, b) => sortOrder === "latest" ? b.published_at - a.published_at : b.view_count - a.view_count), [filteredPosts, sortOrder]);
-  const visibleLatest = sortedPosts.filter((post) => !filteredPopular.some((item) => item.id === post.id));
+  const visibleLatest = sortedPosts;
   const card = (post: BlogPostSummary, index: number, featured = false) => (
     <article className={`journal-card journal-card-tone-${index % 4}${featured ? " journal-card-featured" : ""}`} key={post.id}>
       <Link href={`${base}/${post.slug}`} className="journal-card-link">
@@ -86,10 +86,10 @@ export default function BlogFeed({ popular, posts, language }: { popular: BlogPo
       </div>
       <section className="journal-section journal-popular">
         <div className="journal-section-heading"><div><span className="journal-eyebrow">{en ? "READER FAVORITES" : "READERS' PICKS"}</span><h2>{en ? "Popular reads" : "인기글"}</h2></div><p>{en ? "The articles readers come back to." : "많이 읽힌 콘텐츠를 모아 보여드립니다."}</p></div>
-        {filteredPopular.length > 0 ? <div className="journal-feature-grid">{filteredPopular.slice(0, 3).map((post, index) => card(post, index, index === 0))}</div> : <div className="journal-section-empty">{query || selectedCategory !== "all" ? (en ? "No popular articles match these filters." : "선택한 조건에 맞는 인기글이 없습니다.") : (en ? "Popular articles will appear here as readers discover the journal." : "게시글이 발행되고 조회가 쌓이면 인기글을 보여드립니다.")}</div>}
+        {filteredPopular.length > 0 ? <div className="journal-popular-scroller">{filteredPopular.slice(0, 8).map((post, index) => card(post, index))}</div> : <div className="journal-section-empty">{query || selectedCategory !== "all" ? (en ? "No popular articles match these filters." : "선택한 조건에 맞는 인기글이 없습니다.") : (en ? "Popular articles will appear here as readers discover the journal." : "게시글이 발행되고 조회가 쌓이면 인기글을 보여드립니다.")}</div>}
       </section>
       <section className="journal-section journal-latest">
-        <div className="journal-section-heading"><div><span className="journal-eyebrow">FRESH FROM THE JOURNAL</span><h2>{en ? "Latest articles" : "최신글"}</h2></div><p>{en ? "New ideas, guides and useful reads." : "새롭게 업데이트되는 정보와 가이드"}</p></div>
+        <div className="journal-section-heading"><div><span className="journal-eyebrow">FRESH FROM THE JOURNAL</span><h2>{en ? "All articles" : "전체글"}</h2></div><p>{en ? "New ideas, guides and useful reads." : "새롭게 업데이트되는 정보와 가이드"}</p></div>
       {visibleLatest.length > 0 ? <div className="journal-latest-grid">{visibleLatest.map((post, index) => card(post, index + 3))}</div> : <div className="journal-empty">
         <div className="journal-empty-art" aria-hidden="true"><span>U.</span><i>✳</i></div>
         <div><span className="journal-eyebrow">{query || selectedCategory !== "all" ? (en ? "NO MATCHES" : "검색 결과 없음") : "COMING SOON"}</span><h3>{query || selectedCategory !== "all" ? (en ? "No articles found." : "조건에 맞는 게시글이 없습니다.") : (en ? "Something useful is on its way." : "유용한 이야기를 준비하고 있어요.")}</h3><p>{query || selectedCategory !== "all" ? (en ? "Try another keyword or category." : "검색어를 바꾸거나 전체 카테고리를 선택해 보세요.") : (en ? "We’re preparing practical stories and guides for your everyday. In the meantime, discover the tools that make life a little easier." : "일상에 도움이 되는 실용적인 콘텐츠를 준비하고 있습니다. 그동안 UTILWISE의 다양한 도구를 둘러보세요.")}</p><Link href={tools}>{en ? "Explore UTILWISE tools" : "UTILWISE 도구 둘러보기"} ↗</Link></div>
