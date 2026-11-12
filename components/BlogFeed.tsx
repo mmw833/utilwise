@@ -99,6 +99,6 @@ export default function BlogFeed({ popular, posts, featured, visitorStats, langu
       </section>
     </section>
 
-    <footer className="journal-footer"><Link href={home} className="journal-brand">UTIL<span>WISE</span></Link><p>{en ? "Useful tools and thoughtful ideas for everyday life." : "일상에 필요한 유용한 도구와 더 나은 아이디어."}</p><div><Link href={home}>{en ? "Home" : "홈"}</Link><Link href={tools}>{en ? "Tools" : "도구"}</Link><Link href="/about">{en ? "About" : "소개"}</Link></div><small>© {new Date().getFullYear()} UTILWISE · Simple Tools for Everyday <Link className="journal-admin-entry" href="/admin/blog/login" aria-label="관리자 로그인">Life</Link>.</small></footer>
+    <footer className="journal-footer"><Link href={home} className="journal-brand">UTIL<span>WISE</span></Link><p>{en ? "Useful tools and thoughtful ideas for everyday life." : "일상에 필요한 유용한 도구와 더 나은 아이디어."}</p><div><Link href={home}>{en ? "Home" : "홈"}</Link><Link href={tools}>{en ? "Tools" : "도구"}</Link><Link href="/about">{en ? "About" : "소개"}</Link></div><small>© {new Date().getFullYear()} UTILWISE · Simple Tools for Everyday <Link className="journal-admin-entry" href="/admin/blog/login" aria-label={en ? "Admin login" : "관리자 로그인"}>Life</Link>.</small></footer>
   </main>;
 }
