@@ -481,7 +481,7 @@ export default function AdminBlogManager() {
                   </div>
                   <div className="blog-admin-inline-image-tools">
                     <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
-                    <label>정렬<select value={inlineImageAlign} onChange={(e) => setInlineImageAlign(e.target.value)}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
+                    <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; syncEditorContent(); } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onClick={rememberEditorSelection} onChange={(e) => { placeImageInsertionMarker(); void uploadInlineImage(e.currentTarget.files?.[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
                   <div
