@@ -853,7 +853,7 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 .journal-article-content{width:100%;max-width:none}
 .journal-article-content .blog-markdown{font-size:16px;line-height:1.95}
 .journal-article-content .blog-markdown-image img{height:auto;max-width:100%;object-fit:contain}
-.journal-article-aside,.journal-article-end{display:none!important}
+.journal-article-aside{display:flex!important;justify-content:flex-start;margin:0 0 24px}.journal-article-aside>span,.journal-article-end{display:none!important}
 .blog-admin-header-actions{display:flex;align-items:center;gap:10px}
 .blog-admin-featured-label{display:inline-flex;padding:3px 7px;background:#edf3f8;color:#315f8c;border-radius:4px;font-size:11px;font-weight:700}
 .blog-admin-inline-image-tools input[type=range]{width:130px;accent-color:#3268a8}
