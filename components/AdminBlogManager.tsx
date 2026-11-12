@@ -75,6 +75,57 @@ function slugify(value: string) {
     || `post-${new Date().toISOString().slice(0, 10)}`;
 }
 
+
+function escapeEditorHtml(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function markdownToEditorHtml(markdown: string) {
+  const inline = (value: string) => escapeEditorHtml(value)
+    .replace(/!\[([^\]]*)\]\((\/api\/blog\/images\/[^)]+)\)/g, (_m, alt, src) => '<img src="' + src + '" alt="' + alt + '" data-width="100%" data-align="center" />')
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*]+)\*/g, "<em>$1</em>")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  return markdown.replace(/\r\n?/g, "\n").split(/\n{2,}/).map((block) => {
+    const value = block.trim();
+    if (!value) return "";
+    const heading = value.match(/^(#{1,3})\s+([\s\S]+)$/);
+    if (heading) return "<h" + heading[1].length + ">" + inline(heading[2]) + "</h" + heading[1].length + ">";
+    if (/^(?:[-*]\s+)/m.test(value)) return "<ul>" + value.split("\n").map((line) => "<li>" + inline(line.replace(/^[-*]\s+/, "")) + "</li>").join("") + "</ul>";
+    if (/^>\s?/.test(value)) return "<blockquote>" + inline(value.replace(/^>\s?/, "")) + "</blockquote>";
+    return "<p>" + inline(value).replace(/\n/g, "<br>") + "</p>";
+  }).join("");
+}
+function editorHtmlToMarkdown(root: HTMLElement) {
+  const inline = (node: Node): string => {
+    if (node.nodeType === Node.TEXT_NODE) return node.textContent || "";
+    if (!(node instanceof HTMLElement)) return "";
+    const tag = node.tagName.toLowerCase();
+    if (tag === "br") return "\n";
+    if (tag === "img") {
+      const src = node.getAttribute("src") || "";
+      if (!src.startsWith("/api/blog/images/blog/")) return "";
+      const alt = (node.getAttribute("alt") || "본문 이미지").replace(/[\[\]]/g, " ");
+      const width = node.dataset.width && ["100%", "80%", "60%", "40%"].includes(node.dataset.width) ? node.dataset.width : "100%";
+      const align = node.dataset.align && ["left", "center", "right"].includes(node.dataset.align) ? node.dataset.align : "center";
+      return "![" + alt + "|width=" + width + "|align=" + align + "](" + src + ")";
+    }
+    const content = Array.from(node.childNodes).map(inline).join("");
+    if (tag === "strong" || tag === "b") return "**" + content + "**";
+    if (tag === "em" || tag === "i") return "*" + content + "*";
+    if (tag === "a") {
+      const href = node.getAttribute("href") || "";
+      return /^https?:\/\//i.test(href) ? "[" + content + "](" + href + ")" : content;
+    }
+    return content;
+  };
+  return Array.from(root.children).map((element) => {
+    const tag = element.tagName.toLowerCase();
+    if (/^h[1-3]$/.test(tag)) return "#".repeat(Number(tag[1])) + " " + inline(element);
+    if (tag === "ul" || tag === "ol") return Array.from(element.children).map((item) => "- " + inline(item)).join("\n");
+    if (tag === "blockquote") return "> " + inline(element);
+    return inline(element).trim();
+  }).filter(Boolean).join("\n\n").trim();
+}
 export default function AdminBlogManager() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -88,7 +139,8 @@ export default function AdminBlogManager() {
   const [showEditor, setShowEditor] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [previewMode, setPreviewMode] = useState<"preview" | "split">("preview");
-  const contentRef = useRef<HTMLTextAreaElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const savedSelectionRef = useRef<Range | null>(null);
   const [inlineImageWidth, setInlineImageWidth] = useState("100%");
   const [inlineImageAlign, setInlineImageAlign] = useState("center");
 
@@ -172,28 +224,83 @@ export default function AdminBlogManager() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "본문 이미지를 업로드하지 못했습니다.");
       const alt = file.name.replace(/\.[^.]+$/, "").replace(/[\[\]|]/g, " ").trim() || "본문 이미지";
-      const markdown = `![${alt}|width=${inlineImageWidth}|align=${inlineImageAlign}](/api/blog/images/${data.key})`;
-      setEditor((current) => ({ ...current, content_md: current.content_md ? current.content_md + "\n\n" + markdown + "\n\n" : markdown + "\n\n" }));
-      setNotice("본문 이미지를 업로드하고 본문에 삽입했습니다. 게시글 저장을 눌러 적용하세요.");
+      const root = contentRef.current;
+      if (root) {
+        root.focus();
+        const selection = window.getSelection();
+        if (savedSelectionRef.current && selection) {
+          selection.removeAllRanges();
+          selection.addRange(savedSelectionRef.current);
+        }
+        const image = document.createElement("img");
+        image.src = "/api/blog/images/" + data.key;
+        image.alt = alt;
+        image.dataset.width = inlineImageWidth;
+        image.dataset.align = inlineImageAlign;
+        image.style.width = inlineImageWidth;
+        image.style.maxWidth = "100%";
+        image.style.display = "block";
+        image.style.margin = inlineImageAlign === "left" ? "16px auto 16px 0" : inlineImageAlign === "right" ? "16px 0 16px auto" : "16px auto";
+        const range = selection?.rangeCount ? selection.getRangeAt(0) : null;
+        if (range && root.contains(range.commonAncestorContainer)) {
+          range.deleteContents();
+          range.insertNode(image);
+          range.setStartAfter(image);
+          range.collapse(true);
+          selection?.removeAllRanges();
+          selection?.addRange(range);
+        } else {
+          root.append(image, document.createElement("p"));
+        }
+        savedSelectionRef.current = null;
+        setEditor((current) => ({ ...current, content_md: editorHtmlToMarkdown(root) }));
+      }
+      setNotice("본문 이미지를 업로드해 커서 위치에 삽입했습니다.");
     } catch (e) { setError(e instanceof Error ? e.message : "이미지 업로드 중 오류가 발생했습니다."); }
     finally { setUploadingImage(false); }
   }
 
-  function insertMarkdown(snippet: string) {
-    const textarea = contentRef.current;
-    const start = textarea?.selectionStart ?? editor.content_md.length;
-    const end = textarea?.selectionEnd ?? editor.content_md.length;
-    const next = editor.content_md.slice(0, start) + snippet + editor.content_md.slice(end);
-    setEditor((current) => ({ ...current, content_md: next }));
-    requestAnimationFrame(() => {
-      if (!textarea) return;
-      textarea.focus();
-      const cursor = start + snippet.length;
-      textarea.setSelectionRange(cursor, cursor);
-    });
+  function rememberEditorSelection() {
+    const selection = window.getSelection();
+    if (selection?.rangeCount && contentRef.current?.contains(selection.anchorNode)) {
+      savedSelectionRef.current = selection.getRangeAt(0).cloneRange();
+    }
+  }
+  function applyEditorCommand(command: string, value?: string) {
+    contentRef.current?.focus();
+    if (savedSelectionRef.current) {
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(savedSelectionRef.current);
+    }
+    document.execCommand(command, false, value);
+    rememberEditorSelection();
+    if (contentRef.current) setEditor((current) => ({ ...current, content_md: editorHtmlToMarkdown(contentRef.current!) }));
+  }
+  function insertEditorBlock(tag: "h2" | "h3" | "blockquote") {
+    applyEditorCommand("formatBlock", tag);
+  }
+  function syncEditorContent() {
+    if (contentRef.current) setEditor((current) => ({ ...current, content_md: editorHtmlToMarkdown(contentRef.current!) }));
+  }
+  function handleEditorDrop(event: React.DragEvent<HTMLDivElement>) {
+    const files = Array.from(event.dataTransfer.files).filter((file) => file.type.startsWith("image/"));
+    if (!files.length) return;
+    event.preventDefault();
+    const selection = window.getSelection();
+    if (selection?.rangeCount && contentRef.current?.contains(selection.anchorNode)) {
+      savedSelectionRef.current = selection.getRangeAt(0).cloneRange();
+    } else if (contentRef.current) {
+      const range = document.createRange();
+      range.selectNodeContents(contentRef.current);
+      range.collapse(false);
+      savedSelectionRef.current = range;
+    }
+    void uploadInlineImage(files[0]);
   }
 
-  const wordCount = editor.content_md.trim() ? editor.content_md.trim().split(/\\s+/).length : 0;
+  const liveContent = contentRef.current ? editorHtmlToMarkdown(contentRef.current) : editor.content_md;
+  const wordCount = liveContent.trim() ? liveContent.trim().split(/\\s+/).length : 0;
   const characterCount = editor.content_md.length;
 
   async function savePost(event: React.FormEvent<HTMLFormElement>) {
@@ -339,21 +446,39 @@ export default function AdminBlogManager() {
               ) : (
                 <>
                   <div className="blog-admin-format-tools" role="toolbar" aria-label="본문 서식 도구">
-                    {[
-                      ["H2", "## 소제목\n\n"], ["H3", "### 작은 제목\n\n"],
-                      ["굵게", "**굵은 글씨**"], ["기울임", "*기울임 글씨*"],
-                      ["목록", "\n- 목록 항목"], ["번호 목록", "\n1. 첫 번째 항목"],
-                      ["인용", "\n> 인용 문구"], ["링크", "[링크 문구](https://example.com)"],
-                      ["구분선", "\n\n---\n\n"],
-                    ].map(([label, snippet]) => <button type="button" className="blog-admin-secondary" key={label} onClick={() => insertMarkdown(snippet)}>{label}</button>)}
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => insertEditorBlock("h2")}>큰 제목</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => insertEditorBlock("h3")}>소제목</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("bold")}>굵게</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("italic")}>기울임</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("insertUnorderedList")}>글머리 목록</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => insertEditorBlock("blockquote")}>인용</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => { const url = window.prompt("링크 주소를 입력하세요."); if (url && /^https?:\/\//i.test(url)) applyEditorCommand("createLink", url); }}>링크</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("removeFormat")}>서식 지우기</button>
                   </div>
                   <div className="blog-admin-inline-image-tools">
                     <label>이미지 너비<select value={inlineImageWidth} onChange={(e) => setInlineImageWidth(e.target.value)}><option value="100%">100%</option><option value="80%">80%</option><option value="60%">60%</option><option value="40%">40%</option></select></label>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => setInlineImageAlign(e.target.value)}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadInlineImage(e.target.files?.[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
-                  <textarea ref={contentRef} aria-label="본문 Markdown 편집" className="blog-admin-content" rows={20} value={editor.content_md} onChange={(e) => setEditor({ ...editor, content_md: e.target.value })} placeholder={"## 소제목\n\n본문을 Markdown 형식으로 작성하세요."} />
-                  <small>서식 버튼은 커서 또는 선택한 영역에 삽입됩니다. 미리보기와 나란히 보기를 지원합니다.</small>
+                  <div
+                    key={editor.id || "new-post"}
+                    ref={contentRef}
+                    className="blog-admin-content blog-admin-wysiwyg"
+                    contentEditable
+                    suppressContentEditableWarning
+                    role="textbox"
+                    aria-label="본문 편집 영역"
+                    aria-multiline="true"
+                    data-placeholder="여기에 글을 작성하세요. 서식 버튼을 누르면 입력한 글에 바로 적용됩니다."
+                    dangerouslySetInnerHTML={{ __html: markdownToEditorHtml(editor.content_md) }}
+                    onInput={syncEditorContent}
+                    onKeyUp={rememberEditorSelection}
+                    onMouseUp={rememberEditorSelection}
+                    onFocus={rememberEditorSelection}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={handleEditorDrop}
+                  />
+                  <small>굵게·제목 등은 작성 영역에 바로 표시됩니다. 이미지 파일을 원하는 위치로 끌어다 놓으면 업로드 후 그 자리에 삽입됩니다.</small>
                 </>
               )}
             </div>
