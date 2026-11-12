@@ -16,6 +16,7 @@ export interface BlogPostSummary {
   category_slug: string | null;
   tags_json?: string;
   view_count: number;
+  is_featured?: number;
   published_at: number;
 }
 
@@ -40,6 +41,7 @@ const POST_SUMMARY_SELECT = `
     CASE WHEN p.language = 'en' THEN COALESCE(c.name_en, c.name_ko) ELSE c.name_ko END AS category_name,
     c.slug AS category_slug,
     p.view_count,
+    p.is_featured,
     p.published_at
   FROM blog_posts p
   LEFT JOIN blog_categories c ON c.id = p.category_id
@@ -108,6 +110,7 @@ export async function getPublishedPostBySlug(
         p.seo_title,
         p.seo_description,
         p.view_count,
+        p.is_featured,
         p.published_at,
         p.created_at,
         p.updated_at
@@ -145,4 +148,11 @@ export async function recordPostView(
     `)
     .bind(postId, visitorHash, viewedAt)
     .run();
+}
+
+
+export async function getFeaturedPost(language: BlogLanguage): Promise<BlogPostSummary | null> {
+  const db = getBlogDatabase();
+  const sql = POST_SUMMARY_SELECT + " WHERE p.language = ? AND p.status = 'published' AND p.is_featured = 1 ORDER BY p.published_at DESC LIMIT 1";
+  return db.prepare(sql).bind(language).first<BlogPostSummary>();
 }
