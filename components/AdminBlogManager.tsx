@@ -275,7 +275,6 @@ export default function AdminBlogManager() {
     }
     document.execCommand(command, false, value);
     rememberEditorSelection();
-    if (contentRef.current) setEditor((current) => ({ ...current, content_md: editorHtmlToMarkdown(contentRef.current!) }));
   }
   function insertEditorBlock(tag: "h2" | "h3" | "blockquote") {
     applyEditorCommand("formatBlock", tag);
@@ -430,8 +429,8 @@ export default function AdminBlogManager() {
                 <div><strong>본문 편집</strong><small className="blog-admin-count">{wordCount.toLocaleString("ko-KR")} 단어 · {characterCount.toLocaleString("ko-KR")}자</small></div>
                 <div className="blog-admin-view-switch">
                   <button type="button" className={!showPreview ? "is-active" : ""} onClick={() => setShowPreview(false)}>편집</button>
-                  <button type="button" className={showPreview && previewMode === "preview" ? "is-active" : ""} onClick={() => { setShowPreview(true); setPreviewMode("preview"); }}>미리보기</button>
-                  <button type="button" className={showPreview && previewMode === "split" ? "is-active" : ""} onClick={() => { setShowPreview(true); setPreviewMode("split"); }}>나란히 보기</button>
+                  <button type="button" className={showPreview && previewMode === "preview" ? "is-active" : ""} onClick={() => { syncEditorContent(); setShowPreview(true); setPreviewMode("preview"); }}>미리보기</button>
+                  <button type="button" className={showPreview && previewMode === "split" ? "is-active" : ""} onClick={() => { syncEditorContent(); setShowPreview(true); setPreviewMode("split"); }}>나란히 보기</button>
                 </div>
               </div>
               {showPreview ? (
@@ -471,7 +470,7 @@ export default function AdminBlogManager() {
                     aria-multiline="true"
                     data-placeholder="여기에 글을 작성하세요. 서식 버튼을 누르면 입력한 글에 바로 적용됩니다."
                     dangerouslySetInnerHTML={{ __html: markdownToEditorHtml(editor.content_md) }}
-                    onInput={syncEditorContent}
+                    onBlur={syncEditorContent}
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
                     onFocus={rememberEditorSelection}
