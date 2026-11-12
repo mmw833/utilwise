@@ -424,10 +424,6 @@ export default function AdminBlogManager() {
                 setEditor((current) => ({ ...current, title }));
               }} />
             </label>
-            <label className="blog-admin-full">주소 (slug)
-              <input required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={120} value={editor.slug} onChange={(e) => setEditor({ ...editor, slug: e.target.value })} placeholder="예: simple-life-tips" />
-              <small>자동 변환하지 않습니다. 영문 소문자·숫자·하이픈으로 직접 입력하세요. 비워두면 저장할 수 없습니다.</small>
-            </label>
             <label>카테고리 (직접 입력)
               <input maxLength={40} value={editor.category_name} onChange={(e) => setEditor({ ...editor, category_name: e.target.value, category_id: "" })} placeholder="예: 생활정보" list="blog-category-suggestions" />
               <datalist id="blog-category-suggestions">{categories.map((category) => <option key={category.id} value={category.name_ko} />)}</datalist>
