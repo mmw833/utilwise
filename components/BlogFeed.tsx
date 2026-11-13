@@ -13,7 +13,7 @@ export default function BlogFeed({ popular, posts, featured, visitorStats, langu
   const locale = en ? "en-US" : "ko-KR";
   const base = en ? "/en/blog" : "/blog";
   const home = en ? "/en" : "/";
-  const tools = en ? "/en/online-tools" : "/online-tools";
+  const tools = home;
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortOrder, setSortOrder] = useState<"latest" | "popular">("latest");
