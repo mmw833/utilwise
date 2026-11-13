@@ -1,3 +1,10 @@
+## 2026-11-13 운영 블로그 및 내비게이션 업데이트 배포
+- PR #17 운영 통합 병합: 블로그 편집기/태그/이미지 삽입/대표글/방문자 통계 개선, 한·영 홈 메뉴 및 SEO 업데이트
+- 운영 Worker에 D1 및 R2 binding 설정. GitHub Actions Production Deploy로 빌드, D1 migration, Worker 배포 성공
+- 운영 사이트 홈, 한글/영문 블로그, 관리자 로그인 경로 응답 확인
+- 관리자 `ADMIN_PASSWORD` Worker Secret 미설정 확인. Cloudflare Dashboard에서 설정 후 관리자 기능 검증 필요
+
+
 ## 2026-11-12 블로그 카드·태그·주소 입력 개선
 - 카드 하단의 '글 읽기 / Read article' 문구 제거
 - 쉼표를 입력할 때 태그 입력값이 잘리던 문제 수정
