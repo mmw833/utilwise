@@ -581,3 +581,7 @@
 
 ## 2026-11-13
 - Fix Cloudflare Preview deployment configuration by adding the preview D1 database binding to `wrangler.preview.jsonc` (commit `f9c3edc`). Preview rebuild and browser verification pending.
+
+
+## 2026-11-13
+- Added the preview D1 database binding to the root `wrangler.jsonc` as well as the isolated preview config. Cloudflare managed preview was reading the root config, so the earlier preview-only config change did not resolve the error (commit `5bc6a18`). Rebuild pending.
