@@ -4,8 +4,8 @@ import LanguageSwitcher from "../../../components/LanguageSwitcher";
 import PDFTools from "../../../components/PDFTools";
 
 export const metadata: Metadata = {
-  title: "Organize PDF Pages | Reorder and Remove Pages - UTILWISE",
-  description: "Reorder PDF pages or remove unwanted pages by entering the page sequence.",
+  title: "Reorder PDF Pages | Organize and Remove PDF Pages - UTILWISE",
+  description: "Change the order of PDF pages or remove unwanted pages, then save an organized PDF. Arrange page sequences with this free browser-based PDF tool.",
   alternates: { canonical: "/en/pdf-organize", languages: { "ko-KR": "/pdf-organize", en: "/en/pdf-organize" } },
   openGraph: { title: "Organize PDF Pages | UTILWISE", description: "Reorder PDF pages or remove unwanted pages by entering the page sequence.", url: "https://utilwise.kr/en/pdf-organize", siteName: "UTILWISE", locale: "en_US", type: "website" }
 };

@@ -4,8 +4,8 @@ import LanguageSwitcher from "../../components/LanguageSwitcher";
 import PDFTools from "../../components/PDFTools";
 
 export const metadata: Metadata = {
-  title: "무료 PDF 분할 | PDF 페이지 추출 도구 - UTILWISE",
-  description: "PDF 페이지 범위를 지정해 필요한 페이지만 추출하고 새 PDF로 저장하세요.",
+  title: "PDF 분할 | PDF 페이지 추출·범위 나누기 무료 도구 - UTILWISE",
+  description: "PDF에서 필요한 페이지 번호나 범위를 선택해 별도의 PDF 파일로 추출하세요. 문서 일부만 분리할 때 사용할 수 있으며 파일은 브라우저에서 처리됩니다.",
   alternates: { canonical: "/pdf-split", languages: { "ko-KR": "/pdf-split", en: "/en/pdf-split" } },
   openGraph: { title: "PDF 분할 | UTILWISE", description: "PDF 페이지 범위를 지정해 필요한 페이지만 추출하고 새 PDF로 저장하세요.", url: "https://utilwise.kr/pdf-split", siteName: "UTILWISE", locale: "ko_KR", type: "website" }
 };

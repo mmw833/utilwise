@@ -3,8 +3,8 @@ import Link from "next/link";
 import LanguageSwitcher from "../../../components/LanguageSwitcher";
 import ImageTools from "../../../components/ImageTools";
 export const metadata: Metadata = {
-  title: "Free Image Compressor | Reduce JPG, PNG & WebP Size - UTILWISE",
-  description: "Compress JPG, PNG, and WebP images for free. Adjust quality, process multiple images, and download results. Files are processed locally in your browser.",
+  title: "Reduce Image File Size | Free JPG, PNG & WebP Compressor - UTILWISE",
+  description: "Reduce photo and image file sizes online. Compress JPG, PNG, and WebP files, adjust quality, process multiple images, and download results. Files stay in your browser.",
   alternates: { canonical: "/en/image-compressor", languages: { en: "/en/image-compressor", "ko-KR": "/image-compressor" } },
   openGraph: { title: "Free Image Compressor", description: "Reduce JPG, PNG, and WebP image file sizes directly in your browser.", url: "https://utilwise.kr/en/image-compressor", siteName: "UTILWISE", locale: "en_US", type: "website" }
 };

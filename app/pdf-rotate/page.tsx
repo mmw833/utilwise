@@ -4,8 +4,8 @@ import LanguageSwitcher from "../../components/LanguageSwitcher";
 import PDFTools from "../../components/PDFTools";
 
 export const metadata: Metadata = {
-  title: "무료 PDF 회전 | PDF 페이지 방향 변경 - UTILWISE",
-  description: "PDF 페이지를 90도, 180도, 270도로 회전하고 새 파일로 저장하세요.",
+  title: "PDF 회전 | PDF 페이지 90도·180도·270도 돌리기 - UTILWISE",
+  description: "PDF 문서의 페이지 방향을 90도, 180도 또는 270도로 회전하고 새 파일로 저장하세요. PDF 페이지 회전은 브라우저에서 처리됩니다.",
   alternates: { canonical: "/pdf-rotate", languages: { "ko-KR": "/pdf-rotate", en: "/en/pdf-rotate" } },
   openGraph: { title: "PDF 회전 | UTILWISE", description: "PDF 페이지를 90도, 180도, 270도로 회전하고 새 파일로 저장하세요.", url: "https://utilwise.kr/pdf-rotate", siteName: "UTILWISE", locale: "ko_KR", type: "website" }
 };

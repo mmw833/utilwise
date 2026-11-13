@@ -4,8 +4,8 @@ import LanguageSwitcher from "../../../components/LanguageSwitcher";
 import PDFTools from "../../../components/PDFTools";
 
 export const metadata: Metadata = {
-  title: "Free PDF Merger | Combine PDF Files Online - UTILWISE",
-  description: "Combine multiple PDF files into one document. Files are processed locally in your browser.",
+  title: "Merge PDF Files Online | Combine Multiple PDFs Free - UTILWISE",
+  description: "Combine multiple PDF files into one document, arrange their order, and download the merged PDF. Free browser-based PDF merger; files stay on your device.",
   alternates: { canonical: "/en/pdf-merge", languages: { "ko-KR": "/pdf-merge", en: "/en/pdf-merge" } },
   openGraph: { title: "Merge PDF | UTILWISE", description: "Combine multiple PDF files into one document. Files are processed locally in your browser.", url: "https://utilwise.kr/en/pdf-merge", siteName: "UTILWISE", locale: "en_US", type: "website" }
 };
