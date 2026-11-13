@@ -875,3 +875,10 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
  .journal-article-heading h1{font-size:34px}
  .blog-admin-header-actions{flex-wrap:wrap;justify-content:flex-end}
 }
+
+
+/* Distinctive blog navigation button */
+.nav a.nav-blog-link{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:999px;background:#203d59;color:#fff;font-weight:650;line-height:1.2;transition:background .18s ease,transform .18s ease;}
+.nav a.nav-blog-link:hover{background:#294f70;color:#fff;transform:translateY(-1px)}
+.mobile-menu-panel>a.mobile-blog-link{grid-column:1/-1;justify-content:center;gap:7px;margin-top:3px;background:#203d59;color:#fff;font-weight:700}
+.mobile-menu-panel>a.mobile-blog-link:hover,.mobile-menu-panel>a.mobile-blog-link:active{background:#294f70;color:#fff}
