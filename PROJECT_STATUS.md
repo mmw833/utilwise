@@ -790,3 +790,10 @@
 - 기본 `wrangler.jsonc`에도 `previews.d1_databases.BLOG_DB`를 추가해 Cloudflare managed preview가 참조하는 설정 경로를 보완
 - Preview D1 ID: `5e457e52-0612-4103-80d0-4eec0933c126`; 수정 커밋 `5bc6a18`
 - **검증 대기:** Cloudflare 자동 Preview 재빌드에서 Deploy 단계 통과 여부 확인. 운영 배포/병합 미실시
+
+
+## 2026-11-13 블로그 편집기 Preview 배포 성공
+- 수정 커밋 `1e4949c03cd43a8da77fcdb5f97f450326c3c07c`의 Cloudflare Preview 빌드 ID `59ddbfab` 성공 확인 (Build/Deploy 전체 통과)
+- Preview URL `https://utilwise-preview.mmw833.workers.dev/admin/blog/login` 접속 시 관리자 로그인 폼 표시 확인. 환경 설정 오류 없음
+- **남은 검증:** 관리자 인증 후 본문 이미지 선택/드래그 크기 조절/자르기/가운데 정렬 및 저장 후 재편집 확인 필요. 로그인 비밀번호는 채팅으로 공유하지 말 것
+- **운영 반영:** PR #20 미병합. 실제 관리자 편집 검증 후 병합/운영 배포 진행
