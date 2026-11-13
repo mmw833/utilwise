@@ -208,3 +208,19 @@ Notes:
 - 검색어만 바꾼 유사 페이지를 대량 생성하지 않는다. 별도 페이지는 독립된 기능과 고유한 사용자 목적이 있을 때만 만든다.
 - 제목·설명 수정 후 실제 페이지 H1, 본문, canonical/hreflang, sitemap 포함 여부, 모바일 화면을 함께 확인한다.
 - Search Console과 네이버 데이터가 없는 상태에서 검색량·순위 상승을 단정하지 않는다.
+
+
+## 2차 롱테일 SEO 적용 (2026-11-13)
+
+| 페이지 | 한국어 검색어 후보 | English search phrases |
+|---|---|---|
+| /text-tools/speech-time | 발표시간 계산기, 5분 발표 원고, 10분 발표 원고, 발표 원고 시간 계산 | 5-minute speech time calculator, presentation length estimator, speech time calculator |
+| /pdf-merge | PDF 합치기, PDF 파일 병합, 여러 PDF 하나로 | merge PDF files online, combine multiple PDFs |
+| /pdf-organize | PDF 페이지 순서 변경, PDF 페이지 삭제, PDF 페이지 정리 | reorder PDF pages, organize PDF pages, remove PDF pages |
+| /pdf-split | PDF 분할, PDF 페이지 추출, PDF 범위 나누기 | split PDF online, extract pages from PDF, PDF page extractor |
+| /pdf-rotate | PDF 회전, PDF 페이지 90도 돌리기, PDF 방향 변경 | rotate PDF pages online, rotate PDF 90 degrees |
+| /image-to-pdf | JPG PDF 변환, PNG PDF 변환, 여러 이미지 PDF 만들기 | JPG to PDF converter, PNG to PDF, image to PDF converter |
+
+- 2차 적용은 기존 기능을 기준으로 제목과 설명을 구체화했으며 별도 중복 페이지는 만들지 않았다.
+- 발표시간은 원고와 설정한 말하기 속도에 따른 예상치이며 실제 발표 시간을 보장하지 않는다.
+- PDF 및 이미지 파일은 현재 페이지의 브라우저 내 처리 방식에 맞춰 설명하고 서버 업로드를 암시하지 않는다.
