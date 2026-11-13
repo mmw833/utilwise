@@ -776,3 +776,10 @@
 - 본문 작성 영역 기본 텍스트 정렬을 가운데로 설정하고 공개 게시글 본문/미리보기에도 가운데 정렬 스타일 적용
 - 기존 Markdown 이미지 메타데이터(너비/정렬), R2 업로드 방식 및 기존 게시글 데이터 구조 유지
 - 작업 브랜치 `feat/blog-inline-image-editing`; 빌드/배포 전
+
+
+## 2026-11-13 블로그 편집기 Preview 배포 설정 오류 수정
+- Cloudflare Preview 빌드 로그에서 Next.js/OpenNext 빌드는 통과하고 Wrangler Deploy 단계에서 Preview D1 설정 누락으로 실패한 것을 확인
+- `wrangler.preview.jsonc`의 `previews.d1_databases`에 `BLOG_DB` Preview database ID(`5e457e52-0612-4103-80d0-4eec0933c126`)를 명시
+- 작업 브랜치: `feat/blog-inline-image-editing`; 수정 커밋 `f9c3edc`
+- **검증 대기:** Cloudflare Preview 재빌드, 실제 편집기 이미지 선택/크기 조절/자르기 및 본문 가운데 정렬 확인. 운영 병합/배포는 미실시
