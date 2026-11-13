@@ -770,30 +770,16 @@
 - 작업 브랜치 `fix/header-nav-alignment`; 빌드 및 화면 검증, 운영 반영 대기
 
 
-## 2026-11-13 블로그 본문 이미지 편집 및 가운데 정렬 개선
-- 관리자 편집기에서 본문 이미지를 클릭해 선택하고 모서리 드래그로 너비를 조정할 수 있도록 개선
-- 선택 이미지 자르기 도구 추가: 좌우/상하 시작 위치와 자를 너비/높이를 조정한 뒤 새 WebP 이미지로 업로드하여 본문 이미지에 반영
-- 본문 작성 영역 기본 텍스트 정렬을 가운데로 설정하고 공개 게시글 본문/미리보기에도 가운데 정렬 스타일 적용
-- 기존 Markdown 이미지 메타데이터(너비/정렬), R2 업로드 방식 및 기존 게시글 데이터 구조 유지
-- 작업 브랜치 `feat/blog-inline-image-editing`; 빌드/배포 전
+## 2026-11-14 네이버 서치어드바이저 소유확인 메타태그 운영 확인
+- 사용자가 제공한 네이버 소유확인 코드가 `app/layout.tsx`의 `metadata.verification.other`에 등록되어 있음 확인
+- 운영 사이트 `https://utilwise.kr` 및 `https://utilwise.kr/en`의 실제 응답 HTML head 메타데이터에서 동일한 `naver-site-verification` 값 노출 확인
+- 한국어·영어 전체 페이지에 공통 적용되는 RootLayout 메타데이터이므로 중복 삽입하지 않음
+- **확인 범위:** 메타태그의 운영 사이트 출력 확인 완료. 네이버 서치어드바이저 계정에서 소유확인 완료 상태인지 여부는 별도 확인 대상
 
-
-## 2026-11-13 블로그 편집기 Preview 배포 설정 오류 수정
-- Cloudflare Preview 빌드 로그에서 Next.js/OpenNext 빌드는 통과하고 Wrangler Deploy 단계에서 Preview D1 설정 누락으로 실패한 것을 확인
-- `wrangler.preview.jsonc`의 `previews.d1_databases`에 `BLOG_DB` Preview database ID(`5e457e52-0612-4103-80d0-4eec0933c126`)를 명시
-- 작업 브랜치: `feat/blog-inline-image-editing`; 수정 커밋 `f9c3edc`
-- **검증 대기:** Cloudflare Preview 재빌드, 실제 편집기 이미지 선택/크기 조절/자르기 및 본문 가운데 정렬 확인. 운영 병합/배포는 미실시
-
-
-## 2026-11-13 Cloudflare Preview 설정 파일 적용 범위 보완
-- Cloudflare 빌드 로그 재확인 결과 Preview 배포 명령은 기본 Wrangler 설정을 읽고 있었으며, 앞선 수정은 `wrangler.preview.jsonc`에만 적용되어 오류가 반복됨
-- 기본 `wrangler.jsonc`에도 `previews.d1_databases.BLOG_DB`를 추가해 Cloudflare managed preview가 참조하는 설정 경로를 보완
-- Preview D1 ID: `5e457e52-0612-4103-80d0-4eec0933c126`; 수정 커밋 `5bc6a18`
-- **검증 대기:** Cloudflare 자동 Preview 재빌드에서 Deploy 단계 통과 여부 확인. 운영 배포/병합 미실시
-
-
-## 2026-11-13 블로그 편집기 Preview 배포 성공
-- 수정 커밋 `1e4949c03cd43a8da77fcdb5f97f450326c3c07c`의 Cloudflare Preview 빌드 ID `59ddbfab` 성공 확인 (Build/Deploy 전체 통과)
-- Preview URL `https://utilwise-preview.mmw833.workers.dev/admin/blog/login` 접속 시 관리자 로그인 폼 표시 확인. 환경 설정 오류 없음
-- **남은 검증:** 관리자 인증 후 본문 이미지 선택/드래그 크기 조절/자르기/가운데 정렬 및 저장 후 재편집 확인 필요. 로그인 비밀번호는 채팅으로 공유하지 말 것
-- **운영 반영:** PR #20 미병합. 실제 관리자 편집 검증 후 병합/운영 배포 진행
+## 2026-11-14 블로그 본문 이미지 편집 개선 (PR #20)
+- 관리자 편집기에서 본문 이미지 선택 및 모서리 드래그 너비 조절 지원
+- 선택 이미지 자르기: 위치와 영역을 조절해 WebP로 업로드하고 본문 이미지 교체
+- 편집기 및 공개 게시글 본문 기본 가운데 정렬 적용
+- 기존 Markdown 이미지 너비/정렬 메타데이터, R2 업로드 경로 및 게시글 데이터 구조 유지
+- 변경 범위: `components/AdminBlogManager.tsx`, `app/globals.css`, 관련 프로젝트 문서
+- 운영 반영 전 빌드 및 실제 관리자 편집·저장 동작 확인 필요
