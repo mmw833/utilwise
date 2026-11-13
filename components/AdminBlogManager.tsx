@@ -574,7 +574,8 @@ export default function AdminBlogManager() {
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
                     onFocus={rememberEditorSelection}
-                    onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { selectedInlineImageRef.current = target; setHasSelectedInlineImage(true); setInlineImageWidth(target.dataset.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } else if (target === contentRef.current) { selectedInlineImageRef.current = null; setHasSelectedInlineImage(false); } }}\n                    onPointerDown={handleInlineImagePointerDown}
+                    onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { selectedInlineImageRef.current = target; setHasSelectedInlineImage(true); setInlineImageWidth(target.dataset.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } else if (target === contentRef.current) { selectedInlineImageRef.current = null; setHasSelectedInlineImage(false); } }}
+                    onPointerDown={handleInlineImagePointerDown}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={handleEditorDrop}
                   />
