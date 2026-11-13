@@ -4,8 +4,8 @@ import LanguageSwitcher from "../../components/LanguageSwitcher";
 import PDFTools from "../../components/PDFTools";
 
 export const metadata: Metadata = {
-  title: "무료 PDF 합치기 | 여러 PDF 파일 하나로 병합 - UTILWISE",
-  description: "여러 PDF 파일을 하나로 합치고 문서 순서를 선택하세요. 브라우저에서 안전하게 처리됩니다.",
+  title: "PDF 합치기 | 여러 PDF 파일 하나로 병합·결합 - UTILWISE",
+  description: "여러 개의 PDF 파일을 원하는 순서로 정렬해 하나의 PDF 문서로 합치세요. 무료로 이용할 수 있으며 파일은 브라우저에서 처리됩니다.",
   alternates: { canonical: "/pdf-merge", languages: { "ko-KR": "/pdf-merge", en: "/en/pdf-merge" } },
   openGraph: { title: "PDF 합치기 | UTILWISE", description: "여러 PDF 파일을 하나로 합치고 문서 순서를 선택하세요. 브라우저에서 안전하게 처리됩니다.", url: "https://utilwise.kr/pdf-merge", siteName: "UTILWISE", locale: "ko_KR", type: "website" }
 };

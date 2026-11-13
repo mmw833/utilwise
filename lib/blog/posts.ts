@@ -14,7 +14,9 @@ export interface BlogPostSummary {
   cover_image_key: string | null;
   category_name: string | null;
   category_slug: string | null;
+  tags_json?: string;
   view_count: number;
+  is_featured?: number;
   published_at: number;
 }
 
@@ -34,10 +36,12 @@ const POST_SUMMARY_SELECT = `
     p.slug,
     p.title,
     p.excerpt,
+    p.tags_json,
     p.cover_image_key,
     CASE WHEN p.language = 'en' THEN COALESCE(c.name_en, c.name_ko) ELSE c.name_ko END AS category_name,
     c.slug AS category_slug,
     p.view_count,
+    p.is_featured,
     p.published_at
   FROM blog_posts p
   LEFT JOIN blog_categories c ON c.id = p.category_id
@@ -98,6 +102,7 @@ export async function getPublishedPostBySlug(
         p.slug,
         p.title,
         p.excerpt,
+        p.tags_json,
         p.content_md,
         p.cover_image_key,
         CASE WHEN p.language = 'en' THEN COALESCE(c.name_en, c.name_ko) ELSE c.name_ko END AS category_name,
@@ -105,6 +110,7 @@ export async function getPublishedPostBySlug(
         p.seo_title,
         p.seo_description,
         p.view_count,
+        p.is_featured,
         p.published_at,
         p.created_at,
         p.updated_at
@@ -142,4 +148,20 @@ export async function recordPostView(
     `)
     .bind(postId, visitorHash, viewedAt)
     .run();
+}
+
+
+export async function getFeaturedPost(language: BlogLanguage): Promise<BlogPostSummary | null> {
+  const db = getBlogDatabase();
+  const sql = POST_SUMMARY_SELECT + " WHERE p.language = ? AND p.status = 'published' AND p.is_featured = 1 ORDER BY p.published_at DESC LIMIT 1";
+  return db.prepare(sql).bind(language).first<BlogPostSummary>();
+}
+
+export async function getBlogVisitorStats(): Promise<{ today: number; total: number }> {
+  const db = getBlogDatabase();
+  const now = Math.floor(Date.now() / 1000);
+  const start = Math.floor((now + 32400) / 86400) * 86400 - 32400;
+  const daily = await db.prepare("SELECT COUNT(*) AS count FROM blog_site_visits WHERE visit_date = ?").bind(start).first<{ count: number }>();
+  const total = await db.prepare("SELECT COUNT(*) AS count FROM blog_site_visitors").first<{ count: number }>();
+  return { today: Number(daily?.count || 0), total: Number(total?.count || 0) };
 }

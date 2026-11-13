@@ -4,8 +4,8 @@ import LanguageSwitcher from "../../../components/LanguageSwitcher";
 import QRCodeGenerator from "../../../components/QRCodeGenerator";
 
 export const metadata: Metadata = {
-  title: "Free QR Code Generator | URL, Text, Wi-Fi & Email - UTILWISE",
-  description: "Create QR codes for URLs, plain text, Wi-Fi, email, and phone numbers. Download a free PNG QR code. Your content is processed in your browser.",
+  title: "Wi-Fi QR Code Generator | Free URL, Text & Email QR Codes - UTILWISE",
+  description: "Create a Wi-Fi QR code to share network access, or generate QR codes for URLs, text, email, and phone numbers. Download PNG files. Content stays in your browser.",
   alternates: { canonical: "/en/qr-code-generator", languages: { en: "/en/qr-code-generator", "ko-KR": "/qr-code-generator" } },
   openGraph: { title: "Free QR Code Generator", description: "Generate and download QR codes for websites, text, Wi-Fi, email, and phone numbers.", url: "https://utilwise.kr/en/qr-code-generator", siteName: "UTILWISE", locale: "en_US", type: "website" }
 };

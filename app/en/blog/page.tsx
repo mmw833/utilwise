@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import BlogFeed from "@/components/BlogFeed";
-import { listPopularPosts, listPublishedPosts } from "@/lib/blog/posts";
+import BlogVisitorTracker from "@/components/BlogVisitorTracker";
+import { getBlogVisitorStats, getFeaturedPost, listPopularPosts, listPublishedPosts } from "@/lib/blog/posts";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -11,6 +12,6 @@ export const metadata: Metadata = {
 };
 
 export default async function EnglishBlogPage() {
-  const [popular, posts] = await Promise.all([listPopularPosts("en", 3), listPublishedPosts("en", 30)]);
-  return <BlogFeed popular={popular} posts={posts} language="en" />;
+  const [popular, posts, featured, visitorStats] = await Promise.all([listPopularPosts("en", 8), listPublishedPosts("en", 30), getFeaturedPost("en"), getBlogVisitorStats()]);
+  return <><BlogVisitorTracker /><BlogFeed popular={popular} posts={posts} featured={featured} visitorStats={visitorStats} language="en" /></>;
 }
