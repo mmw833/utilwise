@@ -1,3 +1,12 @@
+## 2026-11-13 운영 배포 및 블로그 구성
+- 운영 배포 workflow: `.github/workflows/production-deploy.yml`
+- `main` push 시 Node.js 22 / OpenNext 빌드 → `wrangler d1 migrations apply utilwise-blog --remote --config wrangler.jsonc` → `wrangler deploy --config wrangler.jsonc` 순서로 실행
+- 운영 `wrangler.jsonc`: D1 binding `BLOG_DB`, R2 binding `BLOG_IMAGES` (bucket `utilwise-blog-images`)
+- 배포 성공 확인: GitHub Actions run 43338420224
+- 관리자 로그인에는 Cloudflare 운영 Worker Secret `ADMIN_PASSWORD`가 필요. Secret은 Cloudflare Dashboard의 Workers & Pages → `utilwise` → Settings → Variables and Secrets에서 Secret으로 등록하고 새 배포/재시작 후 확인. 값은 GitHub나 코드에 저장하지 않는다.
+- 운영 관리자 비밀번호가 설정되지 않으면 로그인 페이지에서 `cloudflarePasswordPresent: false`로 진단됨. 현재 확인된 미완료 항목
+
+
 ## 영어 홈페이지 SEO 안내 콘텐츠 관리
 - 영어 홈페이지(`/en`)는 계산기·온라인 도구·텍스트 도구·테스트 목록에 집중하며 긴 SEO 소개 문단을 하단에 반복 노출하지 않는다.
 - 서비스 전체 설명과 관련 도구 내부 링크는 `/en/about` 소개 페이지에서 관리한다.
