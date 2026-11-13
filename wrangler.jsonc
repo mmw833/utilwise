@@ -13,5 +13,11 @@
       "database_id": "607946e3-d4cd-4cce-b7e9-eaf515244cb4",
       "migrations_dir": "migrations"
     }
-  ]
+  ],
+  "previews": {
+    "d1_databases": [{
+      "binding": "BLOG_DB",
+      "database_id": "5e457e52-0612-4103-80d0-4eec0933c126"
+    }]
+  }
 }

@@ -134,6 +134,12 @@ export default function AdminBlogManager() {
   const selectedInlineImageRef = useRef<HTMLImageElement | null>(null);
   const [inlineImageWidth, setInlineImageWidth] = useState("100%");
   const [inlineImageAlign, setInlineImageAlign] = useState("center");
+  const [hasSelectedInlineImage, setHasSelectedInlineImage] = useState(false);
+  const [cropOpen, setCropOpen] = useState(false);
+  const [cropLeft, setCropLeft] = useState(10);
+  const [cropTop, setCropTop] = useState(10);
+  const [cropWidth, setCropWidth] = useState(80);
+  const [cropHeight, setCropHeight] = useState(80);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -315,6 +321,62 @@ export default function AdminBlogManager() {
     setInlineImageWidth(normalizedWidth);
     syncEditorContent();
   }
+  function handleInlineImagePointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    const target = event.target;
+    if (!(target instanceof HTMLImageElement) || target !== selectedInlineImageRef.current) return;
+    const rect = target.getBoundingClientRect();
+    if (event.clientX < rect.right - 28 || event.clientY < rect.bottom - 28) return;
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = rect.width;
+    const containerWidth = contentRef.current?.clientWidth || rect.width;
+    const move = (moveEvent: PointerEvent) => {
+      const next = Math.round(((startWidth + moveEvent.clientX - startX) / containerWidth) * 100);
+      resizeSelectedInlineImage(Math.min(100, Math.max(30, next)) + "%");
+    };
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", stop);
+      syncEditorContent();
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", stop, { once: true });
+  }
+
+  async function cropSelectedInlineImage() {
+    const image = selectedInlineImageRef.current;
+    if (!image || !contentRef.current?.contains(image)) return;
+    setUploadingImage(true); setError(""); setNotice("");
+    try {
+      const source = new Image();
+      source.src = image.src;
+      await new Promise<void>((resolve, reject) => { source.onload = () => resolve(); source.onerror = () => reject(new Error("이미지를 불러오지 못했습니다.")); });
+      const sx = Math.round(source.naturalWidth * cropLeft / 100);
+      const sy = Math.round(source.naturalHeight * cropTop / 100);
+      const sw = Math.max(1, Math.round(source.naturalWidth * cropWidth / 100));
+      const sh = Math.max(1, Math.round(source.naturalHeight * cropHeight / 100));
+      const canvas = document.createElement("canvas");
+      canvas.width = sw; canvas.height = sh;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("이미지 편집을 시작하지 못했습니다.");
+      context.drawImage(source, sx, sy, Math.min(sw, source.naturalWidth - sx), Math.min(sh, source.naturalHeight - sy), 0, 0, sw, sh);
+      const blob = await new Promise<Blob>((resolve, reject) => canvas.toBlob((value) => value ? resolve(value) : reject(new Error("자른 이미지를 만들지 못했습니다.")), "image/webp", 0.92));
+      const form = new FormData();
+      form.set("file", new File([blob], "cropped-image.webp", { type: "image/webp" }));
+      const response = await fetch("/api/admin/blog-images", { method: "POST", body: form });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "자른 이미지를 업로드하지 못했습니다.");
+      image.src = "/api/blog/images/" + data.key;
+      image.dataset.width = inlineImageWidth;
+      image.dataset.align = inlineImageAlign;
+      syncEditorContent();
+      setCropOpen(false);
+      setNotice("이미지를 자르고 적용했습니다. 게시글 저장을 눌러 반영하세요.");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "이미지 자르기 중 오류가 발생했습니다.");
+    } finally { setUploadingImage(false); }
+  }
+
   function handleEditorDrop(event: React.DragEvent<HTMLDivElement>) {
     const files = Array.from(event.dataTransfer.files).filter((file) => file.type.startsWith("image/"));
     if (!files.length) return;
@@ -494,6 +556,7 @@ export default function AdminBlogManager() {
                   <div className="blog-admin-inline-image-tools">
                     <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; syncEditorContent(); } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
+                    <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage || uploadingImage} onClick={() => { setCropLeft(10); setCropTop(10); setCropWidth(80); setCropHeight(80); setCropOpen(true); }}>선택 이미지 자르기</button>
                     <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onClick={rememberEditorSelection} onChange={(e) => { placeImageInsertionMarker(); void uploadInlineImage(e.currentTarget.files?.[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
                   <div
@@ -511,10 +574,20 @@ export default function AdminBlogManager() {
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
                     onFocus={rememberEditorSelection}
-                    onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { selectedInlineImageRef.current = target; setInlineImageWidth(target.dataset.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } }}
+                    onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { selectedInlineImageRef.current = target; setHasSelectedInlineImage(true); setInlineImageWidth(target.dataset.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } else if (target === contentRef.current) { selectedInlineImageRef.current = null; setHasSelectedInlineImage(false); } }}
+                    onPointerDown={handleInlineImagePointerDown}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={handleEditorDrop}
                   />
+                  {cropOpen ? <div className="blog-admin-crop-panel">
+                    <strong>이미지 자르기</strong>
+                    <p>가로·세로 위치와 자를 영역을 조절한 뒤 적용하세요.</p>
+                    <label>왼쪽 위치 {cropLeft}%<input type="range" min="0" max={100 - cropWidth} value={cropLeft} onChange={(e) => setCropLeft(Number(e.target.value))} /></label>
+                    <label>위쪽 위치 {cropTop}%<input type="range" min="0" max={100 - cropHeight} value={cropTop} onChange={(e) => setCropTop(Number(e.target.value))} /></label>
+                    <label>자르기 너비 {cropWidth}%<input type="range" min="10" max={100 - cropLeft} value={cropWidth} onChange={(e) => setCropWidth(Number(e.target.value))} /></label>
+                    <label>자르기 높이 {cropHeight}%<input type="range" min="10" max={100 - cropTop} value={cropHeight} onChange={(e) => setCropHeight(Number(e.target.value))} /></label>
+                    <div className="blog-admin-crop-actions"><button type="button" className="blog-admin-primary" onClick={() => void cropSelectedInlineImage()} disabled={uploadingImage}>{uploadingImage ? "적용 중..." : "자른 이미지 적용"}</button><button type="button" className="blog-admin-secondary" onClick={() => setCropOpen(false)}>취소</button></div>
+                  </div> : null}
                   <small>굵게·제목 등은 작성 영역에 바로 표시됩니다. 이미지 삽입 버튼을 누르면 마지막 커서 위치에 들어갑니다. 파일을 본문 원하는 위치에 끌어다 놓아도 됩니다. 업로드 중에는 저장할 수 없습니다.</small>
                 </>
               )}
