@@ -5,7 +5,7 @@ import PDFTools from "../../../components/PDFTools";
 
 export const metadata: Metadata = {
   title: "JPG to PDF Converter | Convert PNG Images to PDF Online - UTILWISE",
-  description: "Convert JPG, PNG, and WebP images into one PDF document, arrange the image order, and download your file. Free browser-based image to PDF converter."
+  description: "Convert JPG, PNG, and WebP images into one PDF document, arrange the image order, and download your file. Free browser-based image to PDF converter.",
   alternates: { canonical: "/en/image-to-pdf", languages: { "ko-KR": "/image-to-pdf", en: "/en/image-to-pdf" } },
   openGraph: { title: "Image to PDF | UTILWISE", description: "Convert JPG, PNG, and WebP images into a single PDF document.", url: "https://utilwise.kr/en/image-to-pdf", siteName: "UTILWISE", locale: "en_US", type: "website" }
 };
