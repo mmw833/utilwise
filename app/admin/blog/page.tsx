@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import AdminLogoutButton from "@/components/AdminLogoutButton";
+import Link from "next/link";
 import AdminBlogManager from "@/components/AdminBlogManager";
 import { isAdminAuthenticated } from "@/lib/blog/admin-auth";
 
@@ -21,7 +22,7 @@ export default async function AdminBlogPage() {
             <h1>블로그 관리자</h1>
             <p>게시글 작성과 발행 상태, 조회수를 관리합니다.</p>
           </div>
-          <AdminLogoutButton />
+          <div className="blog-admin-header-actions"><Link href="/blog" className="blog-admin-secondary">일반 블로그 보기 ↗</Link><AdminLogoutButton /></div>
         </div>
         <AdminBlogManager />
       </section>

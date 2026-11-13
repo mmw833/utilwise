@@ -27,9 +27,7 @@ function validPost(value: unknown): value is AdminPostInput {
   const post = value as Record<string, unknown>;
   return (
     (post.language === "ko" || post.language === "en") &&
-    typeof post.slug === "string" &&
-    /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(post.slug) &&
-    post.slug.length <= 120 &&
+    (post.slug === undefined || post.slug === "" || (typeof post.slug === "string" && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(post.slug) && post.slug.length <= 120)) &&
     typeof post.title === "string" &&
     post.title.trim().length > 0 &&
     post.title.length <= 180 &&

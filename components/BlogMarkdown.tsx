@@ -18,9 +18,9 @@ function inline(text: string): ReactNode[] {
     if (image) {
       const src = safeImageSrc(image[2]);
       if (!src) return null;
-      const meta = image[1].match(/^(.*?)\|width=(100%|80%|60%|40%)\|align=(left|center|right)$/);
+      const meta = image[1].match(/^(.*?)\|width=(3[0-9]|[4-9][0-9]|100)%\|align=(left|center|right)$/);
       const alt = (meta ? meta[1] : image[1]).slice(0, 180);
-      const width = meta ? meta[2] : "100%";
+      const width = meta ? (meta[2].endsWith("%") ? meta[2] : meta[2] + "%") : "100%";
       const align = meta ? meta[3] : "center";
       return <span key={index} className={`blog-markdown-image is-${align}`} style={{ width }}><img src={src} alt={alt} loading="lazy" /></span>;
     }

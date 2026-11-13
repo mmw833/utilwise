@@ -20,6 +20,7 @@ type Post = {
   seo_description: string | null;
   status: PostStatus;
   view_count: number;
+  is_featured: number;
   published_at: number | null;
   updated_at: number;
   cover_image_key: string | null;
@@ -62,26 +63,13 @@ function dateLabel(timestamp: number | null) {
   return new Intl.DateTimeFormat("ko-KR", { dateStyle: "medium" }).format(new Date(timestamp * 1000));
 }
 
-function slugify(value: string) {
-  const initial = ["g","kk","n","d","tt","r","m","b","pp","s","ss","","j","jj","ch","k","t","p","h"];
-  const vowel = ["a","ae","ya","yae","eo","e","yeo","ye","o","wa","wae","oe","yo","u","wo","we","wi","yu","eu","ui","i"];
-  const final = ["","k","k","ks","n","nj","nh","t","l","lk","lm","lb","ls","lt","lp","lh","m","p","ps","t","t","ng","t","t","k","t","p","t"];
-  const latin = Array.from(value.normalize("NFC")).map((char) => {
-    const code = char.charCodeAt(0) - 0xac00;
-    if (code < 0 || code > 11171) return char;
-    return initial[Math.floor(code / 588)] + vowel[Math.floor((code % 588) / 28)] + final[code % 28];
-  }).join("");
-  return latin.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 120)
-    || `post-${new Date().toISOString().slice(0, 10)}`;
-}
-
 
 function escapeEditorHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 function markdownToEditorHtml(markdown: string) {
   const inline = (value: string) => escapeEditorHtml(value)
-    .replace(/!\[([^\]]*)\]\((\/api\/blog\/images\/[^)]+)\)/g, (_m, alt, src) => '<img src="' + src + '" alt="' + alt + '" data-width="100%" data-align="center" />')
+    .replace(/!\[([^\]]*)\]\((\/api\/blog\/images\/[^)]+)\)/g, (_m, meta, src) => { const match = meta.match(/^(.*?)\|width=((?:3[0-9]|[4-9][0-9]|100)%)\|align=(left|center|right)$/); const alt = match ? match[1] : meta; const width = match ? match[2] : "100%"; const align = match ? match[3] : "center"; return '<img src="' + src + '" alt="' + alt + '" data-width="' + width + '" data-align="' + align + '" />'; })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
@@ -105,7 +93,7 @@ function editorHtmlToMarkdown(root: HTMLElement) {
       const src = node.getAttribute("src") || "";
       if (!src.startsWith("/api/blog/images/blog/")) return "";
       const alt = (node.getAttribute("alt") || "본문 이미지").replace(/[\[\]]/g, " ");
-      const width = node.dataset.width && ["100%", "80%", "60%", "40%"].includes(node.dataset.width) ? node.dataset.width : "100%";
+      const width = node.dataset.width && /^([3-9][0-9]|100)%$/.test(node.dataset.width) ? node.dataset.width : "100%";
       const align = node.dataset.align && ["left", "center", "right"].includes(node.dataset.align) ? node.dataset.align : "center";
       return "![" + alt + "|width=" + width + "|align=" + align + "](" + src + ")";
     }
@@ -130,6 +118,7 @@ export default function AdminBlogManager() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [editor, setEditor] = useState<Editor>(emptyEditor);
+  const [tagsInput, setTagsInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -142,6 +131,7 @@ export default function AdminBlogManager() {
   const contentRef = useRef<HTMLDivElement>(null);
   const savedSelectionRef = useRef<Range | null>(null);
   const imageInsertionMarkerRef = useRef<HTMLSpanElement | null>(null);
+  const selectedInlineImageRef = useRef<HTMLImageElement | null>(null);
   const [inlineImageWidth, setInlineImageWidth] = useState("100%");
   const [inlineImageAlign, setInlineImageAlign] = useState("center");
 
@@ -174,12 +164,15 @@ export default function AdminBlogManager() {
 
   function startNew() {
     setEditor(emptyEditor());
+    setTagsInput("");
     setNotice("");
     setError("");
     setShowEditor(true);
   }
 
   function editPost(post: Post) {
+    const existingTags = (() => { try { return JSON.parse(post.tags_json || "[]") as string[]; } catch { return []; } })();
+    setTagsInput(existingTags.join(", "));
     setEditor({
       id: post.id,
       translation_group_id: post.translation_group_id,
@@ -190,7 +183,7 @@ export default function AdminBlogManager() {
       content_md: post.content_md || "",
       category_id: post.category_id || "",
       category_name: post.category_name || "",
-      tags: (() => { try { return JSON.parse(post.tags_json || "[]") as string[]; } catch { return []; } })(),
+      tags: existingTags,
       seo_title: post.seo_title || "",
       seo_description: post.seo_description || "",
       status: post.status,
@@ -310,12 +303,25 @@ export default function AdminBlogManager() {
   function syncEditorContent() {
     if (contentRef.current) setEditor((current) => ({ ...current, content_md: editorHtmlToMarkdown(contentRef.current!) }));
   }
+
+  function resizeSelectedInlineImage(width: string) {
+    const image = selectedInlineImageRef.current;
+    if (!image || !contentRef.current?.contains(image)) return;
+    const normalizedWidth = `${Math.min(100, Math.max(30, Number.parseInt(width, 10) || 100))}%`;
+    image.dataset.width = normalizedWidth;
+    image.style.width = normalizedWidth;
+    image.style.maxWidth = "100%";
+    image.style.height = "auto";
+    setInlineImageWidth(normalizedWidth);
+    syncEditorContent();
+  }
   function handleEditorDrop(event: React.DragEvent<HTMLDivElement>) {
     const files = Array.from(event.dataTransfer.files).filter((file) => file.type.startsWith("image/"));
     if (!files.length) return;
     event.preventDefault();
-    const doc = document as Document & { caretRangeFromPoint?: (x: number, y: number) => Range | null };
-    const dropRange = doc.caretRangeFromPoint?.(event.clientX, event.clientY) || null;
+    const doc = document as Document & { caretRangeFromPoint?: (x: number, y: number) => Range | null; caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null };
+    let dropRange = doc.caretRangeFromPoint?.(event.clientX, event.clientY) || null;
+    if (!dropRange && doc.caretPositionFromPoint) { const pos = doc.caretPositionFromPoint(event.clientX, event.clientY); if (pos) { dropRange = document.createRange(); dropRange.setStart(pos.offsetNode, pos.offset); dropRange.collapse(true); } }
     const selection = window.getSelection();
     if (dropRange && contentRef.current?.contains(dropRange.commonAncestorContainer)) {
       savedSelectionRef.current = dropRange.cloneRange();
@@ -344,7 +350,7 @@ export default function AdminBlogManager() {
           ...editor,
           category_id: editor.category_id || null,
           category_name: editor.category_name.trim(),
-          tags: editor.tags,
+          tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
           seo_title: null,
           seo_description: editor.seo_description || null,
         }),
@@ -361,6 +367,15 @@ export default function AdminBlogManager() {
     }
   }
 
+  async function featurePost(post: Post) {
+    if (post.status !== "published") return;
+    try {
+      const response = await fetch("/api/admin/posts/feature", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: post.id, language: post.language }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "대표글을 설정하지 못했습니다.");
+      await loadData(); setNotice("대표글을 변경했습니다.");
+    } catch (e) { setError(e instanceof Error ? e.message : "대표글 설정 중 오류가 발생했습니다."); }
+  }
   async function deletePost(post: Post) {
     if (!window.confirm(`“${post.title}” 게시글을 삭제할까요? 삭제 후 복구할 수 없습니다.`)) return;
     setError("");
@@ -428,20 +443,16 @@ export default function AdminBlogManager() {
             <label className="blog-admin-full">제목
               <input required maxLength={180} value={editor.title} onChange={(e) => {
                 const title = e.target.value;
-                setEditor((current) => ({ ...current, title, slug: current.id ? current.slug : slugify(title) }));
+                setEditor((current) => ({ ...current, title }));
               }} />
-            </label>
-            <label className="blog-admin-full">주소 (slug)
-              <input required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={120} value={editor.slug} onChange={(e) => setEditor({ ...editor, slug: e.target.value })} />
-              <small>영문 소문자, 숫자, 하이픈만 사용할 수 있습니다.</small>
             </label>
             <label>카테고리 (직접 입력)
               <input maxLength={40} value={editor.category_name} onChange={(e) => setEditor({ ...editor, category_name: e.target.value, category_id: "" })} placeholder="예: 생활정보" list="blog-category-suggestions" />
               <datalist id="blog-category-suggestions">{categories.map((category) => <option key={category.id} value={category.name_ko} />)}</datalist>
             </label>
             <label className="blog-admin-full">태그 (쉼표로 구분)
-              <input value={editor.tags.join(", ")} maxLength={400} onChange={(e) => setEditor({ ...editor, tags: e.target.value.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12) })} placeholder="생활정보, 가이드, 팁" />
-              <small>최대 12개까지 입력할 수 있습니다.</small>
+              <input value={tagsInput} maxLength={400} onChange={(e) => setTagsInput(e.target.value)} onBlur={() => setEditor((current) => ({ ...current, tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12) }))} placeholder="생활정보, 가이드, 팁" />
+              <small>쉼표(,)를 입력해도 지워지지 않습니다. 예: 생활정보, 가이드, 팁 (최대 12개)</small>
             </label>
             <label className="blog-admin-full">대표 이미지 (선택)
               <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadCoverImage(e.target.files?.[0]); e.currentTarget.value = ""; }} />
@@ -481,8 +492,8 @@ export default function AdminBlogManager() {
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("removeFormat")}>서식 지우기</button>
                   </div>
                   <div className="blog-admin-inline-image-tools">
-                    <label>이미지 너비<select value={inlineImageWidth} onChange={(e) => setInlineImageWidth(e.target.value)}><option value="100%">100%</option><option value="80%">80%</option><option value="60%">60%</option><option value="40%">40%</option></select></label>
-                    <label>정렬<select value={inlineImageAlign} onChange={(e) => setInlineImageAlign(e.target.value)}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
+                    <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
+                    <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; syncEditorContent(); } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onClick={rememberEditorSelection} onChange={(e) => { placeImageInsertionMarker(); void uploadInlineImage(e.currentTarget.files?.[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
                   <div
@@ -500,6 +511,7 @@ export default function AdminBlogManager() {
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
                     onFocus={rememberEditorSelection}
+                    onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { selectedInlineImageRef.current = target; setInlineImageWidth(target.dataset.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } }}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={handleEditorDrop}
                   />
@@ -541,7 +553,7 @@ export default function AdminBlogManager() {
                     <small>수정 {dateLabel(post.updated_at)} · 조회수 {post.view_count.toLocaleString("ko-KR")}</small>
                   </div>
                   <div className="blog-admin-post-actions">
-                    <button type="button" className="blog-admin-secondary" onClick={() => editPost(post)}>수정</button>
+                    <button type="button" className="blog-admin-secondary" onClick={() => void featurePost(post)} disabled={post.status !== "published"}>{post.is_featured ? "대표글 지정됨" : "대표글 설정"}</button><button type="button" className="blog-admin-secondary" onClick={() => editPost(post)}>수정</button>
                     <button type="button" className="blog-admin-danger" onClick={() => void deletePost(post)}>삭제</button>
                   </div>
                 </article>

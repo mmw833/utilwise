@@ -4,8 +4,8 @@ import LanguageSwitcher from "../../../components/LanguageSwitcher";
 import PDFTools from "../../../components/PDFTools";
 
 export const metadata: Metadata = {
-  title: "Free PDF Rotator | Rotate PDF Pages Online - UTILWISE",
-  description: "Rotate PDF pages by 90, 180, or 270 degrees and save a new file.",
+  title: "Rotate PDF Pages Online | Turn PDF 90, 180 or 270 Degrees - UTILWISE",
+  description: "Rotate PDF pages by 90, 180, or 270 degrees and save the updated document. Use this free browser-based PDF page rotator.",
   alternates: { canonical: "/en/pdf-rotate", languages: { "ko-KR": "/pdf-rotate", en: "/en/pdf-rotate" } },
   openGraph: { title: "Rotate PDF | UTILWISE", description: "Rotate PDF pages by 90, 180, or 270 degrees and save a new file.", url: "https://utilwise.kr/en/pdf-rotate", siteName: "UTILWISE", locale: "en_US", type: "website" }
 };

@@ -4,8 +4,8 @@ import LanguageSwitcher from "../../components/LanguageSwitcher";
 import PDFTools from "../../components/PDFTools";
 
 export const metadata: Metadata = {
-  title: "PDF 페이지 순서 변경 및 삭제 | PDF 정리 도구 - UTILWISE",
-  description: "PDF 페이지 순서를 바꾸거나 필요 없는 페이지를 제외해 새 문서로 만드세요.",
+  title: "PDF 페이지 순서 변경 | PDF 페이지 삭제·정리 도구 - UTILWISE",
+  description: "PDF 페이지 순서를 원하는 대로 바꾸고 불필요한 페이지를 삭제해 새 PDF로 저장하세요. 페이지 순서 정리 작업은 브라우저에서 처리됩니다.",
   alternates: { canonical: "/pdf-organize", languages: { "ko-KR": "/pdf-organize", en: "/en/pdf-organize" } },
   openGraph: { title: "PDF 페이지 정리 | UTILWISE", description: "PDF 페이지 순서를 바꾸거나 필요 없는 페이지를 제외해 새 문서로 만드세요.", url: "https://utilwise.kr/pdf-organize", siteName: "UTILWISE", locale: "ko_KR", type: "website" }
 };

@@ -8,6 +8,7 @@ on:
       - feat/blog-editor-improvements
       - feat/blog-mobile-wysiwyg-editor
       - feat/blog-inline-image-placement
+      - feat/blog-editor-and-card-polish
 
 permissions:
   contents: read

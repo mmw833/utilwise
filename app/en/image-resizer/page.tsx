@@ -3,8 +3,8 @@ import Link from "next/link";
 import LanguageSwitcher from "../../../components/LanguageSwitcher";
 import ImageTools from "../../../components/ImageTools";
 export const metadata: Metadata = {
-  title: "Free Image Resizer | Resize Photos by Pixels - UTILWISE",
-  description: "Resize JPG, PNG, and WebP images to custom pixel dimensions. Keep the aspect ratio, process multiple images, and download files processed locally in your browser.",
+  title: "Resize Image to Exact Pixel Dimensions | Free Image Resizer - UTILWISE",
+  description: "Change photo width and height in pixels for JPG, PNG, and WebP images. Keep the aspect ratio, resize multiple images, and download files processed in your browser.",
   alternates: { canonical: "/en/image-resizer", languages: { en: "/en/image-resizer", "ko-KR": "/image-resizer" } },
   openGraph: { title: "Free Image Resizer", description: "Change image width and height in pixels with an optional aspect ratio lock.", url: "https://utilwise.kr/en/image-resizer", siteName: "UTILWISE", locale: "en_US", type: "website" }
 };
