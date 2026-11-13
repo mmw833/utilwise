@@ -75,15 +75,6 @@ export default function BlogFeed({ popular, posts, featured, visitorStats, langu
 
     {(() => { const lead = featured || posts[0] || null; if (!lead) return null; return <section className="journal-featured"><Link href={base + "/" + lead.slug} className="journal-featured-link"><div className="journal-featured-image">{lead.cover_image_key ? <img src={"/api/blog/images/" + lead.cover_image_key.split("/").map(encodeURIComponent).join("/")} alt="" /> : <div className="journal-featured-placeholder"><span>UTILWISE JOURNAL</span><strong>U.</strong></div>}</div><div className="journal-featured-copy"><h2>{lead.title}</h2><div className="journal-featured-meta">{lead.category_name && <span>{lead.category_name}</span>}<time dateTime={new Date(lead.published_at * 1000).toISOString()}>{dateLabel(lead.published_at, locale)}</time><small className="journal-card-views">{lead.view_count.toLocaleString(locale)} {en ? "views" : "조회"}</small></div></div></Link></section>; })()}
     <section className="journal-section journal-discover" id="latest">
-      <div className="journal-section-heading"><div><span className="journal-eyebrow">EXPLORE THE JOURNAL</span><h2>{en ? "Find your next read" : "관심 있는 이야기 찾기"}</h2></div><p>{en ? "Search and browse practical articles." : "검색하거나 주제별로 콘텐츠를 둘러보세요."}</p></div>
-      <div className="journal-discovery-tools">
-        <label className="journal-search"><span aria-hidden="true">⌕</span><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={en ? "Search articles, topics, keywords..." : "게시글 제목, 소개, 태그 검색"} aria-label={en ? "Search blog posts" : "블로그 게시글 검색"} />{search && <button type="button" onClick={() => setSearch("")} aria-label={en ? "Clear search" : "검색어 지우기"}>×</button>}</label>
-        <label className="journal-sort-label"><span>{en ? "Sort" : "정렬"}</span><select value={sortOrder} onChange={(event) => setSortOrder(event.target.value as "latest" | "popular")}><option value="latest">{en ? "Newest" : "최신순"}</option><option value="popular">{en ? "Most viewed" : "인기순"}</option></select></label>
-      </div>
-      <div className="journal-category-filters" aria-label={en ? "Filter by category" : "카테고리 필터"}>
-        <button type="button" className={selectedCategory === "all" ? "is-active" : ""} onClick={() => setSelectedCategory("all")}>{en ? "All articles" : "전체"}</button>
-        {categories.map((category) => <button type="button" key={category} className={selectedCategory === category ? "is-active" : ""} onClick={() => setSelectedCategory(category)}>{category}</button>)}
-      </div>
       <section className="journal-section journal-popular">
         <div className="journal-section-heading"><div><span className="journal-eyebrow">{en ? "READER FAVORITES" : "READERS' PICKS"}</span><h2>{en ? "Popular reads" : "인기글"}</h2></div><p>{en ? "The articles readers come back to." : "많이 읽힌 콘텐츠를 모아 보여드립니다."}</p></div>
         {filteredPopular.length > 0 ? <div className="journal-popular-scroller">{filteredPopular.slice(0, 8).map((post, index) => card(post, index))}</div> : <div className="journal-section-empty">{query || selectedCategory !== "all" ? (en ? "No popular articles match these filters." : "선택한 조건에 맞는 인기글이 없습니다.") : (en ? "Popular articles will appear here as readers discover the journal." : "게시글이 발행되고 조회가 쌓이면 인기글을 보여드립니다.")}</div>}
@@ -94,6 +85,17 @@ export default function BlogFeed({ popular, posts, featured, visitorStats, langu
         <div className="journal-empty-art" aria-hidden="true"><span>U.</span><i>✳</i></div>
         <div><span className="journal-eyebrow">{query || selectedCategory !== "all" ? (en ? "NO MATCHES" : "검색 결과 없음") : "COMING SOON"}</span><h3>{query || selectedCategory !== "all" ? (en ? "No articles found." : "조건에 맞는 게시글이 없습니다.") : (en ? "Something useful is on its way." : "유용한 이야기를 준비하고 있어요.")}</h3><p>{query || selectedCategory !== "all" ? (en ? "Try another keyword or category." : "검색어를 바꾸거나 전체 카테고리를 선택해 보세요.") : (en ? "We’re preparing practical stories and guides for your everyday. In the meantime, discover the tools that make life a little easier." : "일상에 도움이 되는 실용적인 콘텐츠를 준비하고 있습니다. 그동안 UTILWISE의 다양한 도구를 둘러보세요.")}</p><Link href={tools}>{en ? "Explore UTILWISE tools" : "UTILWISE 도구 둘러보기"} ↗</Link></div>
       </div>}
+      </section>
+      <section className="journal-section journal-discover" aria-label={en ? "Search and filter articles" : "게시글 검색 및 정렬"}>
+      <div className="journal-section-heading"><div><span className="journal-eyebrow">EXPLORE THE JOURNAL</span><h2>{en ? "Find your next read" : "관심 있는 이야기 찾기"}</h2></div><p>{en ? "Search and browse practical articles." : "검색하거나 주제별로 콘텐츠를 둘러보세요."}</p></div>
+      <div className="journal-discovery-tools">
+        <label className="journal-search"><span aria-hidden="true">⌕</span><input type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={en ? "Search articles, topics, keywords..." : "게시글 제목, 소개, 태그 검색"} aria-label={en ? "Search blog posts" : "블로그 게시글 검색"} />{search && <button type="button" onClick={() => setSearch("")} aria-label={en ? "Clear search" : "검색어 지우기"}>×</button>}</label>
+        <label className="journal-sort-label"><span>{en ? "Sort" : "정렬"}</span><select value={sortOrder} onChange={(event) => setSortOrder(event.target.value as "latest" | "popular")}><option value="latest">{en ? "Newest" : "최신순"}</option><option value="popular">{en ? "Most viewed" : "인기순"}</option></select></label>
+      </div>
+      <div className="journal-category-filters" aria-label={en ? "Filter by category" : "카테고리 필터"}>
+        <button type="button" className={selectedCategory === "all" ? "is-active" : ""} onClick={() => setSelectedCategory("all")}>{en ? "All articles" : "전체"}</button>
+        {categories.map((category) => <button type="button" key={category} className={selectedCategory === category ? "is-active" : ""} onClick={() => setSelectedCategory(category)}>{category}</button>)}
+      </div>
       </section>
     </section>
 
