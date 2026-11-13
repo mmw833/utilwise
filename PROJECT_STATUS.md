@@ -1,3 +1,13 @@
+## 2026-11-13 운영 배포 완료 및 관리자 비밀번호 설정 대기
+- 운영 통합 PR #17 병합 완료. 운영 커밋: `acef42c0c75e3dfaba35228f95fefba757ac445d`
+- 포함: 블로그 관리자/편집기 개선, 태그·대표글·방문자 통계, 본문 이미지 삽입 개선, 한국어·영어 블로그 및 홈 내비게이션/SEO 업데이트
+- 운영용 `wrangler.jsonc`에 D1 `BLOG_DB` 및 R2 `BLOG_IMAGES` 연결 구성
+- GitHub Actions `Production Deploy`에서 OpenNext 빌드, 원격 D1 migrations, Cloudflare Worker 배포 모두 성공 확인
+- 실제 URL 확인: `/`, `/blog`, `/en/blog`, `/admin/blog/login` 응답 정상. 한/영 블로그 페이지는 아직 발행 게시글이 없어 빈 상태
+- **미완료/차단:** 운영 Worker에서 `ADMIN_PASSWORD` Secret이 전달되지 않아 관리자 로그인 화면에 설정 오류가 표시됨. Cloudflare Dashboard에서 운영 Worker `utilwise`에 `ADMIN_PASSWORD` Secret을 설정한 뒤 로그인 확인 필요. 비밀번호를 채팅이나 저장소에 입력하지 말 것
+- 관리자 로그인 및 실제 게시글 저장/이미지 업로드/대표글 지정은 아직 미검증. 비밀번호 설정 후 확인 예정
+
+
 ## 2026-11-12 블로그 카드 및 관리자 입력 개선
 - 블로그 카드 하단의 '글 읽기 / Read article' 문구 제거
 - 태그 입력을 별도 문자열 상태로 관리해 쉼표 입력 중 React 렌더링으로 구분자가 사라지는 문제 수정
