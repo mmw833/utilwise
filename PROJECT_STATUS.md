@@ -783,3 +783,10 @@
 - `wrangler.preview.jsonc`의 `previews.d1_databases`에 `BLOG_DB` Preview database ID(`5e457e52-0612-4103-80d0-4eec0933c126`)를 명시
 - 작업 브랜치: `feat/blog-inline-image-editing`; 수정 커밋 `f9c3edc`
 - **검증 대기:** Cloudflare Preview 재빌드, 실제 편집기 이미지 선택/크기 조절/자르기 및 본문 가운데 정렬 확인. 운영 병합/배포는 미실시
+
+
+## 2026-11-13 Cloudflare Preview 설정 파일 적용 범위 보완
+- Cloudflare 빌드 로그 재확인 결과 Preview 배포 명령은 기본 Wrangler 설정을 읽고 있었으며, 앞선 수정은 `wrangler.preview.jsonc`에만 적용되어 오류가 반복됨
+- 기본 `wrangler.jsonc`에도 `previews.d1_databases.BLOG_DB`를 추가해 Cloudflare managed preview가 참조하는 설정 경로를 보완
+- Preview D1 ID: `5e457e52-0612-4103-80d0-4eec0933c126`; 수정 커밋 `5bc6a18`
+- **검증 대기:** Cloudflare 자동 Preview 재빌드에서 Deploy 단계 통과 여부 확인. 운영 배포/병합 미실시
