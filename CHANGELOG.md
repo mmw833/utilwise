@@ -572,20 +572,12 @@
 - 작업 브랜치: `fix/header-nav-alignment`
 
 
-## 2026-11-13 블로그 본문 이미지 편집 개선
-- 본문 이미지 선택 및 드래그 너비 조절 지원
-- 이미지 자르기(위치/영역 조절 후 WebP로 저장·교체) 기능 추가
-- 편집기와 공개 게시글 본문 기본 가운데 정렬 적용
-- 작업 브랜치: `feat/blog-inline-image-editing`
+## 2026-11-14 네이버 서치어드바이저 메타태그 확인
+- 기존 `app/layout.tsx`에 등록된 소유확인 메타태그가 운영 한국어·영어 홈페이지의 실제 HTML head에 출력되는지 확인
+- 소유확인 코드가 양쪽 페이지에서 일치함을 확인. 코드 중복 추가나 사이트 코드 변경은 불필요
+- 네이버 서치어드바이저 대시보드의 최종 소유확인 상태는 별도 확인 필요
 
-
-## 2026-11-13
-- Fix Cloudflare Preview deployment configuration by adding the preview D1 database binding to `wrangler.preview.jsonc` (commit `f9c3edc`). Preview rebuild and browser verification pending.
-
-
-## 2026-11-13
-- Added the preview D1 database binding to the root `wrangler.jsonc` as well as the isolated preview config. Cloudflare managed preview was reading the root config, so the earlier preview-only config change did not resolve the error (commit `5bc6a18`). Rebuild pending.
-
-
-## 2026-11-13
-- Cloudflare Preview deployment for blog inline image editing succeeded (build `59ddbfab`, commit `1e4949c`). Preview admin login page loads and shows the login form. Authenticated editor behavior remains to be tested; PR #20 is not merged.
+## 2026-11-14 블로그 본문 이미지 편집 개선
+- 관리자 편집기에서 본문 이미지를 선택해 드래그로 너비를 조절하고, 선택 영역을 잘라 WebP 이미지로 교체하는 기능 추가
+- 편집기 및 공개 게시글 본문 기본 가운데 정렬 적용
+- 기존 게시글 저장 형식과 이미지 업로드 경로 유지
