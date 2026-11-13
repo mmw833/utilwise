@@ -577,3 +577,7 @@
 - 이미지 자르기(위치/영역 조절 후 WebP로 저장·교체) 기능 추가
 - 편집기와 공개 게시글 본문 기본 가운데 정렬 적용
 - 작업 브랜치: `feat/blog-inline-image-editing`
+
+
+## 2026-11-13
+- Fix Cloudflare Preview deployment configuration by adding the preview D1 database binding to `wrangler.preview.jsonc` (commit `f9c3edc`). Preview rebuild and browser verification pending.
