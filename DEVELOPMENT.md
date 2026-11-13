@@ -391,3 +391,103 @@ npm run preview
 - 데스크톱 스타일은 이 구역에서 변경하지 않는다. 헤더/메뉴 동작은 기존 모바일 내비게이션 구현을 유지한다.
 - 검증 시 360px, 390px, 430px 폭과 PC 1280px 이상을 비교하고 가로 스크롤, 버튼/입력 가림, 텍스트 잘림, 계산 결과 표시를 확인한다.
 
+
+
+## 네이티브 블로그 및 Cloudflare D1
+- 작업 브랜치: `feature/blog-d1-foundation`
+- D1 데이터베이스: `utilwise-blog` / ID: `607946e3-d4cd-4cce-b7e9-eaf515244cb4`
+- Wrangler binding: `BLOG_DB`; migration directory: `migrations/`
+- 최초 스키마: `migrations/0001_blog_initial.sql`
+- 최초 D1 SQL은 2026-11-10 Cloudflare Console에서 직접 실행해 원격 테이블/트리거/인덱스 생성까지 확인했다. 이 경로는 Wrangler migration ledger를 자동 등록하지 않으므로, Wrangler 원격 migration을 사용하기 전 `d1_migrations` 상태를 확인하고 중복 실행 여부를 판단한다.
+- 원격 적용 전에는 migration SQL과 대상 database ID를 다시 확인하고 `wrangler d1 migrations apply utilwise-blog --remote` 실행 결과를 검증한다.
+- D1 binding은 서버 측 코드에서만 사용한다. Worker 배포 전 `npm run cf-typegen`으로 Cloudflare binding 타입을 갱신하고 TypeScript/Next.js 빌드를 수행한다.
+- 조회수 API는 `blog_view_dedup`에 (post_id, visitor_hash) 복합 키를 사용하고, 마지막 집계 시각에서 86,400초가 지난 경우에만 UPSERT가 반영되도록 구현한다. 트리거가 게시글 누적 조회수를 갱신한다.
+- 방문자 토큰은 서버에서 생성하고 HttpOnly/Secure/SameSite 쿠키로 관리한다. 원 IP 주소와 원 토큰은 저장하지 않는다.
+- 초기 범위에서 댓글, AI 번역, 관리자 인증, R2 업로드는 아직 구현하지 않았으며 별도 단계로 진행한다.
+
+
+## 블로그 D1 서버 데이터 접근
+
+- `lib/blog/db.ts`는 `getCloudflareContext()`를 요청 시점에 호출해 `BLOG_DB`를 반환한다. 모듈 최상위에서 Cloudflare 컨텍스트를 호출하지 않는다.
+- `lib/blog/posts.ts`는 공개 발행 글의 최신 목록, 인기글, slug 상세 조회 및 조회수 UPSERT를 제공한다.
+- 조회수 UPSERT에 전달하는 `visitorHash`는 서버가 무작위 HttpOnly 쿠키 토큰을 생성하고 SHA-256으로 해시한 값이어야 한다. 브라우저가 전달한 식별값을 그대로 사용하면 안 된다.
+- 동일 게시글/방문자 조합은 마지막 집계 시각에서 86,400초가 지나야 다시 집계된다. D1 트리거가 `view_count`를 갱신한다.
+- `next.config.ts`의 `initOpenNextCloudflareForDev()`는 `next dev`에서 Cloudflare 바인딩을 사용할 수 있게 한다.
+- 현재 구현은 데이터 접근 계층만 포함한다. 관리자 인증, 쿠키 발급/갱신 API, 게시글 CRUD, 공개 화면, R2는 별도 구현 및 검증이 필요하다.
+
+
+
+## 블로그 관리자 인증 설정
+
+관리자 인증은 저장소에 비밀번호나 세션 서명키를 저장하지 않는다. Cloudflare Worker의 secret으로 등록한다.
+
+프로덕션 Worker에 다음 두 값을 각각 등록한다.
+
+```bash
+npx wrangler secret put ADMIN_PASSWORD
+npx wrangler secret put ADMIN_SESSION_SECRET
+```
+
+- `ADMIN_PASSWORD`: 관리자가 직접 정하는 12자 이상의 강력한 비밀번호
+- `ADMIN_SESSION_SECRET`: 최소 32자 이상의 무작위 비밀값. 예: `openssl rand -base64 48`로 생성
+- secret 등록 후 Worker에 새 버전 배포가 필요하다. 운영 Worker 배포 전 PR 검토 및 사용자 승인 필요.
+- 로컬 개발은 저장소에 커밋하지 않는 `.env.local`에 같은 이름으로 값을 설정할 수 있다. 이 파일을 Git에 추가하지 않는다.
+- 로그인 주소: `/admin/blog/login`; 인증 후 관리자 경로: `/admin/blog`
+- 세션은 8시간 후 만료되며 HttpOnly, SameSite=Strict 쿠키로 전달된다. 운영 환경에서는 Secure 속성이 활성화된다.
+- 관리자 페이지는 검색엔진 색인에서 제외된다.
+- 배포 전 Cloudflare WAF/Rate Limiting에서 `/api/admin/login`의 반복 요청 제한을 설정하고, 실패 횟수/차단 동작을 확인한다. 현재 애플리케이션 코드 자체의 분산 환경 로그인 시도 제한은 아직 구현되지 않았다.
+- 인증 구현은 로그인/로그아웃과 페이지 보호까지다. 관리자 게시글 CRUD 및 카테고리 편집 기능은 별도 단계다.
+
+
+
+### 블로그 관리자 CMS 1차 구현
+- `app/admin/blog/page.tsx`는 서버에서 `isAdminAuthenticated()`를 확인한 뒤 `components/AdminBlogManager.tsx`를 렌더링한다.
+- `GET/POST/DELETE /api/admin/posts`는 세션 인증된 관리자만 게시글을 조회/저장/삭제할 수 있다. 저장 입력은 언어, slug, 제목, 소개, Markdown 본문, 카테고리, SEO 메타데이터, 상태를 검증한다.
+- `GET/POST /api/admin/categories`는 관리자용 카테고리 태그 조회/추가를 제공한다. 공개 카테고리별 피드는 만들지 않는다.
+- `lib/blog/admin-posts.ts`가 D1 쿼리를 담당한다. D1의 `blog_posts`와 `blog_categories` 테이블을 사용한다.
+- 게시글 상태는 `draft`, `published`, `archived`. 발행 시 `published_at`을 최초 발행 시각으로 설정하고, 발행 취소 시 null 처리한다.
+- Markdown은 원문으로 저장한다. 공개 화면에서 HTML로 렌더링할 때 반드시 안전한 Markdown 파서/HTML sanitization을 적용하고 원문을 신뢰 가능한 HTML로 직접 삽입하지 않는다.
+- 현재 관리자 화면은 작성/수정/삭제/상태 관리/조회수 확인을 제공하지만, 공개 블로그 화면·미리보기·R2 이미지 업로드·카테고리 수정/삭제는 아직 제공하지 않는다.
+- API는 인증 후에만 응답하며 `Cache-Control: no-store`를 적용한다. 변경 요청은 Origin을 확인하고 입력값 크기/형식을 제한한다.
+
+
+## 블로그 공개 페이지
+- 공개 URL: /blog, /blog/[slug], /en/blog, /en/blog/[slug]
+- D1 binding BLOG_DB를 사용하는 서버 컴포넌트에서 발행 게시글만 조회
+- 인기글은 view_count 내림차순, 전체 글은 published_at 내림차순
+- 조회수 API: POST /api/blog/view에 {language, slug} 전송. 서버가 발급한 uw_blog_visitor HttpOnly 쿠키를 사용하며 원문 IP는 저장하지 않음
+- Markdown은 안전한 제한 문법으로 렌더링. 원시 HTML/스크립트는 허용하지 않음
+- R2 이미지 업로드 및 이미지 렌더링은 별도 후속 구현
+
+
+## UTILWISE 저널형 블로그 메인 화면
+- 공개 피드 컴포넌트: `components/BlogFeed.tsx`; 스타일: `app/globals.css` 마지막의 `UTILWISE Journal redesign` 구역
+- 한국어 `/blog`, 영어 `/en/blog`가 동일한 컴포넌트를 사용하며 언어별 문구와 링크를 분기한다.
+- 메인 구성: 홈/블로그/도구 탐색 헤더, 언어 전환, 에디토리얼 히어로, 콘텐츠 주제 소개, 인기글, 최신글, 게시글이 없을 때의 안내 및 도구 탐색 링크, 푸터
+- 게시글 카드 데이터는 기존 D1 공개 피드(`popular`, `posts`)를 사용한다. 게시글 이미지 업로드/R2 연결 전에는 CSS 기반 추상 그래픽을 사용하며 이미지가 실제 업로드된 것처럼 표시하지 않는다.
+- 900px/620px 기준으로 태블릿·모바일 레이아웃을 조정한다. 배포 후 PC 1280px, 태블릿 768px, 모바일 390px/360px에서 overflow와 링크·카드 배치를 확인한다.
+
+
+## 블로그 게시글 상세 화면 디자인
+- 공통 상세 화면 컴포넌트: `components/BlogArticle.tsx`; 스타일은 `app/globals.css`의 `UTILWISE Journal article reading experience` 구역
+- 한국어 `/blog/[slug]`, 영어 `/en/blog/[slug]`는 같은 컴포넌트를 사용하며 언어별 내비게이션/문구/도구 링크를 제공한다.
+- D1에서 가져온 카테고리, 발행일, 조회수, 제목, 소개, Markdown 본문을 표시한다. 본문은 기존 `BlogMarkdown` 컴포넌트를 통해 렌더링하며 안전한 Markdown 처리 규칙을 유지한다.
+- 대표 이미지 업로드 전에는 CSS 추상 그래픽을 표시한다. 실제 이미지가 업로드된 것처럼 가장하지 않는다.
+- 배포 검증 시 실제 발행 게시글의 한·영 상세 URL을 열어 metadata, 본문, 조회수, 내부 링크와 PC/모바일 레이아웃을 확인한다.
+
+## Cloudflare R2 블로그 대표 이미지 (2026-11-10)
+- R2 버킷 `utilwise-blog-images`는 Standard 클래스로 생성 완료.
+- Preview 전용 `wrangler.preview.jsonc`에 `BLOG_IMAGES` binding을 연결하고 preview workflow에서 해당 config만 사용한다. 운영 `wrangler.jsonc`는 변경하지 않는다.
+- 관리자 업로드 API는 관리자 세션과 same-origin을 확인하고 JPG/PNG/WebP/AVIF의 실제 파일 시그니처 및 5MB 제한을 검사한다. 객체 키는 `blog/{uuid}.{ext}`이며 기존 객체를 교체/삭제하지 않는다.
+- 공개 GET API는 blog UUID 키만 허용하고 `nosniff` 및 immutable cache 헤더를 설정한다.
+- 관리자 UI에서 업로드/미리보기/키 제거가 가능하며 게시글 저장 시 D1의 `cover_image_key`에 반영한다. 공개 한국어·영어 피드와 상세 페이지에서 실제 이미지가 표시된다.
+- 검증: GitHub Actions preview build/deploy 및 실제 업로드·표시 테스트 대기. 운영 배포 및 main 병합은 하지 않는다.
+
+## 블로그 관리자 인증
+- 관리자 비밀번호는 Cloudflare Worker Secret `ADMIN_PASSWORD` 하나로 관리한다.
+- 비밀번호는 최소 12자 이상으로 설정한다. 소스 코드, GitHub 파일, 클라이언트 번들에 비밀번호를 저장하지 않는다.
+- 별도의 `ADMIN_SESSION_SECRET`은 사용하지 않는다. 세션 서명은 서버에서 관리자 비밀번호를 HMAC 키로 사용한다.
+- 로그인 성공 시 8시간 만료 HttpOnly, SameSite=Strict 쿠키를 발급한다. 로그아웃 시 쿠키를 만료한다.
+- 인증 값은 OpenNext의 `getCloudflareContext({ async: true })`에서 요청 시점에 조회한다.
+- 로그인 페이지는 `/admin/blog/login`, 관리자 화면은 `/admin/blog`이다.
+- Secret 값 자체는 페이지/로그/진단 출력에 표시하지 않는다.

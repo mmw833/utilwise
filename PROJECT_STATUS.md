@@ -1,3 +1,63 @@
+
+## 2026-11-11 관리자 인증 단일 비밀번호 구조 변경 (검증 진행 중)
+- 별도 `ADMIN_SESSION_SECRET` 설정을 제거하고 Cloudflare Worker Secret `ADMIN_PASSWORD` 하나만 사용하도록 인증 모듈 단순화
+- 세션 서명 키는 관리자 비밀번호에서 파생하며 8시간 만료 HttpOnly/SameSite=Strict 쿠키 유지
+- OpenNext Cloudflare context를 `getCloudflareContext({ async: true })`로 요청 시점에 조회하도록 변경
+- 비밀값은 화면/로그에 노출하지 않고 boolean 진단 정보만 제공
+- 작업 브랜치: `fix/admin-single-password-auth`
+- **검증 대기:** GitHub Actions 빌드, Preview 로그인 성공/실패, 관리자 페이지 접근 제어, 로그아웃 및 세션 만료 확인
+- **운영 반영:** 미실시
+## 2026-11-11 블로그 에디토리얼 디자인 1차 수정
+- 블로그 메인에서 주제/카테고리 탐색 메뉴와 영역 제거. 인기글·최신글 중심 구성으로 변경
+- 인기글 1위를 메인 히어로의 대표 스토리로 연결하고 등록된 대표 이미지가 있으면 사진 중심으로 표시, 이미지가 없을 때는 절제된 브랜드 그래픽으로 대체
+- 따뜻한 아이보리 배경, Georgia 계열 에디토리얼 제목 글꼴, 차분한 자연색 포인트, 카드/본문 여백과 이미지 비율 조정
+- 한국어·영어 공통 컴포넌트 및 반응형 CSS에 적용
+- 변경 파일: `components/BlogFeed.tsx`, `app/globals.css`, `PROJECT_STATUS.md`, `CHANGELOG.md`
+- 작업 브랜치: `preview/blog-system`. GitHub 반영 완료. Preview 자동 배포 및 실제 화면 갱신은 확인 대기, 운영 병합/배포 없음
+
+## 2026-11-11 블로그 에디토리얼 디자인 개선 진행
+- 블로그 메인에서 주제 탐색/주제 메뉴 영역 제거. 인기글과 최신글 중심 구조로 정리
+- 메인 히어로 오른쪽에 실제 인기 게시글을 연결하고 대표 이미지가 있으면 이미지로 노출하도록 변경
+- 다음 단계: 에디토리얼 타이포그래피/아이보리 톤/카드 및 상세 읽기 화면을 한국어·영어 공통으로 다듬고 Preview 검증
+- 작업 브랜치 `preview/blog-system`; 운영 반영 없음
+
+## 2026-11-11 관리자 로그인 설정 진단 보강
+- 관리자 로그인 경고 화면에서 비밀값을 노출하지 않고 두 Secret의 전달 여부와 최소 길이 조건만 구분해 안내하도록 보강
+- ADMIN_PASSWORD 최소 12자, ADMIN_SESSION_SECRET 최소 32자 조건은 유지
+- 작업 브랜치 `preview/blog-system`; Preview 재배포 후 실제 로그인 및 CMS 기능 검증 예정. 운영 Worker 변경 없음
+
+
+
+## 2026-11-10 블로그 관리자 인증 1차 구현
+- `/admin/blog/login` 로그인 화면과 `/admin/blog` 보호된 관리자 진입 화면 추가
+- `/api/admin/login`, `/api/admin/logout` 로그인/로그아웃 API 추가
+- 비밀번호 및 HMAC 세션 서명키는 Cloudflare Worker secret(`ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET`)에서 읽고 저장소에는 포함하지 않음
+- 8시간 만료, HttpOnly, SameSite=Strict 세션 쿠키와 HMAC-SHA256 서명 검증 적용
+- 관리자 화면은 인증 전 접근 시 로그인 페이지로 이동하며 검색엔진 noindex 처리
+- 아직 비밀값 등록, Cloudflare 배포, 실제 브라우저 로그인 테스트, 로그인 시도 제한 정책 확인 전. 빌드/CI 검증 대기
+- 현재 관리자 화면은 인증 연결 확인용 placeholder이며 게시글 CRUD는 미구현
+
+## 2026-11-10 블로그 서버 데이터 접근 계층 1차 구현
+- OpenNext `getCloudflareContext()`를 사용하는 서버 전용 D1 접근 모듈 `lib/blog/db.ts` 추가
+- `lib/blog/posts.ts`에 언어별 최신 게시글 목록, 조회수 기준 인기글, 발행 게시글 상세 조회 함수 추가
+- 조회수는 서버가 생성·해시한 방문자 식별값을 받는 UPSERT 방식으로 24시간 중복 집계를 DB에서 원자적으로 처리하도록 구현
+- `next.config.ts`에 `initOpenNextCloudflareForDev()`를 추가해 로컬 개발에서도 OpenNext Cloudflare 바인딩을 사용할 수 있도록 설정
+- 아직 관리자 인증/API/UI, 방문자 쿠키 발급, 공개 블로그 화면, R2 업로드는 미구현
+- GitHub Actions 빌드 결과 및 실제 Cloudflare Preview 실행 검증 대기. 운영 Worker 배포 및 main 병합 없음
+
+## 2026-11-10 블로그 D1 기반 구조 준비
+- Cloudflare D1 `utilwise-blog` 생성 확인: database ID `607946e3-d4cd-4cce-b7e9-eaf515244cb4`
+- 작업 브랜치 `feature/blog-d1-foundation` 생성 (main 기준, 운영 코드와 분리)
+- `wrangler.jsonc`에 서버 전용 D1 binding `BLOG_DB`와 migrations 경로 추가
+- 초기 migration `migrations/0001_blog_initial.sql` 설계: 카테고리, 언어별 게시글/번역 연결, 발행 상태, 조회수 및 24시간 중복 집계 테이블/트리거
+- 익명 방문자는 서버 생성 토큰의 해시만 저장하도록 설계하고 IP 원문 저장은 제외
+- 블로그 요구사항을 `BLOG_SPEC.md`로 정리. 전체 통합 피드/인기글/최신순, 카테고리는 글의 태그만 표시
+- **완료:** Cloudflare D1 Console에서 초기 SQL migration 실행 및 원격 확인. `blog_categories`, `blog_posts`, `blog_view_dedup` 3개 테이블, 2개 조회수 트리거, 4개 인덱스 생성 확인. Cloudflare 내부 테이블 `_cf_KV`는 기존 항목
+- **주의:** Console에서 SQL을 직접 실행했으므로 Wrangler migration ledger 등록 여부는 미확인. 이후 `wrangler d1 migrations apply utilwise-blog --remote` 실행 전 기존 객체와 migration ledger를 확인해야 함. SQL은 `IF NOT EXISTS`로 재실행 안전성 확보
+- **미완료:** Worker 타입 생성, 서버 데이터 접근 계층, 관리자 인증 및 UI, R2, 공개 블로그 화면
+- **검증 상태:** 원격 D1 객체 생성 및 sqlite_master 확인 완료. GitHub Actions 빌드/Cloudflare Worker 배포는 미완료
+- **배포 상태:** PR #10 초안 작성. main 병합 및 운영 배포 없음
+
 ## 2026-11-10 영어 홈페이지 SEO 안내 콘텐츠 위치 조정
 - 영어 홈페이지 하단에 길게 노출되던 SEO 안내 문단을 홈페이지에서 제거하고 `/en/about` 서비스 소개 페이지로 이동
 - 검색 의도에 필요한 계산기·QR·이미지·PDF·텍스트 도구 관련 설명과 내부 링크는 소개 페이지에 유지
@@ -496,3 +556,56 @@
 - 개별 응답은 브라우저 상태로만 처리하며 결과 URL에는 3개 축 요약 코드만 포함
 - 결과는 재미·자기성찰 콘텐츠이며 실제 생존 능력 또는 전문 심리 진단이 아님을 명시
 - **검증 대기:** TypeScript/Next.js 빌드, 12문항 이동·이전·점수 분기, 8개 결과 링크 직접 접속/공유, 모바일 UI, GitHub Actions 및 Cloudflare 운영 배포 확인
+
+
+## 2026-11-10 블로그 관리자 CMS 1차 구현
+- 인증된 관리자 전용 게시글 목록/작성/수정/삭제 API 추가: `/api/admin/posts`
+- 카테고리 목록/추가 API 추가: `/api/admin/categories`. 카테고리는 글의 태그로만 사용하며 카테고리별 공개 피드는 만들지 않음
+- 관리자 화면 `/admin/blog`를 인증 확인용 placeholder에서 실제 CMS 화면으로 교체
+- 게시글 제목, slug, 언어(ko/en), 짧은 소개, Markdown 본문, SEO 제목/설명, 카테고리, 임시저장/발행/보관 상태 입력 지원
+- 게시글 목록에 언어, 발행 상태, 카테고리, 수정일, 누적 조회수 표시
+- 게시글 저장 시 D1에 저장하고 발행 상태일 때 published_at을 설정. 임시저장/보관으로 바꾸면 공개 발행 상태 해제
+- 관리자 API는 세션 인증, no-store 응답, 변경 요청 Origin 검사 및 입력 길이/형식 검증 적용
+- 대표 이미지 업로드는 R2 연결 단계에서 구현 예정. 현재는 이미지 키 입력을 비활성화
+- 공개 블로그 목록/상세 페이지, Markdown 안전 렌더링, 미리보기, R2 업로드, 운영 로그인 검증은 아직 미완료
+- 현재 작업 브랜치 `feature/blog-d1-foundation`, PR #10 초안. 병합 및 운영 배포 없음
+- **검증 대기:** GitHub Actions production build 및 TypeScript 빌드 결과 확인 필요
+
+
+## 2026-11-10 블로그 공개 화면 1차 구현
+- /blog, /blog/[slug], /en/blog, /en/blog/[slug] 공개 라우트 추가
+- 블로그 메인: 언어별 인기글 3개와 최신순 전체 글 30개를 하나의 피드로 제공. 카테고리별 탐색 페이지는 만들지 않음
+- 게시글 상세: 제목/요약/카테고리 태그/발행일/조회수와 안전한 Markdown 일부 렌더링 지원
+- Markdown 렌더러는 제목, 문단, 목록, 인용, 굵게/기울임, 안전한 http(s)/mailto 링크만 허용하며 원시 HTML은 실행하지 않음
+- 게시글 방문 집계 API 추가: 서버 발급 HttpOnly 익명 쿠키의 SHA-256 해시만 D1에 전달하고 24시간 dedup 로직 재사용. IP 원문 저장 없음
+- 홈 한국어/영어 데스크톱·모바일 메뉴에 블로그 링크 추가, sitemap에 블로그 메인 2개 URL 등록
+- 대표 이미지(R2 업로드), 관리자 미리보기, 카테고리 편집/삭제, 게시글 페이지네이션, 실제 게시글 테스트는 후속
+- CI 최신 결과 확인 필요. PR #10 draft, main 병합/운영 배포 없음
+
+
+## 2026-11-10 블로그 메인 디자인 2차 개선
+- 작업 브랜치: `preview/blog-system` (블로그 개발 기반 브랜치에서 분기한 독립 미리보기 브랜치)
+- `components/BlogFeed.tsx`를 UTILWISE 종합 유틸리티 플랫폼의 매거진형 저널 홈으로 재구성
+- 한국어·영어 공통 헤더/언어 전환, 플랫폼 도구 탐색 링크, 에디토리얼 히어로, 주제 소개, 인기 콘텐츠, 최신 콘텐츠, 빈 상태 안내, 푸터 반응형 구성
+- `app/globals.css`에 데스크톱/태블릿/모바일 저널 전용 스타일 추가. 기존 전역/기능별 스타일은 유지하고 마지막에 전용 스타일을 추가
+- 실제 게시글이 없을 때도 준비 중 안내와 UTILWISE 도구로 이어지는 링크를 표시. 실제 게시글이 있으면 인기글/최신글 데이터로 카드 렌더링
+- 대표 이미지 업로드/R2는 아직 연결 전이므로 카드 비주얼은 CSS 기반 임시 그래픽이며 실제 게시글 이미지를 가장한 콘텐츠는 넣지 않음
+- **검증 대기:** Cloudflare preview workflow의 OpenNext 빌드/배포 및 `/blog`, `/en/blog` smoke test. PC·모바일 실기기 시각 검증도 필요
+- main 병합 및 운영 사이트 배포 없음
+
+
+## 2026-11-10 블로그 게시글 상세 디자인 1차
+- `components/BlogArticle.tsx`를 저널형 읽기 화면으로 재구성하고 한국어·영어 공통 적용
+- 브랜드 헤더/언어 전환/도구 링크, breadcrumb, 카테고리·발행일·조회수, 제목·요약, 작성 주체, 대표 비주얼, 본문 읽기 레이아웃, 블로그 복귀 링크, 도구 탐색 CTA 추가
+- Markdown 렌더링은 기존 `BlogMarkdown`을 그대로 사용해 안전한 제한 문법을 유지
+- PC·모바일 전용 CSS를 `app/globals.css`에 추가. 실제 이미지 업로드 전까지 추상 그래픽 사용
+- **검증 대기:** 최신 브랜치 Cloudflare build/deploy 및 한국어·영어 smoke test. 게시글 실제 데이터가 있는 상세 URL로 PC/모바일 시각 확인 필요
+- main 병합 및 운영 배포 없음
+
+## Cloudflare R2 블로그 대표 이미지 (2026-11-10)
+- R2 버킷 `utilwise-blog-images`는 Standard 클래스로 생성 완료.
+- Preview 전용 `wrangler.preview.jsonc`에 `BLOG_IMAGES` binding을 연결하고 preview workflow에서 해당 config만 사용한다. 운영 `wrangler.jsonc`는 변경하지 않는다.
+- 관리자 업로드 API는 관리자 세션과 same-origin을 확인하고 JPG/PNG/WebP/AVIF의 실제 파일 시그니처 및 5MB 제한을 검사한다. 객체 키는 `blog/{uuid}.{ext}`이며 기존 객체를 교체/삭제하지 않는다.
+- 공개 GET API는 blog UUID 키만 허용하고 `nosniff` 및 immutable cache 헤더를 설정한다.
+- 관리자 UI에서 업로드/미리보기/키 제거가 가능하며 게시글 저장 시 D1의 `cover_image_key`에 반영한다. 공개 한국어·영어 피드와 상세 페이지에서 실제 이미지가 표시된다.
+- 검증: GitHub Actions preview build/deploy 및 실제 업로드·표시 테스트 대기. 운영 배포 및 main 병합은 하지 않는다.

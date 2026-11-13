@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { listPublishedPosts } from "@/lib/blog/posts";
 const siteUrl = "https://utilwise.kr";
 const calculators = ["/area","/date","/loan","/brokerage","/salary","/severance","/savings","/dsr","/rent-conversion","/fuel","/vat","/volume","/tip"];
 const englishCalculators = calculators.map((route) => `/en${route}`);
@@ -9,6 +10,8 @@ const textToolPages = ["/text-tools","/text-tools/character-counter","/text-tool
 const englishTextToolPages = textToolPages.map((route) => `/en${route}`);
 const mbtiTypes = ["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"];
 const pages = [
+{route:"/blog",priority:0.75,changeFrequency:"daily" as const},
+{route:"/en/blog",priority:0.7,changeFrequency:"daily" as const},
 {route:"/",priority:1,changeFrequency:"weekly" as const},
 {route:"/about",priority:0.6,changeFrequency:"yearly" as const},
 {route:"/privacy",priority:0.4,changeFrequency:"yearly" as const},
@@ -40,4 +43,23 @@ const pages = [
 {route:"/en/psychology/zombie",priority:0.6,changeFrequency:"monthly" as const},
 ...mbtiTypes.map(type=>({route:`/en/mbti/result/${type}`,priority:0.4,changeFrequency:"yearly" as const}))
 ];
-export default function sitemap():MetadataRoute.Sitemap{return pages.map(({route,priority,changeFrequency})=>({url:`${siteUrl}${route}`,changeFrequency,priority}));}
+export const dynamic = "force-dynamic";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const [koPosts, enPosts] = await Promise.all([
+    listPublishedPosts("ko", 50),
+    listPublishedPosts("en", 50),
+  ]);
+  const staticEntries = pages.map(({ route, priority, changeFrequency }) => ({
+    url: `${siteUrl}${route}`,
+    changeFrequency,
+    priority,
+  }));
+  const postEntries = [...koPosts, ...enPosts].map((post) => ({
+    url: `${siteUrl}/${post.language === "en" ? "en/" : ""}blog/${post.slug}`,
+    lastModified: new Date(post.published_at * 1000),
+    changeFrequency: "monthly" as const,
+    priority: 0.65,
+  }));
+  return [...staticEntries, ...postEntries];
+}
