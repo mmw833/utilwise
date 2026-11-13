@@ -1,6 +1,7 @@
 name: Preview D1 Diagnostics
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - feat/blog-inline-image-editing
