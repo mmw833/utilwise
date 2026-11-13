@@ -134,6 +134,7 @@ export default function AdminBlogManager() {
   const selectedInlineImageRef = useRef<HTMLImageElement | null>(null);
   const [inlineImageWidth, setInlineImageWidth] = useState("100%");
   const [inlineImageAlign, setInlineImageAlign] = useState("center");
+  const [hasSelectedInlineImage, setHasSelectedInlineImage] = useState(false);
   const [cropOpen, setCropOpen] = useState(false);
   const [cropLeft, setCropLeft] = useState(10);
   const [cropTop, setCropTop] = useState(10);
@@ -555,7 +556,7 @@ export default function AdminBlogManager() {
                   <div className="blog-admin-inline-image-tools">
                     <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; syncEditorContent(); } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
-                    <button type="button" className="blog-admin-secondary" disabled={!selectedInlineImageRef.current || uploadingImage} onClick={() => { setCropLeft(10); setCropTop(10); setCropWidth(80); setCropHeight(80); setCropOpen(true); }}>선택 이미지 자르기</button>
+                    <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage || uploadingImage} onClick={() => { setCropLeft(10); setCropTop(10); setCropWidth(80); setCropHeight(80); setCropOpen(true); }}>선택 이미지 자르기</button>
                     <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onClick={rememberEditorSelection} onChange={(e) => { placeImageInsertionMarker(); void uploadInlineImage(e.currentTarget.files?.[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
                   <div
@@ -573,7 +574,7 @@ export default function AdminBlogManager() {
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
                     onFocus={rememberEditorSelection}
-                    onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { selectedInlineImageRef.current = target; setInlineImageWidth(target.dataset.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } else if (target === contentRef.current) { selectedInlineImageRef.current = null; } }}\n                    onPointerDown={handleInlineImagePointerDown}
+                    onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { selectedInlineImageRef.current = target; setHasSelectedInlineImage(true); setInlineImageWidth(target.dataset.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } else if (target === contentRef.current) { selectedInlineImageRef.current = null; setHasSelectedInlineImage(false); } }}\n                    onPointerDown={handleInlineImagePointerDown}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={handleEditorDrop}
                   />
