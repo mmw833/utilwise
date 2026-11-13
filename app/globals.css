@@ -882,3 +882,17 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 .nav a.nav-blog-link:hover{background:#294f70;color:#fff;transform:translateY(-1px)}
 .mobile-menu-panel>a.mobile-blog-link{grid-column:1/-1;justify-content:center;gap:7px;margin-top:3px;background:#203d59;color:#fff;font-weight:700}
 .mobile-menu-panel>a.mobile-blog-link:hover,.mobile-menu-panel>a.mobile-blog-link:active{background:#294f70;color:#fff}
+
+
+/* Header navigation alignment and softer blog call-to-action */
+.header{align-items:center}
+.nav{align-items:center;min-height:76px}
+.nav>a{display:inline-flex;align-items:center;justify-content:center;min-height:40px;line-height:1.4}
+.nav .language-switcher{display:inline-flex;align-items:center;min-height:40px;line-height:1.4}
+.nav a.nav-blog-link{background:#eaf1f8;color:#365b83;padding:8px 15px;min-height:38px;line-height:1.2}
+.nav a.nav-blog-link:hover{background:#dce8f4;color:#294f70;transform:none}
+@media(max-width:760px){
+  .nav{min-height:0}
+  .nav>a{min-height:34px}
+  .nav .language-switcher{min-height:34px}
+}
