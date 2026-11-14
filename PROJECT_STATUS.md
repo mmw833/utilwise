@@ -1,3 +1,10 @@
+## 2026-11-14 이미지 파일 변환기 HEIC/HEIF 지원 추가
+- 기존 이미지 변환기에 HEIC·HEIF 파일 입력 지원 및 JPG/PNG/WebP 출력 연결
+- heic2any 0.0.4 브라우저용 번들을 필요 시 jsDelivr에서 지연 로드하고, 변환된 PNG를 기존 Canvas 출력 파이프라인으로 전달
+- HEIC/HEIF 파일도 다중 선택, 파일당 20MB 제한, 각 변 12,000px 제한을 적용
+- HEIC/HEIF 변환 시 EXIF 메타데이터가 보존되지 않을 수 있음을 화면과 개인정보처리방침에 안내
+- 실제 iPhone 원본 샘플, 모바일 Safari, 회전 방향 및 변환 파일 다운로드 테스트는 검증 대기
+
 ## 2026-11-14 이미지 파일 변환기 개발
 - 작업 브랜치: `feature/image-format-converter` (main 기준)
 - 한국어 `/image-converter`, 영어 `/en/image-converter` 독립 페이지 추가
