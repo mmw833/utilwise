@@ -1,3 +1,14 @@
+## 2026-11-14 PR #20 블로그 이미지 편집 기능 운영 배포 확인
+- PR #20 `Improve blog image editing and centered writing layout` 병합 완료: `a896db5d7326d816547bc718f7f70714d0172f6b` (main 최신 커밋)
+- Cloudflare Workers 운영 빌드 및 배포 체크 성공 확인
+- GitHub Actions `Build, migrate and deploy production Worker`: OpenNext 빌드, 운영 D1 migration, Cloudflare Worker 배포 단계 모두 성공
+- GitHub Actions `Next.js production build` 및 `Workers Builds: utilwise` 성공
+- 운영 `https://utilwise.kr` 응답 확인. 홈 페이지와 Naver verification 메타태그 정상 노출
+- PR #20 변경 파일: `components/AdminBlogManager.tsx`, `app/globals.css`, `wrangler.jsonc`, `wrangler.preview.jsonc`, 프로젝트 기록
+- 반영 기능: 본문 이미지 선택·드래그 너비 조절·이미지 자르기(WebP 교체), 편집기 및 공개 게시글 본문 가운데 정렬
+- 이미지 위치 이동 기능은 추가하지 않음
+- **남은 확인:** 관리자 인증이 가능한 브라우저 세션으로 실제 이미지 선택/크기 조절/자르기/저장과 기존 게시글 호환을 직접 검수할 것. 공개 홈 응답 및 배포 파이프라인 성공은 확인했으나 관리자 편집 동작까지 실사용 검수 완료로 간주하지 않음
+
 ## 2026-11-13 운영 배포 완료 및 관리자 비밀번호 설정 대기
 - 운영 통합 PR #17 병합 완료. 운영 커밋: `acef42c0c75e3dfaba35228f95fefba757ac445d`
 - 포함: 블로그 관리자/편집기 개선, 태그·대표글·방문자 통계, 본문 이미지 삽입 개선, 한국어·영어 블로그 및 홈 내비게이션/SEO 업데이트
