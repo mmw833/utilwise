@@ -612,3 +612,10 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 확인 항목: 모델 다운로드/실행, 투명 알파 채널, 큰 이미지 메모리 사용, 모바일 Safari/Chrome, 데스크톱 Chrome/Firefox/Edge, 한·영 canonical/hreflang 및 sitemap.
 - 새 의존성: @huggingface/transformers ^3.8.1
 - 운영 반영 전 GitHub Actions 빌드 및 실제 브라우저에서 테스트 이미지(인물·제품·복잡한 배경) 검증을 완료한다.
+
+## 블로그 관리자 편집기 이미지 조작
+- 본문 이미지 삽입은 파일 선택창이 열리기 전 `contentEditable`의 현재 Range를 보존하고 DOM 삽입 마커를 둔다. 파일 업로드 완료 후 마커를 실제 이미지로 교체한다.
+- 이미지 크기 조절 중에는 DOM을 Markdown으로 직렬화해 React 상태를 갱신하지 않는다. 드래그 종료 또는 슬라이더 조작 완료 시점에 한 번만 동기화한다. 조절 도중 `dangerouslySetInnerHTML`을 다시 적용하면 선택 중인 이미지 노드가 분리되어 드래그가 끊길 수 있다.
+- 저장 요청 직전에 `contentEditable`의 현재 DOM을 Markdown으로 직렬화해 최신 내용을 전송한다.
+- 삽입 마커는 저장 Markdown에 포함하지 않는다. 이미지의 `data-width`/`data-align` 확장 메타데이터와 R2 업로드 경로는 기존 형식을 유지한다.
+- 검증은 PC 마우스와 모바일 터치에서 커서 중간 삽입, 이미지 선택, 모서리 드래그, 너비 슬라이더, 저장/재편집 및 공개 상세 페이지 표시를 모두 수행한다.
