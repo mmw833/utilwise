@@ -1,3 +1,10 @@
+## 2026-11-14 이미지 파일 변환기 개발
+- `/image-converter`, `/en/image-converter` 신규 페이지 및 공통 브라우저 변환 컴포넌트 추가
+- JPG, PNG, WebP 형식 변환, 다중 파일 처리, 품질 조절, 미리보기 및 개별 다운로드
+- 파일당 20MB 및 각 변 12,000px 제한. 파일은 서버로 전송하지 않음
+- 온라인 도구 목록, sitemap, 개인정보처리방침, SEO 키워드 맵 및 프로젝트 기록 업데이트
+- 작업 브랜치 `feature/image-format-converter`; 빌드·브라우저 테스트·운영 배포는 미완료
+
 ## 2026-11-14 배경 제거 ESM 의존성 번들링 보완
 - 브라우저 전용 `transformers.web.js` 직접 import 파일을 검사한 결과 `onnxruntime-common`, `onnxruntime-web` bare imports가 남아 브라우저에서 모듈 해석이 실패할 수 있음을 확인
 - jsDelivr `+esm` 엔드포인트로 변경해 의존성 import를 브라우저가 해석 가능한 CDN 경로로 재작성하도록 보완
