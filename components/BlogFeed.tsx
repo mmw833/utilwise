@@ -56,21 +56,15 @@ export default function BlogFeed({ popular, posts, featured, visitorStats, langu
 
     <section className="journal-hero">
       <div className="journal-hero-copy">
-        <span className="journal-eyebrow">UTILWISE JOURNAL <i /></span>
-        <h1>{en ? <>Ideas that make<br />everyday life easier.</> : <>일상을 더 편리하게 만드는<br /><em>유용한 이야기</em></>}</h1>
-        <p>{en ? "Useful perspectives, practical guides and fresh ideas for a smarter everyday." : "생활과 디지털, 일과 취미까지. 더 나은 일상을 위한 정보와 실용적인 가이드를 전합니다."}</p>
+        <span className="journal-hero-brand">UTILWISE</span>
+        <h1>BLOG</h1>
+        <p>{en ? "Useful perspectives, practical guides and fresh ideas for a smarter everyday." : "일상을 더 편리하게 만드는 유용한 이야기"}</p>
         <div className="journal-hero-actions">
           <a href="#latest" className="journal-primary-link">{en ? "Explore articles" : "콘텐츠 둘러보기"} <span>↓</span></a>
-          <Link href={tools} className="journal-secondary-link">{en ? "Discover useful tools" : "유용한 도구 살펴보기"} ↗</Link>
+          <Link href={home} className="journal-secondary-link">{en ? "Discover useful tools" : "유용한 도구 살펴보기"} ↗</Link>
         </div>
       </div>
       <div className="journal-visitor-stats"><span>TODAY <b>{visitorStats.today.toLocaleString(locale)}</b></span><i>·</i><span>TOTAL <b>{visitorStats.total.toLocaleString(locale)}</b></span></div>
-      <div className="journal-hero-art" aria-hidden="true">
-        <div className="journal-art-orbit journal-art-orbit-one" />
-        <div className="journal-art-orbit journal-art-orbit-two" />
-        <div className="journal-art-paper"><span>U.</span><small>MAKE EVERYDAY<br />A LITTLE EASIER</small><i>✳</i></div>
-        <div className="journal-art-caption">TOOLS · IDEAS · EVERYDAY</div>
-      </div>
     </section>
 
     {(() => { const lead = featured || posts[0] || null; if (!lead) return null; return <section className="journal-featured"><Link href={base + "/" + lead.slug} className="journal-featured-link"><div className="journal-featured-image">{lead.cover_image_key ? <img src={"/api/blog/images/" + lead.cover_image_key.split("/").map(encodeURIComponent).join("/")} alt="" /> : <div className="journal-featured-placeholder"><span>UTILWISE JOURNAL</span><strong>U.</strong></div>}</div><div className="journal-featured-copy"><h2>{lead.title}</h2><div className="journal-featured-meta">{lead.category_name && <span>{lead.category_name}</span>}<time dateTime={new Date(lead.published_at * 1000).toISOString()}>{dateLabel(lead.published_at, locale)}</time><small className="journal-card-views">{lead.view_count.toLocaleString(locale)} {en ? "views" : "조회"}</small></div></div></Link></section>; })()}
