@@ -26,7 +26,7 @@ async function getBackgroundPipeline(onProgress: ProgressHandler): Promise<Backg
         try { return await pipeline("image-segmentation", model, { ...options, device: "webgpu", dtype: "fp16" }); }
         catch (error) { console.warn("BiRefNet Lite WebGPU unavailable; falling back to WASM.", error); }
       }
-      return await pipeline("image-segmentation", model, { ...options, device: "wasm", dtype: "fp32" });
+      return await pipeline("image-segmentation", model, { ...options, device: "wasm", dtype: "fp16" });
     })().catch((error) => { pipelinePromise = null; throw error; });
   }
   return pipelinePromise;
@@ -57,7 +57,7 @@ const messages = {
     invalid: "JPG, PNG 또는 WebP 이미지 파일을 선택해 주세요.",
     dimensions: "이미지의 가로 또는 세로 길이는 8,000px 이하여야 합니다.",
     error: "이미지를 처리하지 못했습니다. 잠시 후 다시 시도하거나 다른 이미지를 선택해 주세요.",
-    guide: "사람과 사물 등 다양한 사진의 배경을 분리하는 AI 모델을 사용합니다. 복잡한 배경이나 작은 디테일은 결과에 따라 차이가 있을 수 있습니다.",
+    guide: "BiRefNet Lite AI 모델로 사람과 상품 등 다양한 피사체를 분리합니다. 복잡한 배경이나 작은 디테일은 결과에 따라 차이가 있을 수 있습니다.",
     modelReady: "배경 제거가 완료되었습니다.",
     modelDownload: "AI 모델 다운로드",
     modelLoading: "AI 모델 불러오기",
@@ -90,7 +90,7 @@ const messages = {
     invalid: "Please choose a JPG, PNG, or WebP image.",
     dimensions: "Image width and height must each be 8,000 px or less.",
     error: "Could not process this image. Please try again or choose another file.",
-    guide: "The AI model can separate people and objects from a range of photos. Results may vary with complex backgrounds or fine details.",
+    guide: "BiRefNet Lite separates people and products from a range of photos. Results may vary with complex backgrounds or fine details.",
     modelReady: "Background removal complete.",
     modelDownload: "Downloading AI model",
     modelLoading: "Loading AI model",
