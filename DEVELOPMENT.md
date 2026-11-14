@@ -595,7 +595,8 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 ## 이미지 파일 형식 변환기
 - 한국어 `/image-converter`, 영어 `/en/image-converter`
 - UI/처리: `components/ImageFormatConverter.tsx`
-- JPG, PNG, WebP 상호 변환을 브라우저 Canvas API로 수행하며 다중 파일 선택 및 개별 다운로드 지원
+- JPG, PNG, WebP 상호 변환은 브라우저 Canvas API로 수행. HEIC/HEIF는 heic2any 0.0.4 브라우저 번들을 필요 시 jsDelivr에서 로드해 PNG로 디코딩한 뒤 Canvas 출력 파이프라인으로 변환
+- 다중 파일 선택 및 개별 다운로드 지원
 - JPG/WebP 출력 품질 50~100% 조절, PNG는 무손실 저장. JPG 출력은 투명 영역을 흰색으로 채움
 - 파일당 20MB, 가로·세로 각각 최대 12,000px 제한
 - 원본 파일은 UTILWISE 서버로 전송하지 않음
