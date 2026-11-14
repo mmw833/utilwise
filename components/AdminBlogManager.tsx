@@ -353,9 +353,10 @@ export default function AdminBlogManager() {
   function moveSelectedInlineImage(direction: -1 | 1) {
     const image = selectedInlineImageRef.current;
     if (!image || !contentRef.current?.contains(image)) return;
-    const sibling = direction < 0 ? image.previousElementSibling : image.nextElementSibling;
+    const block = image.closest("p") || image;
+    const sibling = direction < 0 ? block.previousElementSibling : block.nextElementSibling;
     if (!sibling) return;
-    if (direction < 0) sibling.before(image); else sibling.after(image);
+    if (direction < 0) sibling.before(block); else sibling.after(block);
     syncEditorContent();
   }
   function deleteSelectedInlineImage() {
