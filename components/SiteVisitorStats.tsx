@@ -9,9 +9,8 @@ export default function SiteVisitorStats() {
 
   useEffect(() => {
     let active = true;
-    const load = async () => {
+    const refresh = async () => {
       try {
-        await fetch("/api/blog/visit", { method: "POST", keepalive: true });
         const response = await fetch("/api/blog/visit", { cache: "no-store" });
         if (!response.ok) return;
         const data = (await response.json()) as VisitorStats;
@@ -20,8 +19,13 @@ export default function SiteVisitorStats() {
         // Visitor statistics are non-essential; keep the header clean if unavailable.
       }
     };
-    void load();
-    return () => { active = false; };
+    const handleTracked = () => { void refresh(); };
+    window.addEventListener("uw:visitor-tracked", handleTracked);
+    void refresh();
+    return () => {
+      active = false;
+      window.removeEventListener("uw:visitor-tracked", handleTracked);
+    };
   }, []);
 
   return (
