@@ -1,3 +1,11 @@
+## 2026-11-14 블로그 메인 히어로 중앙 정렬 디자인 적용
+- 블로그 메인 상단을 중앙 정렬형 에디토리얼 구성으로 변경: 작은 UTILWISE, 큰 세리프 BLOG, 짧은 설명, 버튼 2개
+- 기존 오른쪽 장식 그래픽은 히어로에서 숨기고 방문자 통계는 우측 상단에 유지
+- 콘텐츠 둘러보기는 글 목록으로, 유용한 도구 살펴보기는 언어별 메인 도구 페이지(`/` 또는 `/en`)로 연결
+- 한국어·영어 공통 `BlogFeed` 및 반응형 스타일에 적용
+- 변경 파일: `components/BlogFeed.tsx`, `app/globals.css`
+- GitHub main 반영 완료. 빌드 및 Cloudflare 운영 배포 확인 대기
+
 ## 2026-11-14 AI 배경 제거 Cloudflare 빌드 우회 구조 변경 (빌드 검증 통과)
 - `serverExternalPackages` 지정만으로는 Cloudflare esbuild의 `onnxruntime-node` 네이티브 파일 오류가 해결되지 않음을 재검증
 - NPM의 `@huggingface/transformers` 의존성을 제거하고 브라우저에서 공식 jsDelivr CDN의 Transformers.js 3.8.1 ESM 모듈을 동적 로드하도록 변경
