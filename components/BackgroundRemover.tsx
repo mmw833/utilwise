@@ -127,7 +127,7 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
               model: string,
               options?: Record<string, unknown>,
             ) => Promise<BackgroundPipeline>;
-            env: { allowLocalModels: boolean; useBrowserCache: boolean };
+            env: { allowLocalModels: boolean; allowRemoteModels: boolean; useBrowserCache: boolean };
           };
           env.allowLocalModels = false;
           env.allowRemoteModels = true;
