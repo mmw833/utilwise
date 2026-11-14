@@ -594,7 +594,7 @@ export default function AdminBlogManager() {
                     <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} disabled={!hasSelectedInlineImage} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} onPointerUp={syncEditorContent} onKeyUp={syncEditorContent} /></label>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; syncEditorContent(); } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage || uploadingImage} onClick={() => { setCropLeft(10); setCropTop(10); setCropWidth(80); setCropHeight(80); setCropOpen(true); }}>선택 이미지 자르기</button>
-                    <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onPointerDown={() => { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); }} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); } }} onChange={(e) => { if (e.currentTarget.files?.[0]) void uploadInlineImage(e.currentTarget.files[0]); e.currentTarget.value = ""; }} /></label>
+                    <label onPointerDown={() => { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); }}>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); } }} onChange={(e) => { if (e.currentTarget.files?.[0]) void uploadInlineImage(e.currentTarget.files[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
                   <div
                     key={editor.id || "new-post"}
@@ -607,7 +607,13 @@ export default function AdminBlogManager() {
                     aria-multiline="true"
                     data-placeholder="여기에 글을 작성하세요. 서식 버튼을 누르면 입력한 글에 바로 적용됩니다."
                     dangerouslySetInnerHTML={{ __html: markdownToEditorHtml(editor.content_md) }}
-                    onBlur={syncEditorContent}
+                    onBlur={(event) => {
+                      const nextFocus = event.relatedTarget as HTMLElement | null;
+                      // Keep the live image node attached while the user adjusts its
+                      // width/alignment or uses the formatting toolbar.
+                      if (nextFocus?.closest(".blog-admin-inline-image-tools, .blog-admin-format-tools")) return;
+                      syncEditorContent();
+                    }}
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
                     onFocus={rememberEditorSelection}
