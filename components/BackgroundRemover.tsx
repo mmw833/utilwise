@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 
 type Language = "ko" | "en";
-type PipelineOutput = { toBlob: () => Promise<Blob> };
+type SegmentationMask = { data: Uint8Array | Uint8ClampedArray | Float32Array; width: number; height: number; channels?: number };
+type PipelineOutput = { mask: SegmentationMask };
 type BackgroundPipeline = (image: Blob) => Promise<PipelineOutput[]>;
 type ProgressHandler = (progress: { status?: string; progress?: number }) => void;
 let pipelinePromise: Promise<BackgroundPipeline> | null = null;
@@ -14,32 +15,22 @@ async function getBackgroundPipeline(onProgress: ProgressHandler): Promise<Backg
   if (!pipelinePromise) {
     pipelinePromise = (async () => {
       const transformersCdnUrl = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/+esm";
-      const { pipeline, env } = (await import(
-        /* webpackIgnore: true */ transformersCdnUrl
-      )) as {
+      const { pipeline, env } = (await import(/* webpackIgnore: true */ transformersCdnUrl)) as {
         pipeline: (task: string, model: string, options?: Record<string, unknown>) => Promise<BackgroundPipeline>;
         env: { allowLocalModels: boolean; allowRemoteModels: boolean; useBrowserCache: boolean };
       };
-      env.allowLocalModels = false;
-      env.allowRemoteModels = true;
-      env.useBrowserCache = true;
-      const options = {
-        progress_callback: (progress: { status?: string; progress?: number }) => pipelineProgressHandler?.(progress),
-      };
-      // Prefer WebGPU where available; fall back to the broadly compatible WASM backend.
+      env.allowLocalModels = false; env.allowRemoteModels = true; env.useBrowserCache = true;
+      const options = { progress_callback: (progress: { status?: string; progress?: number }) => pipelineProgressHandler?.(progress) };
+      const model = "shozebDev/birefnet-lite-512-onnx";
       if (typeof navigator !== "undefined" && "gpu" in navigator) {
-        try {
-          return await pipeline("background-removal", "onnx-community/BEN2-ONNX", { ...options, device: "webgpu" });
-        } catch (error) {
-          console.warn("WebGPU background removal unavailable; falling back to WASM.", error);
-        }
+        try { return await pipeline("image-segmentation", model, { ...options, device: "webgpu", dtype: "fp16" }); }
+        catch (error) { console.warn("BiRefNet Lite WebGPU unavailable; falling back to WASM.", error); }
       }
-      return await pipeline("background-removal", "onnx-community/BEN2-ONNX", { ...options, device: "wasm" });
-    })();
+      return await pipeline("image-segmentation", model, { ...options, device: "wasm", dtype: "fp32" });
+    })().catch((error) => { pipelinePromise = null; throw error; });
   }
   return pipelinePromise;
 }
-
 const messages = {
   ko: {
     title: "이미지 선택 또는 여기에 놓기",
