@@ -1,3 +1,10 @@
+## 2026-11-14 AI 이미지 배경 제거 도구 추가 (작업 브랜치)
+- /background-remover, /en/background-remover 한국어·영어 독립 페이지와 AI 배경 제거 UI 추가
+- Transformers.js와 MIT 표기 BEN2 ONNX 모델을 이용해 브라우저에서 배경 제거, 투명 PNG 다운로드 제공
+- JPG/PNG/WebP 업로드, 드래그앤드롭, 20MB 제한, 결과 미리보기 및 배경색 미리보기 지원
+- 온라인 도구 카테고리, sitemap, 개인정보처리방침, SEO 키워드 맵 업데이트
+- 작업 브랜치: feature/background-remover; 빌드·모델 실행·실제 브라우저 검증 및 운영 반영 전
+
 ## 2026-11-13 운영 블로그 및 내비게이션 업데이트 배포
 - PR #17 운영 통합 병합: 블로그 편집기/태그/이미지 삽입/대표글/방문자 통계 개선, 한·영 홈 메뉴 및 SEO 업데이트
 - 운영 Worker에 D1 및 R2 binding 설정. GitHub Actions Production Deploy로 빌드, D1 migration, Worker 배포 성공
