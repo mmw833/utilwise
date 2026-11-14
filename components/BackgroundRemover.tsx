@@ -28,8 +28,8 @@ const messages = {
     invalid: "JPG, PNG 또는 WebP 이미지 파일을 선택해 주세요.",
     dimensions: "이미지의 가로 또는 세로 길이는 8,000px 이하여야 합니다.",
     error: "이미지를 처리하지 못했습니다. 잠시 후 다시 시도하거나 다른 이미지를 선택해 주세요.",
-    guide: "인물 사진에 최적화된 AI 모델을 사용합니다. 복잡한 배경이나 작은 디테일은 결과에 따라 차이가 있을 수 있습니다.",
-    modelReady: "AI 모델 준비 완료",
+    guide: "사람과 사물 등 다양한 사진의 배경을 분리하는 AI 모델을 사용합니다. 복잡한 배경이나 작은 디테일은 결과에 따라 차이가 있을 수 있습니다.",
+    modelReady: "배경 제거가 완료되었습니다.",
   },
   en: {
     title: "Choose an image or drop it here",
@@ -52,8 +52,8 @@ const messages = {
     invalid: "Please choose a JPG, PNG, or WebP image.",
     dimensions: "Image width and height must each be 8,000 px or less.",
     error: "Could not process this image. Please try again or choose another file.",
-    guide: "The AI model is optimized for portrait photos. Results may vary with complex backgrounds or fine details.",
-    modelReady: "AI model ready",
+    guide: "The AI model can separate people and objects from a range of photos. Results may vary with complex backgrounds or fine details.",
+    modelReady: "Background removal complete.",
   },
 };
 
@@ -70,11 +70,12 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
   const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
-    return () => {
-      if (sourceUrl) URL.revokeObjectURL(sourceUrl);
-      if (resultUrl) URL.revokeObjectURL(resultUrl);
-    };
-  }, [sourceUrl, resultUrl]);
+    return () => { if (sourceUrl) URL.revokeObjectURL(sourceUrl); };
+  }, [sourceUrl]);
+
+  useEffect(() => {
+    return () => { if (resultUrl) URL.revokeObjectURL(resultUrl); };
+  }, [resultUrl]);
 
   function selectFile(candidate?: File) {
     if (!candidate) return;
