@@ -94,9 +94,10 @@ function editorHtmlToMarkdown(root: HTMLElement) {
       const src = node.getAttribute("src") || "";
       if (!src.startsWith("/api/blog/images/blog/")) return "";
       const alt = (node.getAttribute("alt") || "본문 이미지").replace(/[\[\]]/g, " ");
+      const caption = node.dataset.caption ? "|caption=" + encodeURIComponent(node.dataset.caption) : "";
       const width = node.dataset.width && /^([3-9][0-9]|100)%$/.test(node.dataset.width) ? node.dataset.width : "100%";
       const align = node.dataset.align && ["left", "center", "right"].includes(node.dataset.align) ? node.dataset.align : "center";
-      return "![" + alt + "|width=" + width + "|align=" + align + "](" + src + ")";
+      return "![" + alt + "|width=" + width + "|align=" + align + caption + "](" + src + ")";
     }
     const content = Array.from(node.childNodes).map(inline).join("");
     if (tag === "strong" || tag === "b") return "**" + content + "**";
@@ -135,6 +136,8 @@ export default function AdminBlogManager() {
   const selectedInlineImageRef = useRef<HTMLImageElement | null>(null);
   const [inlineImageWidth, setInlineImageWidth] = useState("100%");
   const [inlineImageAlign, setInlineImageAlign] = useState("center");
+  const [inlineImageAlt, setInlineImageAlt] = useState("");
+  const [inlineImageCaption, setInlineImageCaption] = useState("");
   const [hasSelectedInlineImage, setHasSelectedInlineImage] = useState(false);
   const [cropOpen, setCropOpen] = useState(false);
   const [cropLeft, setCropLeft] = useState(10);
@@ -277,6 +280,8 @@ export default function AdminBlogManager() {
         setHasSelectedInlineImage(true);
         setInlineImageWidth(image.dataset.width || "100%");
         setInlineImageAlign(image.dataset.align || "center");
+        setInlineImageAlt(image.alt || "");
+        setInlineImageCaption(image.dataset.caption || "");
         const after = document.createElement("p");
         after.append(document.createElement("br"));
         image.after(after);
@@ -337,6 +342,26 @@ export default function AdminBlogManager() {
     // Do not serialize/set React state during a drag. Re-rendering the
     // contentEditable HTML detaches the image and interrupts the resize gesture.
   }
+  function updateSelectedImageMetadata(field: "alt" | "caption", value: string) {
+    const image = selectedInlineImageRef.current;
+    if (!image || !contentRef.current?.contains(image)) return;
+    if (field === "alt") { image.alt = value; setInlineImageAlt(value); }
+    else { image.dataset.caption = value; setInlineImageCaption(value); }
+  }
+  function moveSelectedInlineImage(direction: -1 | 1) {
+    const image = selectedInlineImageRef.current;
+    if (!image || !contentRef.current?.contains(image)) return;
+    const sibling = direction < 0 ? image.previousElementSibling : image.nextElementSibling;
+    if (!sibling) return;
+    if (direction < 0) sibling.before(image); else sibling.after(image);
+    syncEditorContent();
+  }
+  function deleteSelectedInlineImage() {
+    const image = selectedInlineImageRef.current;
+    if (!image) return;
+    image.remove(); selectedInlineImageRef.current = null; setHasSelectedInlineImage(false);
+    setInlineImageAlt(""); setInlineImageCaption(""); syncEditorContent();
+  }
   function handleInlineImagePointerDown(event: React.PointerEvent<HTMLDivElement>) {
     const target = event.target;
     if (!(target instanceof HTMLImageElement) || !contentRef.current?.contains(target)) return;
@@ -351,6 +376,8 @@ export default function AdminBlogManager() {
     setHasSelectedInlineImage(true);
     setInlineImageWidth(target.dataset.width || target.style.width || "100%");
     setInlineImageAlign(target.dataset.align || "center");
+    setInlineImageAlt(target.alt || "");
+    setInlineImageCaption(target.dataset.caption || "");
 
     const rect = target.getBoundingClientRect();
     const handleSize = Math.max(28, Math.min(40, Math.round(Math.min(rect.width, rect.height) * 0.12)));
@@ -553,7 +580,7 @@ export default function AdminBlogManager() {
               <small>쉼표(,)를 입력해도 지워지지 않습니다. 예: 생활정보, 가이드, 팁 (최대 12개)</small>
             </label>
             <label className="blog-admin-full">대표 이미지 (선택)
-              <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadCoverImage(e.target.files?.[0]); e.currentTarget.value = ""; }} />
+              <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple disabled={uploadingImage} onChange={(e) => { void uploadCoverImage(e.target.files?.[0]); e.currentTarget.value = ""; }} />
               <small>JPG, PNG, WebP, AVIF · 최대 5MB</small>
               {editor.cover_image_key ? <div><img src={`/api/blog/images/${editor.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt="대표 이미지 미리보기" style={{ display:"block",width:"100%",maxWidth:360,maxHeight:220,objectFit:"cover",borderRadius:12,marginTop:8 }} /><button type="button" className="blog-admin-text-button" onClick={() => setEditor((current) => ({ ...current, cover_image_key: null }))}>이미지 제거</button></div> : <small>이미지를 선택하면 안전하게 업로드됩니다.</small>}
               {uploadingImage ? <small>이미지 업로드 중...</small> : null}
@@ -584,16 +611,25 @@ export default function AdminBlogManager() {
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => insertEditorBlock("h3")}>소제목</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("bold")}>굵게</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("italic")}>기울임</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("underline")}>밑줄</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("justifyLeft")}>왼쪽 정렬</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("justifyCenter")}>가운데 정렬</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("justifyRight")}>오른쪽 정렬</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("insertUnorderedList")}>글머리 목록</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => insertEditorBlock("blockquote")}>인용</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => { const url = window.prompt("링크 주소를 입력하세요."); if (url && /^https?:\/\//i.test(url)) applyEditorCommand("createLink", url); }}>링크</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("removeFormat")}>서식 지우기</button>
                   </div>
                   <div className="blog-admin-inline-image-tools">
-                    <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} disabled={!hasSelectedInlineImage} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
+                    <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} disabled={!hasSelectedInlineImage} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /><input aria-label="이미지 너비 직접 입력" type="number" min="30" max="100" step="1" value={parseInt(inlineImageWidth, 10) || 100} disabled={!hasSelectedInlineImage} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} style={{width:64}} />%</label>
+                    <label>대체 텍스트(ALT)<input aria-label="이미지 대체 텍스트" value={inlineImageAlt} disabled={!hasSelectedInlineImage} onChange={(e) => updateSelectedImageMetadata("alt", e.target.value)} placeholder="이미지 설명" /></label>
+                    <label>이미지 캡션<input aria-label="이미지 캡션" value={inlineImageCaption} disabled={!hasSelectedInlineImage} onChange={(e) => updateSelectedImageMetadata("caption", e.target.value)} placeholder="이미지 아래 설명" /></label>
+                    <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage} onClick={() => moveSelectedInlineImage(-1)}>이미지 위로</button>
+                    <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage} onClick={() => moveSelectedInlineImage(1)}>이미지 아래로</button>
+                    <button type="button" className="blog-admin-danger" disabled={!hasSelectedInlineImage} onClick={deleteSelectedInlineImage}>이미지 삭제</button>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage || uploadingImage} onClick={() => { setCropLeft(10); setCropTop(10); setCropWidth(80); setCropHeight(80); setCropOpen(true); }}>선택 이미지 자르기</button>
-                    <label onPointerDown={() => { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); }}>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); } }} onChange={(e) => { if (e.currentTarget.files?.[0]) void uploadInlineImage(e.currentTarget.files[0]); e.currentTarget.value = ""; }} /></label>
+                    <label onPointerDown={() => { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); }}>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); } }} onChange={(e) => { if (e.currentTarget.files?.length) { const files = Array.from(e.currentTarget.files); void (async () => { for (const file of files) await uploadInlineImage(file); })(); } e.currentTarget.value = ""; }} /></label>
                   </div>
                   <div
                     key={editor.id || "new-post"}
