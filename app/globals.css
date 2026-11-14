@@ -996,3 +996,7 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 .blog-admin-inline-image-tools label{display:inline-flex;align-items:center;gap:8px}
 .blog-admin-inline-image-tools button:disabled{opacity:.45;cursor:not-allowed}
 .blog-admin-crop-panel input[type=range]{touch-action:pan-y}
+
+
+/* Match the blog masthead to the site's warm ivory canvas. */
+.journal-hero{background:#fffefa}
