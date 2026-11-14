@@ -612,3 +612,11 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 확인 항목: 모델 다운로드/실행, 투명 알파 채널, 큰 이미지 메모리 사용, 모바일 Safari/Chrome, 데스크톱 Chrome/Firefox/Edge, 한·영 canonical/hreflang 및 sitemap.
 - 새 의존성: @huggingface/transformers ^3.8.1
 - 운영 반영 전 GitHub Actions 빌드 및 실제 브라우저에서 테스트 이미지(인물·제품·복잡한 배경) 검증을 완료한다.
+
+
+## AI 이미지 배경 제거 도구 UX 및 성능 개선
+- 이미지 선택 후 최대 640px 크기의 임시 이미지로 먼저 추론해 제거 예상 영역을 붉은 오버레이로 표시한다. 예상 마스크는 참고용이며 최종 결과와 다를 수 있다.
+- 예상 영역 확인 후 원본 파일을 다시 처리해 고화질 투명 PNG를 생성한다.
+- 모델 다운로드는 제공되는 다운로드 진행률을 표시하고, 모델 추론처럼 정확한 퍼센트를 제공하지 않는 단계는 단계명과 불확정 진행 표시를 사용한다.
+- WebGPU를 우선 시도하고 초기화/실행이 지원되지 않으면 WASM으로 폴백한다. 모델은 기존 브라우저 캐시를 사용하며 이미지는 서버로 전송하지 않는다.
+- 검증: GitHub Actions 빌드, Chrome/Edge WebGPU 및 WASM 폴백, Safari/WASM, 모바일 메모리 사용, 저해상도 마스크와 최종 결과의 차이를 확인한다.
