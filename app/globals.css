@@ -956,3 +956,25 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
  .background-actions{flex-direction:column}
  .background-actions>*{width:100%}
 }
+
+
+/* Blog hero: centered editorial masthead */
+.journal-hero{min-height:385px;display:flex;align-items:center;justify-content:center;position:relative;padding:64px 24px 58px;background:#fff;text-align:center;overflow:hidden}
+.journal-hero-copy{width:100%;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center}
+.journal-hero-brand{display:block;color:#202326;font-size:29px;line-height:1.2;font-weight:450;letter-spacing:-1.1px}
+.journal-hero h1{margin:4px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:clamp(76px,10vw,112px);font-weight:400;line-height:.98;letter-spacing:-4px;color:#080808}
+.journal-hero-copy>p{max-width:100%;margin:12px 0 0;color:#333;font-size:16px;line-height:1.6;word-break:keep-all}
+.journal-hero-actions{justify-content:center;gap:18px;margin-top:24px}
+.journal-primary-link,.journal-secondary-link{min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 22px;background:#416fc0;color:#fff;border:1px solid #284e91;border-radius:0;font-size:13px;font-weight:650}
+.journal-primary-link:hover,.journal-secondary-link:hover{background:#315fae;color:#fff}
+.journal-hero-art{display:none}
+.journal-visitor-stats{position:absolute;top:18px;right:24px;font-size:9px;color:#8192a8}
+@media(max-width:620px){
+ .journal-hero{min-height:310px;padding:55px 16px 42px}
+ .journal-hero-brand{font-size:23px}
+ .journal-hero h1{font-size:76px;letter-spacing:-3px;margin-top:5px}
+ .journal-hero-copy>p{font-size:13px;margin-top:10px}
+ .journal-hero-actions{gap:10px;margin-top:21px;flex-wrap:wrap}
+ .journal-primary-link,.journal-secondary-link{min-height:42px;padding:0 14px;font-size:11px}
+ .journal-visitor-stats{top:10px;right:14px;font-size:8px}
+}
