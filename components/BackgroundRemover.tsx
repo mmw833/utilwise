@@ -114,8 +114,11 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
           // Load the browser build directly from the official CDN. Keeping this
           // import external prevents Node-only ONNX native bindings from entering
           // the Next.js / OpenNext server bundle.
+          // Import the package's explicit browser ESM build. The package-root
+          // jsDelivr URL resolves to its legacy minified entrypoint, which is
+          // not the browser ESM export expected by dynamic import().
           const transformersCdnUrl =
-            "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";
+            "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/transformers.web.js";
           const { pipeline, env } = (await import(
             /* webpackIgnore: true */ transformersCdnUrl
           )) as {
@@ -127,6 +130,7 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
             env: { allowLocalModels: boolean; useBrowserCache: boolean };
           };
           env.allowLocalModels = false;
+          env.allowRemoteModels = true;
           env.useBrowserCache = true;
           return await pipeline(
             "background-removal",
