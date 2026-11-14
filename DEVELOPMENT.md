@@ -1,3 +1,13 @@
+## AI 이미지 배경 제거 - Cloudflare 빌드 및 브라우저 로딩 (2026-11-14)
+- 컴포넌트: `components/BackgroundRemover.tsx`; 모델: `onnx-community/BEN2-ONNX`
+- Transformers.js는 공식 CDN ESM 빌드 `https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1`를 브라우저에서 동적 import한다. 공식 설치 문서가 번들러 없이 CDN ESM 사용을 지원한다.
+- 동적 import에는 `webpackIgnore: true`를 사용해 Next.js/webpack이 원격 모듈을 서버 번들 의존성으로 추적하지 않도록 한다.
+- `package.json`에는 `@huggingface/transformers`를 의존성으로 추가하지 않는다. 서버 빌드에 포함되면 `onnxruntime-node` 네이티브 `.node` 파일이 OpenNext/esbuild 단계에서 로딩 오류를 일으켰다.
+- `next.config.ts`는 기존 OpenNext 개발 바인딩 초기화 설정을 유지하며 별도 `serverExternalPackages` 지정은 하지 않는다.
+- 브라우저 실행 시 Transformers.js가 ONNX Runtime Web 및 WASM 자산을 CDN에서 불러오고, 모델은 Hugging Face에서 다운로드한다. 이미지 원본은 브라우저에 머문다.
+- 빌드 검증: GitHub Actions Next.js production build 및 Cloudflare Workers preview build 성공 (2026-11-14)
+- 기능 검증 필수: 실제 브라우저에서 CDN 모듈/CORS/WASM 다운로드, BEN2 추론 및 투명 PNG 알파 채널 확인. CDN 차단 환경은 기능이 동작하지 않을 수 있음.
+
 ## 2026-11-13 운영 배포 및 블로그 구성
 - 운영 배포 workflow: `.github/workflows/production-deploy.yml`
 - `main` push 시 Node.js 22 / OpenNext 빌드 → `wrangler d1 migrations apply utilwise-blog --remote --config wrangler.jsonc` → `wrangler deploy --config wrangler.jsonc` 순서로 실행
@@ -580,3 +590,15 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 한국어 `app/page.tsx`, 영어 `app/en/page.tsx`의 블로그 링크에 강조 버튼 클래스를 부여하고 `app/globals.css`에서 네이비 캡슐형 스타일 적용. 모바일 메뉴에서도 별도 강조 스타일을 사용한다.
 - 성격테스트와 심리테스트의 메뉴 링크를 단일 `성격·심리테스트` 앵커로 통합한다. 두 테스트 영역 및 개별 테스트 링크는 유지한다.
 - 메인 페이지의 footer 마크업/링크는 수정하지 않는다. 관리자 진입 방식은 기존 구현을 보존한다. 변경 후 Preview 배포 및 모바일/데스크톱 검증을 수행하고 운영 반영은 별도 승인 전까지 금지한다.
+
+
+## AI 이미지 배경 제거 도구
+- 한국어: /background-remover; 영어: /en/background-remover
+- UI 및 처리: components/BackgroundRemover.tsx
+- @huggingface/transformers의 background-removal pipeline과 onnx-community/BEN2-ONNX 모델을 브라우저에서 실행한다.
+- 모델 카드의 라이선스 표기는 MIT이며 BEN2(Prama LLC)를 기반으로 한다. 모델 저장소와 라이선스 변경 여부를 배포 전 다시 확인하고 저작자 표기를 유지한다.
+- 사진 파일은 서버로 전송하지 않는다. 첫 실행 시 모델 파일을 Hugging Face에서 내려받고 브라우저 캐시를 활용한다. 네트워크 연결 및 기기 성능에 따라 최초 실행이 느릴 수 있다.
+- JPG/PNG/WebP, 파일당 최대 20MB, 가로·세로 각 8,000px 제한. 출력은 투명 PNG이며 배경색 선택은 미리보기용이다.
+- 확인 항목: 모델 다운로드/실행, 투명 알파 채널, 큰 이미지 메모리 사용, 모바일 Safari/Chrome, 데스크톱 Chrome/Firefox/Edge, 한·영 canonical/hreflang 및 sitemap.
+- 새 의존성: @huggingface/transformers ^3.8.1
+- 운영 반영 전 GitHub Actions 빌드 및 실제 브라우저에서 테스트 이미지(인물·제품·복잡한 배경) 검증을 완료한다.

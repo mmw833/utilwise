@@ -1,3 +1,17 @@
+## 2026-11-14 AI 배경 제거 Cloudflare 빌드 우회 구조 변경 (빌드 검증 통과)
+- `serverExternalPackages` 지정만으로는 Cloudflare esbuild의 `onnxruntime-node` 네이티브 파일 오류가 해결되지 않음을 재검증
+- NPM의 `@huggingface/transformers` 의존성을 제거하고 브라우저에서 공식 jsDelivr CDN의 Transformers.js 3.8.1 ESM 모듈을 동적 로드하도록 변경
+- `next.config.ts`는 기존 최소 설정으로 복구. 서버 번들에 Node ONNX Runtime이 들어가지 않도록 브라우저 전용 CDN 로딩 구조 사용
+- GitHub Actions Next.js production build 성공 (run `43539683161`), Cloudflare Workers preview build 성공 확인
+- 실제 브라우저의 CDN 모듈 로드, 모델 추론 및 투명 PNG 출력 검증은 남아 있으며 운영 병합/배포 없음
+
+## 2026-11-14 AI 이미지 배경 제거 도구 추가 (작업 브랜치)
+- /background-remover, /en/background-remover 한국어·영어 독립 페이지와 AI 배경 제거 UI 추가
+- Transformers.js와 MIT 표기 BEN2 ONNX 모델을 이용해 브라우저에서 배경 제거, 투명 PNG 다운로드 제공
+- JPG/PNG/WebP 업로드, 드래그앤드롭, 20MB 제한, 결과 미리보기 및 배경색 미리보기 지원
+- 온라인 도구 카테고리, sitemap, 개인정보처리방침, SEO 키워드 맵 업데이트
+- 작업 브랜치: feature/background-remover; 빌드·모델 실행·실제 브라우저 검증 및 운영 반영 전
+
 ## 2026-11-13 운영 블로그 및 내비게이션 업데이트 배포
 - PR #17 운영 통합 병합: 블로그 편집기/태그/이미지 삽입/대표글/방문자 통계 개선, 한·영 홈 메뉴 및 SEO 업데이트
 - 운영 Worker에 D1 및 R2 binding 설정. GitHub Actions Production Deploy로 빌드, D1 migration, Worker 배포 성공
