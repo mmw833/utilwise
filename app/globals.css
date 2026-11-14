@@ -1014,3 +1014,59 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 .background-progress-track>span.is-indeterminate{width:36%;animation:background-progress-move 1.25s ease-in-out infinite}
 @keyframes background-progress-move{0%{transform:translateX(-110%)}100%{transform:translateX(300%)}}
 @media(prefers-reduced-motion:reduce){.background-progress-track>span.is-indeterminate{animation:none;width:65%}}
+
+
+/* FINAL OVERRIDE: all blog cover and listing thumbnails are square and show the full image. */
+.journal-featured-image,
+.journal-card-art,
+.journal-article-cover{
+  width:100%;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  aspect-ratio:1 / 1 !important;
+  overflow:hidden;
+  background:transparent !important;
+}
+.journal-featured-image img,
+.journal-card-art img,
+.journal-article-cover img{
+  display:block;
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  aspect-ratio:1 / 1;
+  object-fit:contain !important;
+  object-position:center center !important;
+  background:transparent !important;
+}
+.journal-featured-placeholder{
+  width:100%;
+  height:100%;
+  aspect-ratio:1 / 1;
+  background:transparent !important;
+}
+.journal-card-art:before,
+.journal-card-art:after,
+.journal-article-cover:before,
+.journal-article-cover:after{
+  display:none !important;
+}
+.journal-article-cover>span,
+.journal-article-cover>strong,
+.journal-article-cover>i,
+.journal-article-cover>small{
+  display:none;
+}
+.journal-featured-link:hover .journal-featured-image img{
+  transform:none;
+}
+@media(max-width:620px){
+  .journal-featured-image,
+  .journal-card-art,
+  .journal-article-cover{
+    height:auto !important;
+    aspect-ratio:1 / 1 !important;
+  }
+}
