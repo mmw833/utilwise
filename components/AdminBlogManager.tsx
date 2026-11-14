@@ -323,24 +323,38 @@ export default function AdminBlogManager() {
   }
   function handleInlineImagePointerDown(event: React.PointerEvent<HTMLDivElement>) {
     const target = event.target;
-    if (!(target instanceof HTMLImageElement) || target !== selectedInlineImageRef.current) return;
+    if (!(target instanceof HTMLImageElement) || !contentRef.current?.contains(target)) return;
+
+    // Select the image immediately on the first pointer interaction. Previously,
+    // resizing was ignored until a separate click had populated the selected ref.
+    selectedInlineImageRef.current = target;
+    setHasSelectedInlineImage(true);
+    setInlineImageWidth(target.dataset.width || target.style.width || "100%");
+    setInlineImageAlign(target.dataset.align || "center");
+
     const rect = target.getBoundingClientRect();
-    if (event.clientX < rect.right - 28 || event.clientY < rect.bottom - 28) return;
+    const handleSize = Math.max(28, Math.min(40, Math.round(Math.min(rect.width, rect.height) * 0.12)));
+    const onResizeHandle = event.clientX >= rect.right - handleSize && event.clientY >= rect.bottom - handleSize;
+    if (!onResizeHandle) return;
+
     event.preventDefault();
+    event.stopPropagation();
     const startX = event.clientX;
     const startWidth = rect.width;
-    const containerWidth = contentRef.current?.clientWidth || rect.width;
+    const containerWidth = contentRef.current.clientWidth || rect.width;
     const move = (moveEvent: PointerEvent) => {
-      const next = Math.round(((startWidth + moveEvent.clientX - startX) / containerWidth) * 100);
-      resizeSelectedInlineImage(Math.min(100, Math.max(30, next)) + "%");
+      const nextWidth = Math.round(((startWidth + moveEvent.clientX - startX) / containerWidth) * 100);
+      resizeSelectedInlineImage(Math.min(100, Math.max(30, nextWidth)) + "%");
     };
     const stop = () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
+      window.removeEventListener("pointercancel", stop);
       syncEditorContent();
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", stop, { once: true });
+    window.addEventListener("pointercancel", stop, { once: true });
   }
 
   async function cropSelectedInlineImage() {
