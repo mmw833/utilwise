@@ -240,3 +240,11 @@ Notes:
 |---|---|---|
 | /image-converter | 이미지 파일 변환기 | JPG PNG 변환, PNG JPG 변환, WebP 변환, 이미지 형식 바꾸기 |
 | /en/image-converter | image converter | convert JPG to PNG, convert PNG to JPG, WebP converter, image format converter |
+
+
+## 이미지 파일 변환기 확장
+
+| URL | 대표 검색어 | 보조 검색어 / 검색 의도 |
+|---|---|---|
+| /image-converter | 이미지 파일 변환기 | HEIC JPG 변환, HEIF JPG 변환, 아이폰 사진 JPG 변환, JPG PNG WebP 변환 |
+| /en/image-converter | image converter | HEIC to JPG, HEIF to JPG, iPhone photo converter, convert HEIC to PNG, WebP converter |
