@@ -292,7 +292,8 @@ export default function AdminBlogManager() {
         root.append(image);
       }
       imageInsertionMarkerRef.current = null;
-      if (root) setEditor((current) => ({ ...current, content_md: editorHtmlToMarkdown(root) }));
+      // The save handler serializes the live editor DOM. Avoid replacing
+      // dangerouslySetInnerHTML here so the just-inserted image stays selected.
       setNotice("본문 이미지가 지정한 위치에 삽입됐습니다.");
     } catch (e) {
       marker?.remove();
