@@ -4,7 +4,8 @@
 - Selecting a voice only changes selection; it does not load a voice style or synthesize audio.
 - The explicit preview action loads the selected voice style and synthesizes up to 180 characters from the current input using at most 8 inference steps. Preview audio is a temporary browser Blob URL and has no download link.
 - Full output is synthesized only after the user presses Generate; the existing WAV player/download remains unchanged.
-- Verify all 10 voice styles, language compatibility, actual model callback progress, browser autoplay fallback (manual audio controls remain visible), mobile layout, memory usage, and production build before merge/deploy.
+- Verified: GitHub Actions Next.js production build passed; production page confirmed the loading progress directly below the engine button; engine reached ready state; F1 preview produced a visible audio player without creating a WAV download/output file. PR #28 merged and production deployment confirmed.
+- Remaining optional QA: all 10 voice styles, language compatibility matrix, mobile layout, browser memory usage, and full speech generation/download after preview.
 
 ## AI 이미지 배경 제거 - Cloudflare 빌드 및 브라우저 로딩 (2026-11-14)
 - 컴포넌트: `components/BackgroundRemover.tsx`; 모델: `onnx-community/BEN2-ONNX`
