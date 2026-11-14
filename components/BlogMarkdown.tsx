@@ -12,7 +12,7 @@ function safeImageSrc(value: string): string | null {
 }
 
 function inline(text: string): ReactNode[] {
-  const parts = text.split(/(!\[[^\]]*\]\([^)]+\)|\*\*[^*]+\*\*|\+\+[^+]+\+\+|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g);
+  const parts = text.split(/(!\[[^\]]*\]\([^)]+\)|\*\*[^*]+\*\*|\+\+[^+]+\+\+|\{\{color=#[0-9a-fA-F]{6}\}\}[\s\S]*?\{\{\/color\}\}|\{\{highlight=#[0-9a-fA-F]{6}\}\}[\s\S]*?\{\{\/highlight\}\}|\{\{size=(?:small|large)\}\}[\s\S]*?\{\{\/size\}\}|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g);
   return parts.map((part, index) => {
     const image = part.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
     if (image) {
@@ -27,6 +27,12 @@ function inline(text: string): ReactNode[] {
     }
     if (part.startsWith("**") && part.endsWith("**")) return <strong key={index}>{part.slice(2, -2)}</strong>;
     if (part.startsWith("++") && part.endsWith("++")) return <u key={index}>{part.slice(2, -2)}</u>;
+    const color = part.match(/^\{\{color=(#[0-9a-fA-F]{6})\}\}([\s\S]*?)\{\{\/color\}\}$/);
+    if (color) return <span key={index} style={{color:color[1]}}>{color[2]}</span>;
+    const highlight = part.match(/^\{\{highlight=(#[0-9a-fA-F]{6})\}\}([\s\S]*?)\{\{\/highlight\}\}$/);
+    if (highlight) return <span key={index} style={{backgroundColor:highlight[1],borderRadius:3,padding:"0 2px"}}>{highlight[2]}</span>;
+    const size = part.match(/^\{\{size=(small|large)\}\}([\s\S]*?)\{\{\/size\}\}$/);
+    if (size) return <span key={index} style={{fontSize:size[1] === "small" ? "0.85em" : "1.25em"}}>{size[2]}</span>;
     if (part.startsWith("*") && part.endsWith("*")) return <em key={index}>{part.slice(1, -1)}</em>;
     const link = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
     if (link) {
