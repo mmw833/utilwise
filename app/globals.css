@@ -1000,3 +1000,17 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 
 /* Match the blog masthead to the site's warm ivory canvas. */
 .journal-hero{background:#fffefa}
+
+
+/* Background remover: estimated mask and honest processing progress */
+.background-estimate-frame{position:relative}
+.background-estimate-frame:after{content:"AI 예상 영역";position:absolute;right:12px;top:12px;padding:5px 9px;border-radius:5px;background:#ef4444;color:#fff;font-size:11px;font-weight:750;pointer-events:none}
+.background-estimate-help{margin:8px 0 0;color:#b45353;font-size:12px;line-height:1.55}
+.background-progress{margin-top:13px;max-width:520px}
+.background-progress-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px;color:#536477;font-size:12px}
+.background-progress-top strong{color:#315f8e;font-variant-numeric:tabular-nums}
+.background-progress-track{height:8px;overflow:hidden;border-radius:999px;background:#e9eef4}
+.background-progress-track>span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#4b83bd,#315f9e);transition:width .2s ease}
+.background-progress-track>span.is-indeterminate{width:36%;animation:background-progress-move 1.25s ease-in-out infinite}
+@keyframes background-progress-move{0%{transform:translateX(-110%)}100%{transform:translateX(300%)}}
+@media(prefers-reduced-motion:reduce){.background-progress-track>span.is-indeterminate{animation:none;width:65%}}
