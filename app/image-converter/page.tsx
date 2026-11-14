@@ -1,0 +1,11 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import LanguageSwitcher from "../../components/LanguageSwitcher";
+import ImageFormatConverter from "../../components/ImageFormatConverter";
+export const metadata: Metadata = {
+  title: "이미지 파일 변환기 | JPG·PNG·WebP 무료 변환 - UTILWISE",
+  description: "JPG, PNG, WebP 이미지 파일 형식을 무료로 변환하세요. 여러 이미지를 한 번에 바꾸고 품질을 조절해 다운로드할 수 있습니다. 파일은 브라우저에서 처리됩니다.",
+  alternates: { canonical: "/image-converter", languages: { "ko-KR": "/image-converter", en: "/en/image-converter" } },
+  openGraph: { title: "무료 이미지 파일 변환기 | UTILWISE", description: "JPG, PNG, WebP 이미지 형식을 브라우저에서 간편하게 변환하세요.", url: "https://utilwise.kr/image-converter", siteName: "UTILWISE", locale: "ko_KR", type: "website" }
+};
+export default function Page(){return <main><header className="wrap header"><Link href="/" className="logo">UTIL<span>WISE</span>.</Link><nav className="nav"><Link href="/online-tools">온라인 도구</Link><LanguageSwitcher/></nav></header><section className="wrap section image-tool-page"><div className="eyebrow">UTILWISE ONLINE TOOLS</div><h1>무료 이미지 파일 변환기</h1><p className="sub">아이폰 HEIC·HEIF 사진과 JPG, PNG, WebP 이미지 형식을 원하는 파일 형식으로 간편하게 바꾸세요.</p><ImageFormatConverter lang="ko"/><div className="image-tool-guide"><h2>이미지 파일 변환이란?</h2><p>이미지 파일 변환은 사진이나 그래픽의 저장 형식을 JPG, PNG, WebP 등으로 변경하는 작업입니다. 웹사이트 호환성, 투명 배경 유지, 파일 용량 등 사용 목적에 맞는 형식을 선택할 수 있습니다.</p><h2>지원하는 이미지 형식</h2><ul><li><strong>JPG:</strong> 사진에 적합하며 투명 배경은 지원하지 않습니다. PNG에서 JPG로 변환하면 투명한 부분은 흰색으로 채워집니다.</li><li><strong>PNG:</strong> 투명 배경과 선명한 그래픽을 보존하는 데 적합합니다.</li><li><strong>WebP:</strong> 웹에서 효율적으로 사용하기 좋은 이미지 형식입니다.</li></ul><h2>사용 방법</h2><ol><li>JPG, PNG 또는 WebP 이미지 파일을 선택합니다.</li><li>변환할 파일 형식과 이미지 품질을 선택합니다.</li><li>변환 버튼을 누르고 결과 파일을 다운로드합니다.</li></ol><p>여러 파일을 한 번에 변환할 수 있습니다. 파일은 브라우저에서 처리되며 UTILWISE 서버로 업로드되지 않습니다. 파일당 최대 20MB, 가로·세로 각각 최대 12,000px까지 지원합니다.</p><h2>자주 묻는 질문</h2><h3>이미지 품질은 그대로 유지되나요?</h3><p>HEIC·HEIF 파일은 먼저 브라우저에서 이미지로 디코딩한 뒤 선택한 형식으로 저장됩니다. 이 과정에서 원본 촬영 날짜나 GPS 등 EXIF 메타데이터는 보존되지 않을 수 있습니다. PNG는 무손실 형식으로 저장됩니다. JPG와 WebP는 품질 설정에 따라 일부 화질이나 파일 크기가 달라질 수 있습니다.</p><h3>투명 배경도 유지되나요?</h3><p>PNG 또는 WebP로 변환하면 투명도를 유지할 수 있습니다. JPG는 투명도를 지원하지 않아 흰색 배경으로 저장됩니다.</p><h3>관련 도구</h3><p><Link href="/image-compressor">이미지 압축기</Link>로 용량을 줄이거나 <Link href="/image-resizer">이미지 크기 조절기</Link>로 픽셀 크기를 변경할 수 있습니다.</p></div></section></main>}
