@@ -77,7 +77,7 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
     return () => { if (resultUrl) URL.revokeObjectURL(resultUrl); };
   }, [resultUrl]);
 
-  function selectFile(candidate?: File) {
+  async function selectFile(candidate?: File) {
     if (!candidate) return;
     if (!["image/jpeg", "image/png", "image/webp"].includes(candidate.type)) {
       setError(t.invalid);
@@ -85,6 +85,15 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
     }
     if (candidate.size > 20 * 1024 * 1024) {
       setError(t.tooLarge);
+      return;
+    }
+    try {
+      const bitmap = await createImageBitmap(candidate);
+      const tooLarge = bitmap.width > 8000 || bitmap.height > 8000;
+      bitmap.close();
+      if (tooLarge) { setError(t.dimensions); return; }
+    } catch {
+      setError(t.invalid);
       return;
     }
     setError("");
