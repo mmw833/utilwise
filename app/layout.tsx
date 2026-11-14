@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import BlogVisitorTracker from "@/components/BlogVisitorTracker";
 
 const siteUrl = "https://utilwise.kr";
 
@@ -32,5 +33,5 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="ko"><body>{children}</body></html>;
+  return <html lang="ko"><body><BlogVisitorTracker />{children}</body></html>;
 }
