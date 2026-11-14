@@ -1,8 +1,8 @@
-## 2026-11-14 AI 배경 제거 Cloudflare 빌드 오류 대응
-- Cloudflare OpenNext 빌드 로그에서 `onnxruntime-node` 네이티브 `.node` 파일 6개를 esbuild가 처리하지 못하는 오류 확인
-- `next.config.ts`의 `serverExternalPackages`에 `@huggingface/transformers`를 지정해 서버 번들에서 제외하도록 수정
-- 커밋: `4b3f45de6d05c5c6de3ae8817237b8889fd43026`
-- GitHub Actions Build Check 재실행 중. 결과 확인 전 해결 완료로 간주하지 않으며 운영 병합/배포 없음
+## 2026-11-14 AI 배경 제거 Cloudflare 빌드 우회 구조 변경
+- `serverExternalPackages` 지정만으로는 Cloudflare esbuild의 `onnxruntime-node` 네이티브 파일 오류가 해결되지 않음을 재검증
+- NPM의 `@huggingface/transformers` 의존성을 제거하고 브라우저에서 공식 jsDelivr CDN의 Transformers.js 3.8.1 ESM 모듈을 동적 로드하도록 변경
+- `next.config.ts`는 기존 최소 설정으로 복구. 서버 번들에 Node ONNX Runtime이 들어가지 않도록 브라우저 전용 CDN 로딩 구조 사용
+- Cloudflare 및 GitHub Actions 빌드와 브라우저 실제 추론 검증 대기. 운영 병합/배포 없음
 
 ## 2026-11-14 AI 이미지 배경 제거 도구 추가 (작업 브랜치)
 - /background-remover, /en/background-remover 한국어·영어 독립 페이지와 AI 배경 제거 UI 추가
