@@ -1,9 +1,11 @@
-## AI 이미지 배경 제거 및 Cloudflare 번들링 주의사항 (2026-11-14)
-- 브라우저 전용 AI 처리 컴포넌트: `components/BackgroundRemover.tsx`; 라이브러리: `@huggingface/transformers` 3.8.1
-- Transformers.js는 브라우저에서 `onnxruntime-web`, Node.js 환경에서 `onnxruntime-node`를 선택한다. Cloudflare Worker 서버 번들에 Node 네이티브 `.node` 파일이 포함되면 OpenNext/esbuild 단계에서 빌드가 실패할 수 있다.
-- 이를 방지하기 위해 `next.config.ts`의 `serverExternalPackages`에 `@huggingface/transformers`를 명시했다. 브라우저에서의 모델 다운로드/추론이 실제 동작하는지 별도로 확인해야 한다.
-- 오류 발생 당시 Cloudflare Build #49의 오류는 `onnxruntime-node/dist/binding.js`가 macOS/Linux/Windows 네이티브 `.node` 파일을 참조하며 esbuild가 loader를 찾지 못한 것이었다.
-- 현재 수정 커밋 `4b3f45de6d05c5c6de3ae8817237b8889fd43026`; GitHub Actions 및 Cloudflare 빌드 재검증 대기. 이 설정만으로 문제가 해결됐다고 단정하지 않는다.
+## AI 이미지 배경 제거 - Cloudflare 빌드 및 브라우저 로딩 (2026-11-14)
+- 컴포넌트: `components/BackgroundRemover.tsx`; 모델: `onnx-community/BEN2-ONNX`
+- Transformers.js는 공식 CDN ESM 빌드 `https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1`를 브라우저에서 동적 import한다. 공식 설치 문서가 번들러 없이 CDN ESM 사용을 지원한다.
+- 동적 import에는 `webpackIgnore: true`를 사용해 Next.js/webpack이 원격 모듈을 서버 번들 의존성으로 추적하지 않도록 한다.
+- `package.json`에는 `@huggingface/transformers`를 의존성으로 추가하지 않는다. 서버 빌드에 포함되면 `onnxruntime-node` 네이티브 `.node` 파일이 OpenNext/esbuild 단계에서 로딩 오류를 일으켰다.
+- `next.config.ts`는 기존 OpenNext 개발 바인딩 초기화 설정을 유지하며 별도 `serverExternalPackages` 지정은 하지 않는다.
+- 브라우저 실행 시 Transformers.js가 ONNX Runtime Web 및 WASM 자산을 CDN에서 불러오고, 모델은 Hugging Face에서 다운로드한다. 이미지 원본은 브라우저에 머문다.
+- 검증 필수: GitHub Actions Next.js 빌드, Cloudflare Workers Build, 실제 브라우저에서 CDN 모듈/CORS/WASM 다운로드, BEN2 추론 및 투명 PNG 알파 채널. CDN 차단 환경은 기능이 동작하지 않을 수 있음.
 
 ## 2026-11-13 운영 배포 및 블로그 구성
 - 운영 배포 workflow: `.github/workflows/production-deploy.yml`
