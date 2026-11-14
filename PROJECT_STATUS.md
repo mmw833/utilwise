@@ -1,3 +1,10 @@
+## 2026-11-14 Cloudflare 빌드 오류 대응 (검증 진행 중)
+- PR #21 작업 브랜치 `feature/background-remover`에서 Cloudflare OpenNext 빌드가 `onnxruntime-node`의 네이티브 `.node` 파일 로딩 오류로 실패한 로그 확인
+- `next.config.ts`에 `serverExternalPackages: ["@huggingface/transformers"]`를 추가해 Transformers.js가 Next.js 서버 번들에 포함되지 않도록 분리
+- 수정 커밋: `4b3f45de6d05c5c6de3ae8817237b8889fd43026`
+- GitHub Actions Build Check run `43539307803` 실행 중. 완료 결과 및 Cloudflare 빌드 재검증 대기
+- 운영 main 병합 및 Cloudflare 배포는 하지 않음. 빌드 성공 후에도 실제 모델 다운로드/추론 및 투명 PNG 검증 필요
+
 ## 2026-11-14 AI 이미지 배경 제거 도구 개발 (Preview 검증 전)
 - 작업 브랜치: feature/background-remover (main 기준으로 생성, 운영 코드 변경 없음)
 - 한국어 /background-remover, 영어 /en/background-remover 독립 페이지 및 온라인 도구 목록 연결
