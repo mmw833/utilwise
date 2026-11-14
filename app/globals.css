@@ -978,3 +978,21 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
  .journal-primary-link,.journal-secondary-link{min-height:42px;padding:0 14px;font-size:11px}
  .journal-visitor-stats{top:10px;right:14px;font-size:8px}
 }
+
+
+/* Reliable image selection and resize affordance in the blog editor */
+.blog-admin-wysiwyg img{
+  display:block;
+  max-width:100%;
+  height:auto;
+  pointer-events:auto;
+  user-select:none;
+  -webkit-user-drag:none;
+  touch-action:pan-y;
+  cursor:pointer;
+}
+.blog-admin-wysiwyg img:active{cursor:nwse-resize}
+.blog-admin-inline-image-tools{display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+.blog-admin-inline-image-tools label{display:inline-flex;align-items:center;gap:8px}
+.blog-admin-inline-image-tools button:disabled{opacity:.45;cursor:not-allowed}
+.blog-admin-crop-panel input[type=range]{touch-action:pan-y}
