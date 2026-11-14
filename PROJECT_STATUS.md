@@ -1,3 +1,13 @@
+## 2026-11-15 이미지 텍스트 추출 OCR 도구 추가 (Preview 검증 대기)
+- 작업 브랜치: `feature/image-to-text-ocr` (main 기준)
+- 한국어 `/image-to-text`, 영어 `/en/image-to-text` 독립 페이지 및 공통 컴포넌트 `components/ImageToTextOCR.tsx` 추가
+- Tesseract.js 6.0.1을 브라우저에서 동적 로드해 한국어+영어, 한국어, 영어 OCR 지원. 이미지 파일은 서버로 업로드하지 않음
+- 이미지 선택/드래그앤드롭, 파일당 15MB 제한, 결과 텍스트 편집, 클립보드 복사, TXT 다운로드 제공
+- 한국어·영어 홈의 문서·텍스트 도구 카드, 카테고리 목록, sitemap, 개인정보처리방침, SEO 메타데이터 및 FAQ 반영
+- OCR 엔진과 언어 데이터는 첫 사용 시 jsDelivr CDN에서 다운로드되므로 인터넷 연결 필요. 손글씨·저해상도·복잡한 배경은 인식 오류 가능
+- **검증 대기:** GitHub Actions 빌드, 실제 한국어/영어 샘플 이미지 인식, 혼합 언어, 모바일 파일 선택/드래그, 복사·TXT 다운로드, CDN 및 Cloudflare 운영 호환성
+- PR 및 운영 배포 전. 검증 완료 전 공개 기능 완료로 간주하지 않음
+
 ## 2026-11-14 메인 페이지 온라인 도구 목록 누락 수정
 - 메인 홈페이지(`/`) 온라인 도구 배열에서 이미지 파일 변환기(`/image-converter`)와 AI 이미지 배경 제거(`/background-remover`)가 누락된 것을 확인
 - 한국어 메인 페이지에 두 도구 카드 추가. 영어 메인 페이지에도 Image Format Converter와 AI Background Remover를 동일하게 추가
