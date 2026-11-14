@@ -1,3 +1,13 @@
+## 2026-11-15 텍스트 음성 변환기 목소리 미리 듣기 및 로딩 진행 표시 개선 (검증 대기)
+- 작업 브랜치: `feature/tts-voice-preview-progress` (main 기준)
+- 음성 엔진 불러오기 버튼 바로 아래에 단계별 상태와 모델 다운로드 진행률 표시 추가
+- 목소리 선택 시 자동으로 음성 파일을 생성하지 않으며, 별도 '선택한 목소리 미리 듣기' 버튼을 눌렀을 때 입력 문장의 앞부분(최대 180자)으로 짧은 미리 듣기를 생성·재생
+- 미리 듣기는 브라우저 임시 오디오로만 재생하고 다운로드 링크를 제공하지 않음. 실제 전체 음성 생성과 WAV 다운로드는 사용자가 생성 버튼을 눌렀을 때만 실행
+- 한국어·영어 UI 공통 컴포넌트에 적용. 기존 Supertonic 모델, 브라우저 내 처리 및 WAV 출력 구조 유지
+- 변경 파일: `components/TextToSpeechTool.tsx`, `app/globals.css`, 프로젝트 기록 문서
+- **검증 대기:** TypeScript/Next.js production build, Preview 배포, 모델 실제 로딩 진행률, 10개 음성별 미리 듣기, 언어 변경, 전체 생성/WAV 다운로드, 모바일 레이아웃 및 브라우저 메모리 확인
+- PR/운영 배포 전. 검증 전 기능 완료로 간주하지 않음
+
 ## 2026-11-15 텍스트 음성 변환기 로딩 오류 (미해결)
 - PR #27 병합 완료: `33bc84b3881ed710f34914e47921183abfedcd41`; GitHub Actions Next.js production build 성공
 - `components/TextToSpeechTool.tsx`: ONNX Runtime WebAssembly 파일 경로 명시, WASM 스레드 1개로 제한, Supertonic helper revision 고정, 초기화 예외 상세 노출 추가
