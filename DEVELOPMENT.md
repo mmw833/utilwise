@@ -1,3 +1,11 @@
+## Text-to-speech engine loading and voice preview (2026-11-15)
+- Shared UI: `components/TextToSpeechTool.tsx`; Korean route `/text-to-speech`, English route `/en/text-to-speech`.
+- Engine/model loading progress appears directly below the engine-load button. The model loader callback updates the progress bar and current model name.
+- Selecting a voice only changes selection; it does not load a voice style or synthesize audio.
+- The explicit preview action loads the selected voice style and synthesizes up to 180 characters from the current input using at most 8 inference steps. Preview audio is a temporary browser Blob URL and has no download link.
+- Full output is synthesized only after the user presses Generate; the existing WAV player/download remains unchanged.
+- Verify all 10 voice styles, language compatibility, actual model callback progress, browser autoplay fallback (manual audio controls remain visible), mobile layout, memory usage, and production build before merge/deploy.
+
 ## AI 이미지 배경 제거 - Cloudflare 빌드 및 브라우저 로딩 (2026-11-14)
 - 컴포넌트: `components/BackgroundRemover.tsx`; 모델: `onnx-community/BEN2-ONNX`
 - Transformers.js는 공식 CDN ESM 빌드 `https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1`를 브라우저에서 동적 import한다. 공식 설치 문서가 번들러 없이 CDN ESM 사용을 지원한다.
