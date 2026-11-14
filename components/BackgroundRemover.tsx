@@ -118,7 +118,7 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
           // jsDelivr URL resolves to its legacy minified entrypoint, which is
           // not the browser ESM export expected by dynamic import().
           const transformersCdnUrl =
-            "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/dist/transformers.web.js";
+            "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/+esm";
           const { pipeline, env } = (await import(
             /* webpackIgnore: true */ transformersCdnUrl
           )) as {
