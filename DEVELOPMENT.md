@@ -641,3 +641,12 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 파이프라인의 첫 번째 segmentation mask를 투명 PNG 마스크로 변환한다. 최종 PNG는 원본 이미지에 마스크 알파를 적용해 생성한다.
 - 모델 카드 기준 512x512 입력, FP16 가중치 파일 약 100MB. 속도 및 인식률은 실제 기기 테스트 결과로만 평가한다.
 - 모델 정보: https://huggingface.co/shozebDev/birefnet-lite-512-onnx
+
+
+## Image-to-text OCR
+- Korean: `/image-to-text`; English: `/en/image-to-text`.
+- Shared client component: `components/ImageToTextOCR.tsx`.
+- Uses Tesseract.js 6.0.1 loaded dynamically from jsDelivr; languages: `kor+eng`, `kor`, and `eng`.
+- Image OCR runs in the visitor's browser. Image files are not uploaded. The OCR engine and language data require an internet connection on first use.
+- Supports image selection, drag-and-drop, files up to 15 MB, editable result text, clipboard copy, and TXT download.
+- Test clear Korean, English, mixed-language screenshots, mobile upload, copy/download, CDN loading, and Cloudflare production build before release.
