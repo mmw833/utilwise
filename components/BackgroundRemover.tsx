@@ -111,7 +111,21 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
     try {
       if (!pipelinePromise) {
         pipelinePromise = (async () => {
-          const { pipeline, env } = await import("@huggingface/transformers");
+          // Load the browser build directly from the official CDN. Keeping this
+          // import external prevents Node-only ONNX native bindings from entering
+          // the Next.js / OpenNext server bundle.
+          const transformersCdnUrl =
+            "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1";
+          const { pipeline, env } = (await import(
+            /* webpackIgnore: true */ transformersCdnUrl
+          )) as {
+            pipeline: (
+              task: string,
+              model: string,
+              options?: Record<string, unknown>,
+            ) => Promise<BackgroundPipeline>;
+            env: { allowLocalModels: boolean; useBrowserCache: boolean };
+          };
           env.allowLocalModels = false;
           env.useBrowserCache = true;
           return await pipeline(
