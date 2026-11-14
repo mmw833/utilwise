@@ -1,3 +1,11 @@
+## Homepage visitor counter (2026-11-15)
+- Shared UI: `components/SiteVisitorStats.tsx`; shown in the Korean `/` and English `/en` homepage headers only.
+- Shared tracking: existing `components/BlogVisitorTracker.tsx` is mounted in `app/layout.tsx`, so every route under the root layout contributes to one site-wide count regardless of language.
+- Data source: existing D1 tables `blog_site_visitors` and `blog_site_visits`; no migration or reset is required. TODAY uses Korea Standard Time and counts each anonymous visitor once per day; TOTAL counts unique visitor tokens since tracking began.
+- Privacy: the existing random cookie token is SHA-256 hashed before storage; raw IP addresses are not stored.
+- `GET /api/blog/visit` returns fresh statistics with `Cache-Control: no-store`; `POST` retains the existing visit-recording behavior.
+- Build and live browser verification pending.
+
 ## Text-to-speech engine loading and voice preview (2026-11-15)
 - Shared UI: `components/TextToSpeechTool.tsx`; Korean route `/text-to-speech`, English route `/en/text-to-speech`.
 - Engine/model loading progress appears directly below the engine-load button. The model loader callback updates the progress bar and current model name.
