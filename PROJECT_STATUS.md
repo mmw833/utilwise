@@ -1,3 +1,13 @@
+## 2026-11-14 AI 이미지 배경 제거 도구 개발 (Preview 검증 전)
+- 작업 브랜치: feature/background-remover (main 기준으로 생성, 운영 코드 변경 없음)
+- 한국어 /background-remover, 영어 /en/background-remover 독립 페이지 및 온라인 도구 목록 연결
+- 브라우저 내 AI 처리: Transformers.js + onnx-community/BEN2-ONNX (모델 저장소 표기 MIT License). 이미지 파일은 서버로 업로드하지 않고 투명 PNG 결과를 브라우저에서 생성
+- 이미지 선택/드래그앤드롭, JPG/PNG/WebP, 파일당 20MB 제한, 8,000px 최대 치수 검사, 결과 미리보기, 배경색 미리보기, PNG 다운로드
+- SEO metadata, canonical/hreflang, sitemap, 한국어·영어 개인정보처리방침, 온라인 도구 목록 및 SEO 키워드 맵 반영
+- 모델 파일은 첫 사용 시 외부 저장소에서 다운로드되므로 초기 로딩이 길 수 있음. 이후 브라우저 캐시 사용
+- 검증 대기: 의존성 설치 및 GitHub Actions 빌드, 실제 모델 다운로드/실행, 투명 PNG 알파 채널, 한·영 페이지, 모바일 PC 레이아웃 및 브라우저 호환성
+- 주의: 기능은 작업 브랜치에만 있으며 PR/운영 병합/Cloudflare 배포 전. 검증 전 사용자 공개 완료로 간주하지 않음
+
 ## 2026-11-14 PR #20 블로그 이미지 편집 기능 운영 배포 확인
 - PR #20 `Improve blog image editing and centered writing layout` 병합 완료: `a896db5d7326d816547bc718f7f70714d0172f6b` (main 최신 커밋)
 - Cloudflare Workers 운영 빌드 및 배포 체크 성공 확인
