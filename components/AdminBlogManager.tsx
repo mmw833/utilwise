@@ -71,6 +71,7 @@ function markdownToEditorHtml(markdown: string) {
   const inline = (value: string) => escapeEditorHtml(value)
     .replace(/!\[([^\]]*)\]\((\/api\/blog\/images\/[^)]+)\)/g, (_m, meta, src) => { const match = meta.match(/^(.*?)\|width=((?:3[0-9]|[4-9][0-9]|100)%)\|align=(left|center|right)(?:\|caption=([^|]*))?$/); const alt = match ? match[1] : meta; const width = match ? match[2] : "100%"; const align = match ? match[3] : "center"; const caption = match?.[4] ? decodeURIComponent(match[4]) : ""; return '<img src="' + src + '" alt="' + alt + '" data-width="' + width + '" data-align="' + align + '" data-caption="' + escapeEditorHtml(caption) + '" />'; })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\+\+([^+]+)\+\+/g, "<u>$1</u>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
   return markdown.replace(/\r\n?/g, "\n").split(/\n{2,}/).map((block) => {
@@ -102,6 +103,7 @@ function editorHtmlToMarkdown(root: HTMLElement) {
     const content = Array.from(node.childNodes).map(inline).join("");
     if (tag === "strong" || tag === "b") return "**" + content + "**";
     if (tag === "em" || tag === "i") return "*" + content + "*";
+    if (tag === "u") return "++" + content + "++";
     if (tag === "a") {
       const href = node.getAttribute("href") || "";
       return /^https?:\/\//i.test(href) ? "[" + content + "](" + href + ")" : content;
