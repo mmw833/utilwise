@@ -26,7 +26,6 @@ export default function TextToSpeechTool({ lang }: { lang: "ko" | "en" }) {
   const [steps, setSteps] = useState(8);
   const [engine, setEngine] = useState<Helper | null>(null);
   const [tts, setTts] = useState<TTS | null>(null);
-  const [style, setStyle] = useState<Style | null>(null);
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState("");
@@ -62,10 +61,7 @@ export default function TextToSpeechTool({ lang }: { lang: "ko" | "en" }) {
       setStatus(en ? "Downloading speech models (about 398 MB) and preparing the engine…" : "음성 모델(약 398MB)을 다운로드하고 엔진을 준비하는 중…");
       const loaded = await helper.loadTextToSpeech(ONNX, { executionProviders: ["wasm"], graphOptimizationLevel: "all" }, (name, current, total) => { setLoadProgress(total > 0 ? Math.min(99, Math.round(current / total * 100)) : 0); setStatus(`${en ? "Loading model" : "모델 불러오는 중"} (${current}/${total}): ${name}`); });
       setEngine(helper); setTts(loaded.textToSpeech); setLoadProgress(100);
-      setStatus(en ? "Loading voice style…" : "음성 스타일을 준비하는 중…");
-      const loadedStyle = await helper.loadVoiceStyle([`${MODEL}/voice_styles/${voice}.json`]);
-      setStyle(loadedStyle);
-      setStatus(en ? "Ready. Enter text and generate speech." : "준비 완료! 문장을 입력하고 음성을 생성하세요.");
+      setStatus(en ? "Engine ready. Choose a voice and preview it before generating." : "엔진 준비 완료! 목소리를 미리 들어본 뒤 음성을 생성하세요.");
     } catch (e) {
       const detail = e instanceof Error ? e.message : String(e);
       console.error("UTILWISE TTS engine initialization failed:", e);
