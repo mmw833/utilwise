@@ -43,7 +43,8 @@ export default function TextToSpeechTool({ lang }: { lang: "ko" | "en" }) {
     setLoading(true); setError("");
     try {
       setStatus(en ? "Loading the speech engine module…" : "음성 엔진 모듈을 불러오는 중…");
-      const helper = helperRef.current ?? await import(/* webpackIgnore: true */ "https://cdn.jsdelivr.net/gh/supertone-oss-archive/supertonic@main/web/helper.js/+esm") as Helper;
+      const helperUrl = "https://cdn.jsdelivr.net/gh/supertone-oss-archive/supertonic@main/web/helper.js/+esm";
+      const helper = helperRef.current ?? await import(/* webpackIgnore: true */ helperUrl) as Helper;
       helperRef.current = helper;
       setStatus(en ? "Downloading speech models (about 398 MB) and preparing the engine…" : "음성 모델(약 398MB)을 다운로드하고 엔진을 준비하는 중…");
       const loaded = await helper.loadTextToSpeech(ONNX, { executionProviders: ["wasm"], graphOptimizationLevel: "all" }, (name, current, total) => setStatus(`${en ? "Loading model" : "모델 불러오는 중"} (${current}/${total}): ${name}`));
