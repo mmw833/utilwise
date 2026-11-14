@@ -1,3 +1,10 @@
+## AI 이미지 배경 제거 및 Cloudflare 번들링 주의사항 (2026-11-14)
+- 브라우저 전용 AI 처리 컴포넌트: `components/BackgroundRemover.tsx`; 라이브러리: `@huggingface/transformers` 3.8.1
+- Transformers.js는 브라우저에서 `onnxruntime-web`, Node.js 환경에서 `onnxruntime-node`를 선택한다. Cloudflare Worker 서버 번들에 Node 네이티브 `.node` 파일이 포함되면 OpenNext/esbuild 단계에서 빌드가 실패할 수 있다.
+- 이를 방지하기 위해 `next.config.ts`의 `serverExternalPackages`에 `@huggingface/transformers`를 명시했다. 브라우저에서의 모델 다운로드/추론이 실제 동작하는지 별도로 확인해야 한다.
+- 오류 발생 당시 Cloudflare Build #49의 오류는 `onnxruntime-node/dist/binding.js`가 macOS/Linux/Windows 네이티브 `.node` 파일을 참조하며 esbuild가 loader를 찾지 못한 것이었다.
+- 현재 수정 커밋 `4b3f45de6d05c5c6de3ae8817237b8889fd43026`; GitHub Actions 및 Cloudflare 빌드 재검증 대기. 이 설정만으로 문제가 해결됐다고 단정하지 않는다.
+
 ## 2026-11-13 운영 배포 및 블로그 구성
 - 운영 배포 workflow: `.github/workflows/production-deploy.yml`
 - `main` push 시 Node.js 22 / OpenNext 빌드 → `wrangler d1 migrations apply utilwise-blog --remote --config wrangler.jsonc` → `wrangler deploy --config wrangler.jsonc` 순서로 실행
