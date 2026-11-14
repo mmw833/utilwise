@@ -331,7 +331,7 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
       )}
       <input ref={inputRef} className="background-file-input" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => selectFile(event.target.files?.[0])} />
       {file && <div className="background-actions">
-        {!resultUrl && <button type="button" className="primary" onClick={removeBackground} disabled={isProcessing || !previewUrl}>{previewBusy ? t.previewing : busy ? t.working : t.run}</button>}
+        {!resultUrl && <button type="button" className="primary" onClick={removeBackground} disabled={isProcessing || (!previewUrl && !error)}>{previewBusy ? t.previewing : busy ? t.working : t.run}</button>}
         {resultUrl && <a className="primary" href={resultUrl} download={`${file.name.replace(/\.[^.]+$/, "")}-background-removed.png`}>{t.download}</a>}
         <button type="button" className="background-secondary" onClick={reset} disabled={isProcessing}>{t.reset}</button>
       </div>}
