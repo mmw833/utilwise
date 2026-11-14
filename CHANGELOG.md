@@ -712,3 +712,9 @@
 - 영어 메인 페이지에 `Text to Speech Converter` 카드가 표시되고 `/en/text-to-speech`로 연결됨을 확인
 - 모델은 최초 실행 시 약 398MB 다운로드 안내가 표시됨. 이번 브라우저 점검은 페이지와 내비게이션 확인이며 실제 모델 다운로드·음성 생성 결과 및 모바일 메모리 사용량은 별도 실사용 검증 대상
 - 현재 다운로드 형식은 WAV이며 MP3 내보내기는 미구현
+
+## 2026-11-15 텍스트 음성 변환기 로딩 오류 수정 시도 및 운영 재검증
+- PR #27 병합 완료: `33bc84b3881ed710f34914e47921183abfedcd41`; GitHub Actions Next.js production build 성공
+- ONNX Runtime WebAssembly 경로 명시, WASM 스레드 1개 제한, Supertonic helper revision 고정 및 초기화 오류 상세 표시 추가
+- 운영 `/text-to-speech` 실제 브라우저 테스트에서 여전히 `Duration Predictor` 모델 초기화 단계 실패. 음성 생성·재생·WAV 다운로드 검증 불가
+- 따라서 PR 병합과 빌드 통과는 확인했으나 TTS 기능 정상화는 미완료. 다음 조치: 운영 Worker가 PR #27 코드로 실제 갱신됐는지 배포 실행 내역 확인 후, 모델 파일 요청/브라우저 콘솔 오류를 추적
