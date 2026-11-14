@@ -1,3 +1,10 @@
+## 2026-11-15
+- Add browser-based image-to-text OCR for Korean and English.
+- Add Korean and English standalone pages, homepage and text-tools directory links, sitemap entries, privacy disclosures, and SEO content.
+- Support image selection and drag-and-drop, 15 MB file limit, editable OCR output, clipboard copy, and TXT download.
+- OCR engine and language data load from jsDelivr on first use; image files remain in the browser.
+- Build and real-image recognition tests pending; work is on feature/image-to-text-ocr and is not deployed.
+
 ## 2026-11-14 메인 페이지 온라인 도구 목록 누락 수정
 - 메인 홈페이지(`/`) 온라인 도구 배열에서 이미지 파일 변환기(`/image-converter`)와 AI 이미지 배경 제거(`/background-remover`)가 누락된 것을 확인
 - 한국어 메인 페이지에 두 도구 카드 추가. 영어 메인 페이지에도 Image Format Converter와 AI Background Remover를 동일하게 추가
