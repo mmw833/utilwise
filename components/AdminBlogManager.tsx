@@ -69,8 +69,12 @@ function escapeEditorHtml(value: string) {
 }
 function markdownToEditorHtml(markdown: string) {
   const inline = (value: string) => escapeEditorHtml(value)
-    .replace(/!\[([^\]]*)\]\((\/api\/blog\/images\/[^)]+)\)/g, (_m, meta, src) => { const match = meta.match(/^(.*?)\|width=((?:3[0-9]|[4-9][0-9]|100)%)\|align=(left|center|right)$/); const alt = match ? match[1] : meta; const width = match ? match[2] : "100%"; const align = match ? match[3] : "center"; return '<img src="' + src + '" alt="' + alt + '" data-width="' + width + '" data-align="' + align + '" />'; })
+    .replace(/!\[([^\]]*)\]\((\/api\/blog\/images\/[^)]+)\)/g, (_m, meta, src) => { const match = meta.match(/^(.*?)\|width=((?:3[0-9]|[4-9][0-9]|100)%)\|align=(left|center|right)(?:\|caption=([^|]*))?$/); const alt = match ? match[1] : meta; const width = match ? match[2] : "100%"; const align = match ? match[3] : "center"; const caption = match?.[4] ? decodeURIComponent(match[4]) : ""; return '<img src="' + src + '" alt="' + alt + '" data-width="' + width + '" data-align="' + align + '" data-caption="' + escapeEditorHtml(caption) + '" />'; })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\+\+([^+]+)\+\+/g, "<u>$1</u>")
+    .replace(/\{\{color=(#[0-9a-fA-F]{6})\}\}([\s\S]*?)\{\{\/color\}\}/g, '<span style="color:$1">$2</span>')
+    .replace(/\{\{highlight=(#[0-9a-fA-F]{6})\}\}([\s\S]*?)\{\{\/highlight\}\}/g, '<span style="background-color:$1">$2</span>')
+    .replace(/\{\{size=(small|normal|large)\}\}([\s\S]*?)\{\{\/size\}\}/g, (_m, size, content) => '<span style="font-size:' + (size === "small" ? "0.85em" : size === "large" ? "1.25em" : "1em") + '">' + content + '</span>')
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
   return markdown.replace(/\r\n?/g, "\n").split(/\n{2,}/).map((block) => {
@@ -87,19 +91,40 @@ function editorHtmlToMarkdown(root: HTMLElement) {
   const inline = (node: Node): string => {
     if (node.nodeType === Node.TEXT_NODE) return node.textContent || "";
     if (!(node instanceof HTMLElement)) return "";
+    if (node.dataset.imageInsertionMarker === "true") return "";
     const tag = node.tagName.toLowerCase();
     if (tag === "br") return "\n";
     if (tag === "img") {
       const src = node.getAttribute("src") || "";
       if (!src.startsWith("/api/blog/images/blog/")) return "";
       const alt = (node.getAttribute("alt") || "본문 이미지").replace(/[\[\]]/g, " ");
+      const caption = node.dataset.caption ? "|caption=" + encodeURIComponent(node.dataset.caption) : "";
       const width = node.dataset.width && /^([3-9][0-9]|100)%$/.test(node.dataset.width) ? node.dataset.width : "100%";
       const align = node.dataset.align && ["left", "center", "right"].includes(node.dataset.align) ? node.dataset.align : "center";
-      return "![" + alt + "|width=" + width + "|align=" + align + "](" + src + ")";
+      return "![" + alt + "|width=" + width + "|align=" + align + caption + "](" + src + ")";
     }
     const content = Array.from(node.childNodes).map(inline).join("");
     if (tag === "strong" || tag === "b") return "**" + content + "**";
     if (tag === "em" || tag === "i") return "*" + content + "*";
+    if (tag === "u") return "++" + content + "++";
+    if (tag === "span" || tag === "font") {
+      const color = node.style.color || node.getAttribute("color") || "";
+      const background = node.style.backgroundColor || "";
+      const size = node.style.fontSize || "";
+      const toHex = (value: string) => {
+        const rgb = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+        if (rgb) return "#" + [rgb[1],rgb[2],rgb[3]].map((v) => Number(v).toString(16).padStart(2,"0")).join("");
+        return /^#[0-9a-f]{6}$/i.test(value) ? value : "";
+      };
+      const colorHex = toHex(color);
+      const highlightHex = toHex(background);
+      const sizeName = /(?:1\.25|large|18px|20px)/i.test(size) || node.getAttribute("size") === "5" ? "large" : /(?:0\.85|small|12px|13px)/i.test(size) || node.getAttribute("size") === "2" ? "small" : "";
+      let styled = content;
+      if (colorHex) styled = "{{color=" + colorHex + "}}" + styled + "{{/color}}";
+      if (highlightHex) styled = "{{highlight=" + highlightHex + "}}" + styled + "{{/highlight}}";
+      if (sizeName) styled = "{{size=" + sizeName + "}}" + styled + "{{/size}}";
+      return styled;
+    }
     if (tag === "a") {
       const href = node.getAttribute("href") || "";
       return /^https?:\/\//i.test(href) ? "[" + content + "](" + href + ")" : content;
@@ -134,6 +159,8 @@ export default function AdminBlogManager() {
   const selectedInlineImageRef = useRef<HTMLImageElement | null>(null);
   const [inlineImageWidth, setInlineImageWidth] = useState("100%");
   const [inlineImageAlign, setInlineImageAlign] = useState("center");
+  const [inlineImageAlt, setInlineImageAlt] = useState("");
+  const [inlineImageCaption, setInlineImageCaption] = useState("");
   const [hasSelectedInlineImage, setHasSelectedInlineImage] = useState(false);
   const [cropOpen, setCropOpen] = useState(false);
   const [cropLeft, setCropLeft] = useState(10);
@@ -218,7 +245,9 @@ export default function AdminBlogManager() {
   function placeImageInsertionMarker(range?: Range | null) {
     const root = contentRef.current;
     if (!root) return null;
-    const target = range || savedSelectionRef.current;
+    const selection = window.getSelection();
+    const currentRange = selection?.rangeCount ? selection.getRangeAt(0) : null;
+    const target = range || savedSelectionRef.current || (currentRange && root.contains(currentRange.commonAncestorContainer) ? currentRange : null);
     const marker = document.createElement("span");
     marker.dataset.imageInsertionMarker = "true";
     marker.textContent = "\u200b";
@@ -230,7 +259,11 @@ export default function AdminBlogManager() {
       insertion.deleteContents();
       insertion.insertNode(marker);
     } else {
-      root.appendChild(marker);
+      // No active caret: use the end of the document as a predictable fallback.
+      const insertion = document.createRange();
+      insertion.selectNodeContents(root);
+      insertion.collapse(false);
+      insertion.insertNode(marker);
     }
     imageInsertionMarkerRef.current = marker;
     savedSelectionRef.current = null;
@@ -261,8 +294,17 @@ export default function AdminBlogManager() {
       image.style.height = "auto";
       image.style.display = "block";
       image.style.margin = inlineImageAlign === "left" ? "16px auto 16px 0" : inlineImageAlign === "right" ? "16px 0 16px auto" : "16px auto";
+      image.style.touchAction = "pan-y";
       if (marker?.isConnected) {
         marker.replaceWith(image);
+        selectedInlineImageRef.current = image;
+        image.style.outline = "2px solid #7da4d0";
+        image.style.outlineOffset = "3px";
+        setHasSelectedInlineImage(true);
+        setInlineImageWidth(image.dataset.width || "100%");
+        setInlineImageAlign(image.dataset.align || "center");
+        setInlineImageAlt(image.alt || "");
+        setInlineImageCaption(image.dataset.caption || "");
         const after = document.createElement("p");
         after.append(document.createElement("br"));
         image.after(after);
@@ -278,7 +320,8 @@ export default function AdminBlogManager() {
         root.append(image);
       }
       imageInsertionMarkerRef.current = null;
-      if (root) setEditor((current) => ({ ...current, content_md: editorHtmlToMarkdown(root) }));
+      // The save handler serializes the live editor DOM. Avoid replacing
+      // dangerouslySetInnerHTML here so the just-inserted image stays selected.
       setNotice("본문 이미지가 지정한 위치에 삽입됐습니다.");
     } catch (e) {
       marker?.remove();
@@ -319,7 +362,29 @@ export default function AdminBlogManager() {
     image.style.maxWidth = "100%";
     image.style.height = "auto";
     setInlineImageWidth(normalizedWidth);
+    // Do not serialize/set React state during a drag. Re-rendering the
+    // contentEditable HTML detaches the image and interrupts the resize gesture.
+  }
+  function updateSelectedImageMetadata(field: "alt" | "caption", value: string) {
+    const image = selectedInlineImageRef.current;
+    if (!image || !contentRef.current?.contains(image)) return;
+    if (field === "alt") { image.alt = value; setInlineImageAlt(value); }
+    else { image.dataset.caption = value; setInlineImageCaption(value); }
+  }
+  function moveSelectedInlineImage(direction: -1 | 1) {
+    const image = selectedInlineImageRef.current;
+    if (!image || !contentRef.current?.contains(image)) return;
+    const block = image.closest("p") || image;
+    const sibling = direction < 0 ? block.previousElementSibling : block.nextElementSibling;
+    if (!sibling) return;
+    if (direction < 0) sibling.before(block); else sibling.after(block);
     syncEditorContent();
+  }
+  function deleteSelectedInlineImage() {
+    const image = selectedInlineImageRef.current;
+    if (!image) return;
+    image.remove(); selectedInlineImageRef.current = null; setHasSelectedInlineImage(false);
+    setInlineImageAlt(""); setInlineImageCaption(""); syncEditorContent();
   }
   function handleInlineImagePointerDown(event: React.PointerEvent<HTMLDivElement>) {
     const target = event.target;
@@ -327,10 +392,16 @@ export default function AdminBlogManager() {
 
     // Select the image immediately on the first pointer interaction. Previously,
     // resizing was ignored until a separate click had populated the selected ref.
+    const previous = selectedInlineImageRef.current;
+    if (previous && previous !== target) previous.style.outline = "";
     selectedInlineImageRef.current = target;
+    target.style.outline = "2px solid #7da4d0";
+    target.style.outlineOffset = "3px";
     setHasSelectedInlineImage(true);
     setInlineImageWidth(target.dataset.width || target.style.width || "100%");
     setInlineImageAlign(target.dataset.align || "center");
+    setInlineImageAlt(target.alt || "");
+    setInlineImageCaption(target.dataset.caption || "");
 
     const rect = target.getBoundingClientRect();
     const handleSize = Math.max(28, Math.min(40, Math.round(Math.min(rect.width, rect.height) * 0.12)));
@@ -342,6 +413,7 @@ export default function AdminBlogManager() {
     const startX = event.clientX;
     const startWidth = rect.width;
     const containerWidth = contentRef.current.clientWidth || rect.width;
+    target.style.touchAction = "none";
     const move = (moveEvent: PointerEvent) => {
       const nextWidth = Math.round(((startWidth + moveEvent.clientX - startX) / containerWidth) * 100);
       resizeSelectedInlineImage(Math.min(100, Math.max(30, nextWidth)) + "%");
@@ -350,6 +422,7 @@ export default function AdminBlogManager() {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
       window.removeEventListener("pointercancel", stop);
+      target.style.touchAction = "pan-y";
       syncEditorContent();
     };
     window.addEventListener("pointermove", move);
@@ -383,7 +456,6 @@ export default function AdminBlogManager() {
       image.src = "/api/blog/images/" + data.key;
       image.dataset.width = inlineImageWidth;
       image.dataset.align = inlineImageAlign;
-      syncEditorContent();
       setCropOpen(false);
       setNotice("이미지를 자르고 적용했습니다. 게시글 저장을 눌러 반영하세요.");
     } catch (e) {
@@ -424,6 +496,7 @@ export default function AdminBlogManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...editor,
+          content_md: contentRef.current ? editorHtmlToMarkdown(contentRef.current) : editor.content_md,
           category_id: editor.category_id || null,
           category_name: editor.category_name.trim(),
           tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
@@ -562,16 +635,25 @@ export default function AdminBlogManager() {
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => insertEditorBlock("h3")}>소제목</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("bold")}>굵게</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("italic")}>기울임</button>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("underline")}>밑줄</button>
+                    <label className="blog-admin-inline-style-control">글자색<input aria-label="글자색 선택" type="color" defaultValue="#26364a" onMouseDown={() => rememberEditorSelection()} onChange={(e) => applyEditorCommand("foreColor", e.target.value)} /></label>
+                    <label className="blog-admin-inline-style-control">형광펜<input aria-label="강조 배경색 선택" type="color" defaultValue="#fff1a8" onMouseDown={() => rememberEditorSelection()} onChange={(e) => applyEditorCommand("hiliteColor", e.target.value)} /></label>
+                    <label className="blog-admin-inline-style-control">글자 크기<select aria-label="글자 크기" defaultValue="3" onMouseDown={() => rememberEditorSelection()} onChange={(e) => applyEditorCommand("fontSize", e.target.value)}><option value="2">작게</option><option value="3">보통</option><option value="5">크게</option></select></label>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("insertUnorderedList")}>글머리 목록</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => insertEditorBlock("blockquote")}>인용</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => { const url = window.prompt("링크 주소를 입력하세요."); if (url && /^https?:\/\//i.test(url)) applyEditorCommand("createLink", url); }}>링크</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("removeFormat")}>서식 지우기</button>
                   </div>
                   <div className="blog-admin-inline-image-tools">
-                    <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
-                    <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; syncEditorContent(); } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
+                    <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} disabled={!hasSelectedInlineImage} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /><input aria-label="이미지 너비 직접 입력" type="number" min="30" max="100" step="1" value={parseInt(inlineImageWidth, 10) || 100} disabled={!hasSelectedInlineImage} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} style={{width:64}} />%</label>
+                    <label>대체 텍스트(ALT)<input aria-label="이미지 대체 텍스트" value={inlineImageAlt} disabled={!hasSelectedInlineImage} onChange={(e) => updateSelectedImageMetadata("alt", e.target.value)} placeholder="이미지 설명" /></label>
+                    <label>이미지 캡션<input aria-label="이미지 캡션" value={inlineImageCaption} disabled={!hasSelectedInlineImage} onChange={(e) => updateSelectedImageMetadata("caption", e.target.value)} placeholder="이미지 아래 설명" /></label>
+                    <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage} onClick={() => moveSelectedInlineImage(-1)}>이미지 위로</button>
+                    <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage} onClick={() => moveSelectedInlineImage(1)}>이미지 아래로</button>
+                    <button type="button" className="blog-admin-danger" disabled={!hasSelectedInlineImage} onClick={deleteSelectedInlineImage}>이미지 삭제</button>
+                    <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage || uploadingImage} onClick={() => { setCropLeft(10); setCropTop(10); setCropWidth(80); setCropHeight(80); setCropOpen(true); }}>선택 이미지 자르기</button>
-                    <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onClick={rememberEditorSelection} onChange={(e) => { placeImageInsertionMarker(); void uploadInlineImage(e.currentTarget.files?.[0]); e.currentTarget.value = ""; }} /></label>
+                    <label onPointerDown={() => { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); }}>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple disabled={uploadingImage} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); } }} onChange={(e) => { if (e.currentTarget.files?.length) { const files = Array.from(e.currentTarget.files); void (async () => { for (const file of files) await uploadInlineImage(file); })(); } e.currentTarget.value = ""; }} /></label>
                   </div>
                   <div
                     key={editor.id || "new-post"}
@@ -584,7 +666,13 @@ export default function AdminBlogManager() {
                     aria-multiline="true"
                     data-placeholder="여기에 글을 작성하세요. 서식 버튼을 누르면 입력한 글에 바로 적용됩니다."
                     dangerouslySetInnerHTML={{ __html: markdownToEditorHtml(editor.content_md) }}
-                    onBlur={syncEditorContent}
+                    onBlur={(event) => {
+                      const nextFocus = event.relatedTarget as HTMLElement | null;
+                      // Keep the live image node attached while the user adjusts its
+                      // width/alignment or uses the formatting toolbar.
+                      if (nextFocus?.closest(".blog-admin-inline-image-tools, .blog-admin-format-tools")) return;
+                      syncEditorContent();
+                    }}
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
                     onFocus={rememberEditorSelection}
@@ -602,7 +690,7 @@ export default function AdminBlogManager() {
                     <label>자르기 높이 {cropHeight}%<input type="range" min="10" max={100 - cropTop} value={cropHeight} onChange={(e) => setCropHeight(Number(e.target.value))} /></label>
                     <div className="blog-admin-crop-actions"><button type="button" className="blog-admin-primary" onClick={() => void cropSelectedInlineImage()} disabled={uploadingImage}>{uploadingImage ? "적용 중..." : "자른 이미지 적용"}</button><button type="button" className="blog-admin-secondary" onClick={() => setCropOpen(false)}>취소</button></div>
                   </div> : null}
-                  <small>굵게·제목 등은 작성 영역에 바로 표시됩니다. 이미지 삽입 버튼을 누르면 마지막 커서 위치에 들어갑니다. 파일을 본문 원하는 위치에 끌어다 놓아도 됩니다. 업로드 중에는 저장할 수 없습니다.</small>
+                  <small>이미지는 본문에서 커서를 놓은 위치에 삽입됩니다. 이미지를 선택한 뒤 너비 슬라이더를 사용하거나 이미지 우측 하단 모서리를 드래그해 크기를 조절하세요. 파일을 본문 원하는 위치에 끌어다 놓아도 됩니다. 업로드 중에는 저장할 수 없습니다.</small>
                 </>
               )}
             </div>
