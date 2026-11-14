@@ -1,4 +1,10 @@
 ## 2026-11-15
+- PR #28 merged and production deployment verified for the text-to-speech loading progress and explicit voice-preview flow.
+- GitHub Actions Next.js production build passed (run #43615375503).
+- Live browser QA confirmed engine-loading progress, engine readiness, F1 preview audio player, and no downloadable WAV output created by preview.
+- Production URL: `https://utilwise.kr/text-to-speech`; merge commit: `98d44e73ee9a861678a708b1fae7899209053fee`.
+
+## 2026-11-15
 - Improve text-to-speech UX with visible speech-engine/model loading progress directly below the load button.
 - Add explicit selected-voice preview; choosing a voice no longer triggers style loading or creates an output file.
 - Preview uses up to the first 180 characters of the entered text and plays temporary browser audio without a download action.
