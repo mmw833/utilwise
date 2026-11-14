@@ -42,8 +42,16 @@ export default function TextToSpeechTool({ lang }: { lang: "ko" | "en" }) {
     if (loading || tts) return;
     setLoading(true); setError("");
     try {
+      setStatus(en ? "Preparing the speech runtime…" : "음성 실행 환경을 준비하는 중…");
+      // Configure ONNX Runtime's WASM binaries explicitly. Without this, a
+      // dynamically imported ESM build can resolve .wasm files against the
+      // UTILWISE page URL instead of the CDN package directory.
+      const ortUrl = "https://esm.sh/onnxruntime-web@1.17.0/es2022/onnxruntime-web.mjs";
+      const ort = await import(/* webpackIgnore: true */ ortUrl);
+      ort.env.wasm.wasmPaths = "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.17.0/dist/";
+      ort.env.wasm.numThreads = 1;
       setStatus(en ? "Loading the speech engine module…" : "음성 엔진 모듈을 불러오는 중…");
-      const helperUrl = "https://esm.sh/gh/supertone-oss-archive/supertonic@main/web/helper.js?deps=onnxruntime-web@1.17.0";
+      const helperUrl = "https://esm.sh/gh/supertone-oss-archive/supertonic@1e9799e/web/helper.js?deps=onnxruntime-web@1.17.0";
       const helper = helperRef.current ?? await import(/* webpackIgnore: true */ helperUrl) as Helper;
       helperRef.current = helper;
       setStatus(en ? "Downloading speech models (about 398 MB) and preparing the engine…" : "음성 모델(약 398MB)을 다운로드하고 엔진을 준비하는 중…");
@@ -54,7 +62,11 @@ export default function TextToSpeechTool({ lang }: { lang: "ko" | "en" }) {
       setStyle(loadedStyle);
       setStatus(en ? "Ready. Enter text and generate speech." : "준비 완료! 문장을 입력하고 음성을 생성하세요.");
     } catch (e) {
-      setError(en ? "The speech engine could not be loaded. Check your connection, available memory, and browser compatibility, then try again." : "음성 엔진을 불러오지 못했습니다. 인터넷 연결, 기기 메모리, 브라우저 호환성을 확인한 뒤 다시 시도해 주세요.");
+      const detail = e instanceof Error ? e.message : String(e);
+      console.error("UTILWISE TTS engine initialization failed:", e);
+      setError(en
+        ? `The speech engine could not be loaded. Check your connection and browser memory, then try again. Details: ${detail}`
+        : `음성 엔진을 불러오지 못했습니다. 인터넷 연결과 브라우저 메모리를 확인해 주세요. 오류 내용: ${detail}`);
       setStatus("");
       console.error(e);
     } finally { setLoading(false); }
