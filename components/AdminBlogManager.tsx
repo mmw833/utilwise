@@ -405,7 +405,6 @@ export default function AdminBlogManager() {
       image.src = "/api/blog/images/" + data.key;
       image.dataset.width = inlineImageWidth;
       image.dataset.align = inlineImageAlign;
-      syncEditorContent();
       setCropOpen(false);
       setNotice("이미지를 자르고 적용했습니다. 게시글 저장을 눌러 반영하세요.");
     } catch (e) {
@@ -591,8 +590,8 @@ export default function AdminBlogManager() {
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("removeFormat")}>서식 지우기</button>
                   </div>
                   <div className="blog-admin-inline-image-tools">
-                    <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} disabled={!hasSelectedInlineImage} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} onPointerUp={syncEditorContent} onKeyUp={syncEditorContent} /></label>
-                    <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; syncEditorContent(); } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
+                    <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} disabled={!hasSelectedInlineImage} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
+                    <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage || uploadingImage} onClick={() => { setCropLeft(10); setCropTop(10); setCropWidth(80); setCropHeight(80); setCropOpen(true); }}>선택 이미지 자르기</button>
                     <label onPointerDown={() => { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); }}>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); } }} onChange={(e) => { if (e.currentTarget.files?.[0]) void uploadInlineImage(e.currentTarget.files[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
