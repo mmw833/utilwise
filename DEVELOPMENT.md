@@ -5,7 +5,8 @@
 - `package.json`에는 `@huggingface/transformers`를 의존성으로 추가하지 않는다. 서버 빌드에 포함되면 `onnxruntime-node` 네이티브 `.node` 파일이 OpenNext/esbuild 단계에서 로딩 오류를 일으켰다.
 - `next.config.ts`는 기존 OpenNext 개발 바인딩 초기화 설정을 유지하며 별도 `serverExternalPackages` 지정은 하지 않는다.
 - 브라우저 실행 시 Transformers.js가 ONNX Runtime Web 및 WASM 자산을 CDN에서 불러오고, 모델은 Hugging Face에서 다운로드한다. 이미지 원본은 브라우저에 머문다.
-- 검증 필수: GitHub Actions Next.js 빌드, Cloudflare Workers Build, 실제 브라우저에서 CDN 모듈/CORS/WASM 다운로드, BEN2 추론 및 투명 PNG 알파 채널. CDN 차단 환경은 기능이 동작하지 않을 수 있음.
+- 빌드 검증: GitHub Actions Next.js production build 및 Cloudflare Workers preview build 성공 (2026-11-14)
+- 기능 검증 필수: 실제 브라우저에서 CDN 모듈/CORS/WASM 다운로드, BEN2 추론 및 투명 PNG 알파 채널 확인. CDN 차단 환경은 기능이 동작하지 않을 수 있음.
 
 ## 2026-11-13 운영 배포 및 블로그 구성
 - 운영 배포 workflow: `.github/workflows/production-deploy.yml`
