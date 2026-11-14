@@ -912,3 +912,12 @@
 - 모델 카드상 512x512 입력, FP16 모델 약 100MB. 실제 속도·인식률은 운영 브라우저와 기기별 실측 전까지 개선 완료로 단정하지 않음
 - 변경 파일: components/BackgroundRemover.tsx 및 프로젝트 문서
 - 빌드/배포 및 실기기 테스트 대기
+
+
+## 2026-11-15 텍스트 음성 변환기 개발 (진행 중)
+- 개발 브랜치: `feature/text-to-speech`
+- 신규 페이지: `/text-to-speech`, `/en/text-to-speech`
+- 브라우저 내 Supertonic 3 ONNX 음성 생성 시도, 한국어/영어 등 언어 선택, 10개 음성 스타일, 속도·품질 설정, WAV 미리 듣기 및 다운로드 UI를 추가했다.
+- 모델은 Hugging Face 고정 revision에서 최초 약 398MB를 다운로드한다. 외부 모델 저장소와 jsDelivr 연결이 필요하다.
+- 아직 실제 브라우저 모델 로딩/음성 생성, Next.js 빌드, Cloudflare Preview 검증은 완료되지 않았다. 운영 배포 및 병합 금지.
+- 현재 MP3 다운로드는 구현하지 않았고 WAV만 제공한다. 성능·모바일 메모리 검증 후 후속 결정.
