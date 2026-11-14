@@ -877,3 +877,11 @@
 - WebGPU 지원 브라우저에서는 WebGPU를 우선 시도하고 실패하면 WASM으로 폴백. 기존 브라우저 캐시 및 로컬 처리·개인정보 보호 유지
 - 변경 파일: components/BackgroundRemover.tsx, app/globals.css 및 프로젝트 문서
 - 자동 빌드 및 실제 브라우저(Chrome/Safari, WebGPU/WASM) 검증 후 운영 기능 완료 판정
+
+
+## 2026-11-14 블로그 전체 이미지 정사각형 표시 수정
+- 실제 운영 main 브랜치의 BlogFeed 및 BlogArticle 클래스에 맞춰 최종 CSS 우선순위 재정의
+- 대표글, 인기글, 전체글, 상세 페이지 대표 이미지 모두 1:1 비율 강제
+- object-fit: contain 및 중앙 정렬로 정사각형 원본 이미지 상하가 잘리지 않게 표시
+- 기존 고정 높이, 모바일 4:3 규칙, 장식 배경 및 hover 확대 효과 제거
+- 변경 파일: app/globals.css. GitHub Actions 빌드 및 운영 화면 확인 대기
