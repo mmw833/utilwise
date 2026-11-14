@@ -124,12 +124,17 @@ async function makeEstimatedOverlay(source: Blob, removedBackground: Blob): Prom
   const maskImage = await blobToImage(removedBackground);
   const width = sourceImage.naturalWidth;
   const height = sourceImage.naturalHeight;
+
+  // Draw the source first, then composite the translucent red mask over it.
+  // putImageData() replaces pixels instead of alpha-blending them, which
+  // previously produced a dark red/black preview and obscured the original.
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
-  const context = canvas.getContext("2d", { willReadFrequently: true });
+  const context = canvas.getContext("2d");
   if (!context) throw new Error("Canvas is unavailable");
   context.drawImage(sourceImage, 0, 0, width, height);
+
   const maskCanvas = document.createElement("canvas");
   maskCanvas.width = width;
   maskCanvas.height = height;
@@ -137,21 +142,32 @@ async function makeEstimatedOverlay(source: Blob, removedBackground: Blob): Prom
   if (!maskContext) throw new Error("Canvas is unavailable");
   maskContext.drawImage(maskImage, 0, 0, width, height);
   const mask = maskContext.getImageData(0, 0, width, height).data;
-  const overlay = context.createImageData(width, height);
+
+  const overlayCanvas = document.createElement("canvas");
+  overlayCanvas.width = width;
+  overlayCanvas.height = height;
+  const overlayContext = overlayCanvas.getContext("2d");
+  if (!overlayContext) throw new Error("Canvas is unavailable");
+  const overlay = overlayContext.createImageData(width, height);
   for (let i = 0; i < mask.length; i += 4) {
-    const removed = 255 - mask[i + 3];
+    // The model output is the retained subject with transparency elsewhere.
+    const estimatedBackground = 255 - mask[i + 3];
     overlay.data[i] = 239;
     overlay.data[i + 1] = 68;
     overlay.data[i + 2] = 68;
-    overlay.data[i + 3] = Math.round(removed * 0.42);
+    overlay.data[i + 3] = Math.round(estimatedBackground * 0.38);
   }
-  context.putImageData(overlay, 0, 0);
-  return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Preview encoding failed")), "image/jpeg", 0.88));
+  overlayContext.putImageData(overlay, 0, 0);
+  context.drawImage(overlayCanvas, 0, 0);
+
+  return new Promise((resolve, reject) =>
+    canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Preview encoding failed")), "image/jpeg", 0.9)
+  );
 }
 
 async function makeSmallPreview(file: File): Promise<Blob> {
   const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, 640 / Math.max(bitmap.width, bitmap.height));
+  const scale = Math.min(1, 448 / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement("canvas");
   canvas.width = Math.max(1, Math.round(bitmap.width * scale));
   canvas.height = Math.max(1, Math.round(bitmap.height * scale));
