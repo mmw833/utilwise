@@ -1,3 +1,9 @@
+## 2026-11-14 이미지 파일 변환기 HEIC/HEIF 지원 추가
+- 기존 변환기에 iPhone HEIC/HEIF 파일 입력과 JPG/PNG/WebP 출력 기능 추가
+- 브라우저 전용 heic2any 모듈을 최초 HEIC 변환 시 jsDelivr에서 지연 로드
+- EXIF 메타데이터 보존이 보장되지 않는 점을 UI/개인정보처리방침에 안내
+- iPhone 실파일 및 모바일 Safari 검증은 미완료
+
 ## 2026-11-14 이미지 파일 변환기 개발
 - `/image-converter`, `/en/image-converter` 신규 페이지 및 공통 브라우저 변환 컴포넌트 추가
 - JPG, PNG, WebP 형식 변환, 다중 파일 처리, 품질 조절, 미리보기 및 개별 다운로드
