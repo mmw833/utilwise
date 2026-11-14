@@ -224,3 +224,11 @@ Notes:
 - 2차 적용은 기존 기능을 기준으로 제목과 설명을 구체화했으며 별도 중복 페이지는 만들지 않았다.
 - 발표시간은 원고와 설정한 말하기 속도에 따른 예상치이며 실제 발표 시간을 보장하지 않는다.
 - PDF 및 이미지 파일은 현재 페이지의 브라우저 내 처리 방식에 맞춰 설명하고 서버 업로드를 암시하지 않는다.
+
+
+## 이미지 도구
+
+| URL | 대표 검색어 | 보조 검색어 / 검색 의도 |
+|---|---|---|
+| /background-remover | 이미지 배경 제거 | 사진 배경 지우기, AI 배경 제거, 투명 PNG 만들기 |
+| /en/background-remover | background remover | remove image background, transparent PNG, AI background remover |
