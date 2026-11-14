@@ -72,6 +72,9 @@ function markdownToEditorHtml(markdown: string) {
     .replace(/!\[([^\]]*)\]\((\/api\/blog\/images\/[^)]+)\)/g, (_m, meta, src) => { const match = meta.match(/^(.*?)\|width=((?:3[0-9]|[4-9][0-9]|100)%)\|align=(left|center|right)(?:\|caption=([^|]*))?$/); const alt = match ? match[1] : meta; const width = match ? match[2] : "100%"; const align = match ? match[3] : "center"; const caption = match?.[4] ? decodeURIComponent(match[4]) : ""; return '<img src="' + src + '" alt="' + alt + '" data-width="' + width + '" data-align="' + align + '" data-caption="' + escapeEditorHtml(caption) + '" />'; })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\+\+([^+]+)\+\+/g, "<u>$1</u>")
+    .replace(/\{\{color=(#[0-9a-fA-F]{6})\}\}([\s\S]*?)\{\{\/color\}\}/g, '<span style="color:$1">$2</span>')
+    .replace(/\{\{highlight=(#[0-9a-fA-F]{6})\}\}([\s\S]*?)\{\{\/highlight\}\}/g, '<span style="background-color:$1">$2</span>')
+    .replace(/\{\{size=(small|normal|large)\}\}([\s\S]*?)\{\{\/size\}\}/g, (_m, size, content) => '<span style="font-size:' + (size === "small" ? "0.85em" : size === "large" ? "1.25em" : "1em") + '">' + content + '</span>')
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
   return markdown.replace(/\r\n?/g, "\n").split(/\n{2,}/).map((block) => {
@@ -104,6 +107,24 @@ function editorHtmlToMarkdown(root: HTMLElement) {
     if (tag === "strong" || tag === "b") return "**" + content + "**";
     if (tag === "em" || tag === "i") return "*" + content + "*";
     if (tag === "u") return "++" + content + "++";
+    if (tag === "span" || tag === "font") {
+      const color = node.style.color || node.getAttribute("color") || "";
+      const background = node.style.backgroundColor || "";
+      const size = node.style.fontSize || "";
+      const toHex = (value: string) => {
+        const rgb = value.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/i);
+        if (rgb) return "#" + [rgb[1],rgb[2],rgb[3]].map((v) => Number(v).toString(16).padStart(2,"0")).join("");
+        return /^#[0-9a-f]{6}$/i.test(value) ? value : "";
+      };
+      const colorHex = toHex(color);
+      const highlightHex = toHex(background);
+      const sizeName = /(?:1\.25|large|18px|20px)/i.test(size) || node.getAttribute("size") === "5" ? "large" : /(?:0\.85|small|12px|13px)/i.test(size) || node.getAttribute("size") === "2" ? "small" : "";
+      let styled = content;
+      if (colorHex) styled = "{{color=" + colorHex + "}}" + styled + "{{/color}}";
+      if (highlightHex) styled = "{{highlight=" + highlightHex + "}}" + styled + "{{/highlight}}";
+      if (sizeName) styled = "{{size=" + sizeName + "}}" + styled + "{{/size}}";
+      return styled;
+    }
     if (tag === "a") {
       const href = node.getAttribute("href") || "";
       return /^https?:\/\//i.test(href) ? "[" + content + "](" + href + ")" : content;
@@ -615,6 +636,9 @@ export default function AdminBlogManager() {
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("bold")}>굵게</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("italic")}>기울임</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("underline")}>밑줄</button>
+                    <label className="blog-admin-inline-style-control">글자색<input aria-label="글자색 선택" type="color" defaultValue="#26364a" onMouseDown={() => rememberEditorSelection()} onChange={(e) => applyEditorCommand("foreColor", e.target.value)} /></label>
+                    <label className="blog-admin-inline-style-control">형광펜<input aria-label="강조 배경색 선택" type="color" defaultValue="#fff1a8" onMouseDown={() => rememberEditorSelection()} onChange={(e) => applyEditorCommand("hiliteColor", e.target.value)} /></label>
+                    <label className="blog-admin-inline-style-control">글자 크기<select aria-label="글자 크기" defaultValue="3" onMouseDown={() => rememberEditorSelection()} onChange={(e) => applyEditorCommand("fontSize", e.target.value)}><option value="2">작게</option><option value="3">보통</option><option value="5">크게</option></select></label>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("insertUnorderedList")}>글머리 목록</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => insertEditorBlock("blockquote")}>인용</button>
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => { const url = window.prompt("링크 주소를 입력하세요."); if (url && /^https?:\/\//i.test(url)) applyEditorCommand("createLink", url); }}>링크</button>
