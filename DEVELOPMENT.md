@@ -650,3 +650,12 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - Image OCR runs in the visitor's browser. Image files are not uploaded. The OCR engine and language data require an internet connection on first use.
 - Supports image selection, drag-and-drop, files up to 15 MB, editable result text, clipboard copy, and TXT download.
 - Test clear Korean, English, mixed-language screenshots, mobile upload, copy/download, CDN loading, and Cloudflare production build before release.
+
+
+## 텍스트 음성 변환기 (개발 중)
+- 경로: `/text-to-speech`, `/en/text-to-speech`
+- UI: `components/TextToSpeechTool.tsx`
+- Supertonic 3 ONNX 모델을 브라우저에서 실행하며 텍스트를 서버로 전송하지 않는다.
+- 모델 파일은 Hugging Face의 고정 revision에서 최초 약 398MB 다운로드하고, helper 모듈은 jsDelivr에서 불러온다.
+- 현재 지원 UI: 한국어/영어 및 일부 다국어 선택, 10개 음성 스타일, 속도·생성 단계 설정, WAV 재생/다운로드.
+- MP3 변환은 미구현. 모델 로딩, CORS, ONNX Runtime Web/WASM 경로, 실제 음성 출력, 모바일 메모리, Cloudflare 배포 호환성을 반드시 검증한 뒤 공개한다.
