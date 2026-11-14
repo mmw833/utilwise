@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getBlogDatabase } from "@/lib/blog/db";\nimport { getBlogVisitorStats } from "@/lib/blog/posts";
+import { getBlogDatabase } from "@/lib/blog/db";
+import { getBlogVisitorStats } from "@/lib/blog/posts";
 
 export const dynamic = "force-dynamic";
 const COOKIE = "uw_blog_visitor";
 function token() { const bytes = new Uint8Array(32); crypto.getRandomValues(bytes); return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join(""); }
 async function hash(value: string) { const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value)); return Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, "0")).join(""); }
-export async function GET() {\n  try {\n    const stats = await getBlogVisitorStats();\n    return NextResponse.json(stats, { headers: { "Cache-Control": "no-store" } });\n  } catch {\n    return NextResponse.json({ today: 0, total: 0 }, { status: 503, headers: { "Cache-Control": "no-store" } });\n  }\n}\n\nexport async function POST(request: NextRequest) {
+export async function GET() {
+  try {
+    const stats = await getBlogVisitorStats();
+    return NextResponse.json(stats, { headers: { "Cache-Control": "no-store" } });
+  } catch {
+    return NextResponse.json({ today: 0, total: 0 }, { status: 503, headers: { "Cache-Control": "no-store" } });
+  }
+}
+
+export async function POST(request: NextRequest) {
   try {
     const current = request.cookies.get(COOKIE)?.value;
     const visitor = current && /^[a-f0-9]{64}$/.test(current) ? current : token();
