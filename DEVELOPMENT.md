@@ -592,6 +592,15 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 메인 페이지의 footer 마크업/링크는 수정하지 않는다. 관리자 진입 방식은 기존 구현을 보존한다. 변경 후 Preview 배포 및 모바일/데스크톱 검증을 수행하고 운영 반영은 별도 승인 전까지 금지한다.
 
 
+## 이미지 파일 형식 변환기
+- 한국어 `/image-converter`, 영어 `/en/image-converter`
+- UI/처리: `components/ImageFormatConverter.tsx`
+- JPG, PNG, WebP 상호 변환을 브라우저 Canvas API로 수행하며 다중 파일 선택 및 개별 다운로드 지원
+- JPG/WebP 출력 품질 50~100% 조절, PNG는 무손실 저장. JPG 출력은 투명 영역을 흰색으로 채움
+- 파일당 20MB, 가로·세로 각각 최대 12,000px 제한
+- 원본 파일은 UTILWISE 서버로 전송하지 않음
+- 배포 전 데스크톱·모바일 브라우저에서 각 형식 변환, PNG 투명도, 다중 파일 처리, 다운로드 파일 열기 검증
+
 ## AI 이미지 배경 제거 도구
 - 한국어: /background-remover; 영어: /en/background-remover
 - UI 및 처리: components/BackgroundRemover.tsx
