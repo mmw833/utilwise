@@ -1,4 +1,10 @@
 ## 2026-11-15
+- Add a compact TODAY / TOTAL visitor counter to the top-right area of the Korean and English homepage headers.
+- Reuse the existing D1 site-wide visitor tables and anonymous hashed visitor cookie; preserve existing totals and avoid storing raw IP addresses.
+- Move visitor tracking to the shared root layout so visits across all pages and both languages are counted together.
+- Add a no-store GET response for the existing visitor endpoint. Build and browser QA pending.
+
+## 2026-11-15
 - PR #28 merged and production deployment verified for the text-to-speech loading progress and explicit voice-preview flow.
 - GitHub Actions Next.js production build passed (run #43615375503).
 - Live browser QA confirmed engine-loading progress, engine readiness, F1 preview audio player, and no downloadable WAV output created by preview.
