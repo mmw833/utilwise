@@ -633,3 +633,11 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - putImageData는 알파 블렌딩을 수행하지 않고 픽셀을 교체하므로 원본 캔버스에 반투명 마스크를 직접 기록하지 않는다.
 - 사전 분석용 축소 이미지는 최대 448px로 생성한다. 최종 결과는 원본 파일로 다시 처리한다.
 - BEN2 인식 품질은 사진 종류별 검증이 필요하며, 마스크 미리보기 합성 수정과 모델 정확도 개선을 구분해서 보고한다.
+
+
+## AI 배경 제거 모델
+- 기본 모델은 shozebDev/birefnet-lite-512-onnx이며 Transformers.js `image-segmentation` 파이프라인을 사용한다.
+- WebGPU를 우선 사용하고 사용할 수 없으면 WASM으로 폴백한다. 모델 옵션은 FP16 가중치를 선택한다.
+- 파이프라인의 첫 번째 segmentation mask를 투명 PNG 마스크로 변환한다. 최종 PNG는 원본 이미지에 마스크 알파를 적용해 생성한다.
+- 모델 카드 기준 512x512 입력, FP16 가중치 파일 약 100MB. 속도 및 인식률은 실제 기기 테스트 결과로만 평가한다.
+- 모델 정보: https://huggingface.co/shozebDev/birefnet-lite-512-onnx
