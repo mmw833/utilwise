@@ -1,4 +1,11 @@
 ## 2026-11-15
+- Improve text-to-speech UX with visible speech-engine/model loading progress directly below the load button.
+- Add explicit selected-voice preview; choosing a voice no longer triggers style loading or creates an output file.
+- Preview uses up to the first 180 characters of the entered text and plays temporary browser audio without a download action.
+- Full speech generation and WAV download remain opt-in through the separate Generate button.
+- Work branch: `feature/tts-voice-preview-progress`; build, browser QA, and deployment pending.
+
+## 2026-11-15
 - Add browser-based image-to-text OCR for Korean and English.
 - Add Korean and English standalone pages, homepage and text-tools directory links, sitemap entries, privacy disclosures, and SEO content.
 - Support image selection and drag-and-drop, 15 MB file limit, editable OCR output, clipboard copy, and TXT download.
