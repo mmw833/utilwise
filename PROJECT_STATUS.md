@@ -1,3 +1,10 @@
+## 2026-11-15 텍스트 음성 변환기 로딩 오류 (미해결)
+- PR #27 병합 완료: `33bc84b3881ed710f34914e47921183abfedcd41`; GitHub Actions Next.js production build 성공
+- `components/TextToSpeechTool.tsx`: ONNX Runtime WebAssembly 파일 경로 명시, WASM 스레드 1개로 제한, Supertonic helper revision 고정, 초기화 예외 상세 노출 추가
+- 운영 브라우저에서 `https://utilwise.kr/text-to-speech` 접속은 정상이나 엔진 로딩이 여전히 실패. 진행 상태가 `Duration Predictor`에서 멈춘 후 오류 표시
+- 실제 음성 생성, 재생, WAV 다운로드는 아직 검증 불가. TTS를 정상 완료로 처리하지 말 것
+- 다음 작업: 운영 Worker 배포가 PR #27 커밋을 포함하는지 배포 실행 내역 확인. 이어서 Hugging Face 모델 파일별 요청 실패/HTTP 상태와 브라우저 콘솔 오류 확인. 필요하면 Supertonic 모델 URL·로더의 파일명/경로 규약 재검증
+
 ## 2026-11-15 이미지 텍스트 추출 OCR 도구 추가 (Preview 검증 대기)
 - 작업 브랜치: `feature/image-to-text-ocr` (main 기준)
 - 한국어 `/image-to-text`, 영어 `/en/image-to-text` 독립 페이지 및 공통 컴포넌트 `components/ImageToTextOCR.tsx` 추가
