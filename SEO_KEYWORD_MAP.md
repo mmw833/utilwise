@@ -232,3 +232,11 @@ Notes:
 |---|---|---|
 | /background-remover | 이미지 배경 제거 | 사진 배경 지우기, AI 배경 제거, 투명 PNG 만들기 |
 | /en/background-remover | background remover | remove image background, transparent PNG, AI background remover |
+
+
+## 이미지 파일 변환기
+
+| URL | 대표 검색어 | 보조 검색어 / 검색 의도 |
+|---|---|---|
+| /image-converter | 이미지 파일 변환기 | JPG PNG 변환, PNG JPG 변환, WebP 변환, 이미지 형식 바꾸기 |
+| /en/image-converter | image converter | convert JPG to PNG, convert PNG to JPG, WebP converter, image format converter |
