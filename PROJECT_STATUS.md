@@ -1,11 +1,12 @@
-## 2026-11-14 AI 이미지 배경 제거 Cloudflare 빌드 오류 대응 (최신 수정, 검증 대기)
+## 2026-11-14 AI 이미지 배경 제거 Cloudflare 빌드 검증 통과 (브라우저 기능 검증 대기)
 - Cloudflare Build #49 및 후속 Build에서 `onnxruntime-node`의 네이티브 `.node` 파일 6개를 esbuild가 처리하지 못하는 오류 확인
 - `serverExternalPackages` 설정만으로는 오류가 해결되지 않아 해당 설정을 되돌림
 - Transformers.js NPM 의존성을 제거하고, 브라우저에서만 공식 jsDelivr CDN의 Transformers.js 3.8.1 ESM 빌드를 동적 import하도록 변경
 - 모델 실행은 계속 브라우저에서 수행하며 이미지 원본을 UTILWISE 서버로 전송하지 않음. CDN/WASM 및 모델 파일 다운로드를 위해 사용자 브라우저의 외부 네트워크 연결은 필요
 - 관련 변경: `components/BackgroundRemover.tsx`, `package.json`, `next.config.ts`
-- 현재 GitHub Actions 및 Cloudflare Workers 빌드 결과 확인 대기. 브라우저에서 CDN 모듈 로드, 모델 추론, 투명 PNG 출력 검증 전에는 해결/완료로 간주하지 않음
-- PR #21은 draft 유지. main 병합 및 운영 배포 없음
+- 최신 커밋 `5a8dfa3bd842f4e499723a5255ccf58f1c0995d4`에서 GitHub Actions Next.js production build 성공 (run `43539683161`), Cloudflare Workers preview build 성공 확인
+- 아직 브라우저에서 CDN 모듈 로드, 모델 다운로드/추론, 투명 PNG 알파 채널 및 모바일/PC UI를 검증하지 않음
+- PR #21은 draft/open 유지. main 병합 및 운영 배포 없음
 
 ## 2026-11-14 AI 이미지 배경 제거 도구 개발 (Preview 검증 전)
 - 작업 브랜치: feature/background-remover (main 기준으로 생성, 운영 코드 변경 없음)
