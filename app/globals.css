@@ -1000,3 +1000,46 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 
 /* Match the blog masthead to the site's warm ivory canvas. */
 .journal-hero{background:#fffefa}
+
+
+/* Blog editor usability: clear selected-image affordance and touch-safe resize controls */
+.blog-admin-wysiwyg img[style*="outline"]{
+  outline:2px solid #7da4d0;
+  outline-offset:3px;
+  border-radius:8px;
+}
+.blog-admin-wysiwyg img{
+  -webkit-user-select:none;
+  user-select:none;
+}
+.blog-admin-inline-image-tools input[type="range"]:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+}
+.blog-admin-inline-image-tools label{
+  min-height:38px;
+}
+.blog-admin-format-tools{
+  position:sticky;
+  top:8px;
+  z-index:4;
+  padding:8px;
+  border:1px solid #e3e9f0;
+  border-radius:10px;
+  background:rgba(255,255,255,.96);
+  box-shadow:0 3px 12px rgba(25,45,70,.06);
+}
+.blog-admin-wysiwyg{
+  min-height:420px;
+  line-height:1.9;
+  overflow-wrap:anywhere;
+}
+.blog-admin-wysiwyg:empty:before{
+  color:#9aa7b6;
+}
+@media(max-width:760px){
+  .blog-admin-format-tools{top:4px;gap:6px}
+  .blog-admin-inline-image-tools{align-items:flex-start;gap:10px}
+  .blog-admin-inline-image-tools label{flex-wrap:wrap}
+  .blog-admin-wysiwyg{min-height:360px}
+}
