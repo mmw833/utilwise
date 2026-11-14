@@ -87,6 +87,7 @@ function editorHtmlToMarkdown(root: HTMLElement) {
   const inline = (node: Node): string => {
     if (node.nodeType === Node.TEXT_NODE) return node.textContent || "";
     if (!(node instanceof HTMLElement)) return "";
+    if (node.dataset.imageInsertionMarker === "true") return "";
     const tag = node.tagName.toLowerCase();
     if (tag === "br") return "\n";
     if (tag === "img") {
@@ -341,7 +342,11 @@ export default function AdminBlogManager() {
 
     // Select the image immediately on the first pointer interaction. Previously,
     // resizing was ignored until a separate click had populated the selected ref.
+    const previous = selectedInlineImageRef.current;
+    if (previous && previous !== target) previous.style.outline = "";
     selectedInlineImageRef.current = target;
+    target.style.outline = "2px solid #7da4d0";
+    target.style.outlineOffset = "3px";
     setHasSelectedInlineImage(true);
     setInlineImageWidth(target.dataset.width || target.style.width || "100%");
     setInlineImageAlign(target.dataset.align || "center");
