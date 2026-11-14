@@ -588,7 +588,7 @@ export default function AdminBlogManager() {
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
                     onFocus={rememberEditorSelection}
-                    onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { selectedInlineImageRef.current = target; setHasSelectedInlineImage(true); setInlineImageWidth(target.dataset.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } else if (target === contentRef.current) { selectedInlineImageRef.current = null; setHasSelectedInlineImage(false); } }}
+                    onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { const previous = selectedInlineImageRef.current; if (previous && previous !== target) previous.style.outline = ""; selectedInlineImageRef.current = target; target.style.outline = "2px solid #7da4d0"; target.style.outlineOffset = "3px"; setHasSelectedInlineImage(true); setInlineImageWidth(target.dataset.width || target.style.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } else if (target === contentRef.current) { if (selectedInlineImageRef.current) selectedInlineImageRef.current.style.outline = ""; selectedInlineImageRef.current = null; setHasSelectedInlineImage(false); } }}
                     onPointerDown={handleInlineImagePointerDown}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={handleEditorDrop}
