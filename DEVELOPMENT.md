@@ -626,3 +626,10 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 실제 목록 구성 요소 클래스는 BlogFeed의 journal-featured-image 및 journal-card-art, 상세 페이지는 BlogArticle의 journal-article-cover이다.
 - 해당 요소에 1:1 aspect ratio를 강제하고 이미지에 object-fit: contain을 적용하여 정사각형 원본의 전체 영역이 보이도록 한다.
 - 기존 모바일 고정 높이 및 상세 대표 이미지 4:3 규칙을 최종 CSS에서 덮어쓴다.
+
+
+## 배경 제거 예상 영역 합성
+- 예상 영역은 원본 사진 위에 반투명 붉은 마스크를 별도 캔버스로 만든 뒤 drawImage로 합성한다.
+- putImageData는 알파 블렌딩을 수행하지 않고 픽셀을 교체하므로 원본 캔버스에 반투명 마스크를 직접 기록하지 않는다.
+- 사전 분석용 축소 이미지는 최대 448px로 생성한다. 최종 결과는 원본 파일로 다시 처리한다.
+- BEN2 인식 품질은 사진 종류별 검증이 필요하며, 마스크 미리보기 합성 수정과 모델 정확도 개선을 구분해서 보고한다.
