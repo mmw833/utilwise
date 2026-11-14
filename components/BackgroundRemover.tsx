@@ -236,6 +236,7 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
       setStage(t.analyzing);
       setProgress(100);
     } catch (cause) {
+      pipelinePromise = null;
       console.error("Background preview failed", cause);
       if (selection === selectionRef.current) {
         setError(t.error);
