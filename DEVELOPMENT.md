@@ -620,3 +620,9 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 모델 다운로드는 제공되는 다운로드 진행률을 표시하고, 모델 추론처럼 정확한 퍼센트를 제공하지 않는 단계는 단계명과 불확정 진행 표시를 사용한다.
 - WebGPU를 우선 시도하고 초기화/실행이 지원되지 않으면 WASM으로 폴백한다. 모델은 기존 브라우저 캐시를 사용하며 이미지는 서버로 전송하지 않는다.
 - 검증: GitHub Actions 빌드, Chrome/Edge WebGPU 및 WASM 폴백, Safari/WASM, 모바일 메모리 사용, 저해상도 마스크와 최종 결과의 차이를 확인한다.
+
+
+## 블로그 썸네일 표시 규칙 보완
+- 실제 목록 구성 요소 클래스는 BlogFeed의 journal-featured-image 및 journal-card-art, 상세 페이지는 BlogArticle의 journal-article-cover이다.
+- 해당 요소에 1:1 aspect ratio를 강제하고 이미지에 object-fit: contain을 적용하여 정사각형 원본의 전체 영역이 보이도록 한다.
+- 기존 모바일 고정 높이 및 상세 대표 이미지 4:3 규칙을 최종 CSS에서 덮어쓴다.
