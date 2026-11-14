@@ -892,3 +892,13 @@
 - 수정: 별도 오버레이 캔버스에 마스크를 기록한 뒤 drawImage로 원본 위에 합성
 - 예상 영역 분석용 임시 이미지 최대 변 길이를 640px에서 448px로 줄여 1차 분석 시간 및 메모리 사용 감소
 - BEN2 모델의 실제 분할 정확도 자체는 별도 모델 비교/실기기 테스트가 필요하며, 이번 변경으로 인식률이 개선됐다고 단정하지 않음
+
+
+## 2026-11-15 AI 배경 제거 모델 BiRefNet Lite 교체
+- 기존 BEN2-ONNX를 shozebDev/birefnet-lite-512-onnx로 교체
+- Transformers.js image-segmentation 파이프라인 사용, WebGPU 우선 및 WASM 폴백
+- WebGPU/WASM 모두 FP16 가중치 모델 선택
+- 세그멘테이션 마스크를 투명 PNG 마스크로 변환하고 원본 이미지 알파 채널에 적용
+- 모델 카드상 512x512 입력, FP16 모델 약 100MB. 실제 속도·인식률은 운영 브라우저와 기기별 실측 전까지 개선 완료로 단정하지 않음
+- 변경 파일: components/BackgroundRemover.tsx 및 프로젝트 문서
+- 빌드/배포 및 실기기 테스트 대기
