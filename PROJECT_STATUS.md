@@ -1,3 +1,10 @@
+## 2026-11-14 배경 제거 ESM 의존성 번들링 보완
+- 브라우저 전용 `transformers.web.js` 직접 import 파일을 검사한 결과 `onnxruntime-common`, `onnxruntime-web` bare imports가 남아 브라우저에서 모듈 해석이 실패할 수 있음을 확인
+- jsDelivr `+esm` 엔드포인트로 변경해 의존성 import를 브라우저가 해석 가능한 CDN 경로로 재작성하도록 보완
+- 운영 자동화 테스트에서는 로컬 파일 선택창이 자동화 환경에서 열리지 않아 실제 모델 추론 테스트는 미완료
+- 변경 파일: `components/BackgroundRemover.tsx`
+- GitHub main 반영 완료. 빌드 및 운영 배포 확인 대기
+
 ## 2026-11-14 AI 배경 제거 모듈 로딩 경로 수정
 - 운영 페이지는 정상 렌더링되지만 자동화 환경에서 파일 선택을 제공하지 못해 실제 추론 검증은 미완료였음
 - Transformers.js 3.8.1 패키지 기본 CDN 경로가 package.json의 jsdelivr 엔트리(`dist/transformers.min.js`)로 해석되는 점 확인
