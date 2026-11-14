@@ -1,3 +1,12 @@
+## 2026-11-14 이미지 파일 변환기 개발
+- 작업 브랜치: `feature/image-format-converter` (main 기준)
+- 한국어 `/image-converter`, 영어 `/en/image-converter` 독립 페이지 추가
+- JPG, PNG, WebP 상호 변환, 다중 파일 일괄 처리, JPG/WebP 품질 설정, 결과 미리보기 및 개별 다운로드
+- 브라우저 Canvas에서 처리하며 파일을 UTILWISE 서버로 업로드하지 않음
+- 파일당 20MB, 가로·세로 각각 12,000px 제한. JPG 출력 시 투명 영역은 흰색 배경으로 변환
+- 온라인 도구 한·영 목록, sitemap, 개인정보처리방침, SEO 키워드 맵 및 개발 기록 반영
+- **검증 대기:** GitHub Actions 빌드, 실제 브라우저 이미지 형식별 변환·투명도·일괄 다운로드·모바일 레이아웃 테스트. 운영 배포 전
+
 ## 2026-11-14 배경 제거 ESM 의존성 번들링 보완
 - 브라우저 전용 `transformers.web.js` 직접 import 파일을 검사한 결과 `onnxruntime-common`, `onnxruntime-web` bare imports가 남아 브라우저에서 모듈 해석이 실패할 수 있음을 확인
 - jsDelivr `+esm` 엔드포인트로 변경해 의존성 import를 브라우저가 해석 가능한 CDN 경로로 재작성하도록 보완
