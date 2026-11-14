@@ -218,7 +218,9 @@ export default function AdminBlogManager() {
   function placeImageInsertionMarker(range?: Range | null) {
     const root = contentRef.current;
     if (!root) return null;
-    const target = range || savedSelectionRef.current;
+    const selection = window.getSelection();
+    const currentRange = selection?.rangeCount ? selection.getRangeAt(0) : null;
+    const target = range || savedSelectionRef.current || (currentRange && root.contains(currentRange.commonAncestorContainer) ? currentRange : null);
     const marker = document.createElement("span");
     marker.dataset.imageInsertionMarker = "true";
     marker.textContent = "\u200b";
@@ -230,7 +232,11 @@ export default function AdminBlogManager() {
       insertion.deleteContents();
       insertion.insertNode(marker);
     } else {
-      root.appendChild(marker);
+      // No active caret: use the end of the document as a predictable fallback.
+      const insertion = document.createRange();
+      insertion.selectNodeContents(root);
+      insertion.collapse(false);
+      insertion.insertNode(marker);
     }
     imageInsertionMarkerRef.current = marker;
     savedSelectionRef.current = null;
@@ -261,8 +267,15 @@ export default function AdminBlogManager() {
       image.style.height = "auto";
       image.style.display = "block";
       image.style.margin = inlineImageAlign === "left" ? "16px auto 16px 0" : inlineImageAlign === "right" ? "16px 0 16px auto" : "16px auto";
+      image.style.touchAction = "pan-y";
       if (marker?.isConnected) {
         marker.replaceWith(image);
+        selectedInlineImageRef.current = image;
+        image.style.outline = "2px solid #7da4d0";
+        image.style.outlineOffset = "3px";
+        setHasSelectedInlineImage(true);
+        setInlineImageWidth(image.dataset.width || "100%");
+        setInlineImageAlign(image.dataset.align || "center");
         const after = document.createElement("p");
         after.append(document.createElement("br"));
         image.after(after);
@@ -319,7 +332,8 @@ export default function AdminBlogManager() {
     image.style.maxWidth = "100%";
     image.style.height = "auto";
     setInlineImageWidth(normalizedWidth);
-    syncEditorContent();
+    // Do not serialize/set React state during a drag. Re-rendering the
+    // contentEditable HTML detaches the image and interrupts the resize gesture.
   }
   function handleInlineImagePointerDown(event: React.PointerEvent<HTMLDivElement>) {
     const target = event.target;
@@ -342,6 +356,7 @@ export default function AdminBlogManager() {
     const startX = event.clientX;
     const startWidth = rect.width;
     const containerWidth = contentRef.current.clientWidth || rect.width;
+    target.style.touchAction = "none";
     const move = (moveEvent: PointerEvent) => {
       const nextWidth = Math.round(((startWidth + moveEvent.clientX - startX) / containerWidth) * 100);
       resizeSelectedInlineImage(Math.min(100, Math.max(30, nextWidth)) + "%");
@@ -350,6 +365,7 @@ export default function AdminBlogManager() {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", stop);
       window.removeEventListener("pointercancel", stop);
+      target.style.touchAction = "pan-y";
       syncEditorContent();
     };
     window.addEventListener("pointermove", move);
@@ -424,6 +440,7 @@ export default function AdminBlogManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...editor,
+          content_md: contentRef.current ? editorHtmlToMarkdown(contentRef.current) : editor.content_md,
           category_id: editor.category_id || null,
           category_name: editor.category_name.trim(),
           tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
@@ -568,10 +585,10 @@ export default function AdminBlogManager() {
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("removeFormat")}>서식 지우기</button>
                   </div>
                   <div className="blog-admin-inline-image-tools">
-                    <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
+                    <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} disabled={!hasSelectedInlineImage} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} onPointerUp={syncEditorContent} onKeyUp={syncEditorContent} /></label>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; syncEditorContent(); } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage || uploadingImage} onClick={() => { setCropLeft(10); setCropTop(10); setCropWidth(80); setCropHeight(80); setCropOpen(true); }}>선택 이미지 자르기</button>
-                    <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onClick={rememberEditorSelection} onChange={(e) => { placeImageInsertionMarker(); void uploadInlineImage(e.currentTarget.files?.[0]); e.currentTarget.value = ""; }} /></label>
+                    <label>본문 이미지 삽입<input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onPointerDown={() => { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); }} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { rememberEditorSelection(); placeImageInsertionMarker(savedSelectionRef.current); } }} onChange={(e) => { if (e.currentTarget.files?.[0]) void uploadInlineImage(e.currentTarget.files[0]); e.currentTarget.value = ""; }} /></label>
                   </div>
                   <div
                     key={editor.id || "new-post"}
@@ -602,7 +619,7 @@ export default function AdminBlogManager() {
                     <label>자르기 높이 {cropHeight}%<input type="range" min="10" max={100 - cropTop} value={cropHeight} onChange={(e) => setCropHeight(Number(e.target.value))} /></label>
                     <div className="blog-admin-crop-actions"><button type="button" className="blog-admin-primary" onClick={() => void cropSelectedInlineImage()} disabled={uploadingImage}>{uploadingImage ? "적용 중..." : "자른 이미지 적용"}</button><button type="button" className="blog-admin-secondary" onClick={() => setCropOpen(false)}>취소</button></div>
                   </div> : null}
-                  <small>굵게·제목 등은 작성 영역에 바로 표시됩니다. 이미지 삽입 버튼을 누르면 마지막 커서 위치에 들어갑니다. 파일을 본문 원하는 위치에 끌어다 놓아도 됩니다. 업로드 중에는 저장할 수 없습니다.</small>
+                  <small>이미지는 본문에서 커서를 놓은 위치에 삽입됩니다. 이미지를 선택한 뒤 너비 슬라이더를 사용하거나 이미지 우측 하단 모서리를 드래그해 크기를 조절하세요. 파일을 본문 원하는 위치에 끌어다 놓아도 됩니다. 업로드 중에는 저장할 수 없습니다.</small>
                 </>
               )}
             </div>
