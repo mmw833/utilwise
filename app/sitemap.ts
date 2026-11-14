@@ -6,7 +6,7 @@ const englishCalculators = calculators.map((route) => `/en${route}`);
 const pdfToolPages = ["/pdf-merge","/pdf-split","/pdf-rotate","/pdf-organize","/image-to-pdf"];
 const onlineToolPages = ["/online-tools","/qr-code-generator","/image-compressor","/image-resizer","/background-remover","/image-converter",...pdfToolPages];
 const englishOnlineToolPages = onlineToolPages.map((route) => `/en${route}`);
-const textToolPages = ["/text-tools","/image-to-text","/text-tools/character-counter","/text-tools/text-compare","/text-tools/remove-duplicates","/text-tools/speech-time"];
+const textToolPages = ["/text-tools","/image-to-text","/text-to-speech","/text-to-speech","/text-tools/character-counter","/text-tools/text-compare","/text-tools/remove-duplicates","/text-tools/speech-time"];
 const englishTextToolPages = textToolPages.map((route) => `/en${route}`);
 const mbtiTypes = ["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"];
 const pages = [
