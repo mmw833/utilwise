@@ -5,8 +5,8 @@ import BlogVisitorTracker from "@/components/BlogVisitorTracker";
 const siteUrl = "https://utilwise.kr";
 
 export const metadata: Metadata = {
-  title: "UTILWISE | 무료 계산기·온라인 도구·심리테스트",
-  description: "생활 계산기, QR 코드 생성기, 문서·텍스트 도구와 성격·심리테스트를 무료로 이용하세요.",
+  title: "유틸와이즈 UTILWISE | 무료 계산기·온라인 도구",
+  description: "유틸와이즈(UTILWISE)에서 생활 계산기, 무료 온라인 도구, 이미지·PDF 변환과 심리테스트를 이용하세요.",
   metadataBase: new URL(siteUrl),
   alternates: { canonical: "/", languages: { "ko-KR": "/", en: "/en" } },
   robots: {
@@ -18,8 +18,8 @@ export const metadata: Metadata = {
     other: { "naver-site-verification": "9768ab8d71b09c1ea9daa35e9442e8bfcf0d442b" },
   },
   openGraph: {
-    title: "UTILWISE | 무료 계산기·온라인 도구·심리테스트",
-    description: "생활 계산기, 무료 QR 코드 생성기, 텍스트 도구와 성격·심리테스트를 한곳에서 이용하세요.",
+    title: "유틸와이즈 UTILWISE | 무료 계산기·온라인 도구",
+    description: "유틸와이즈(UTILWISE)에서 생활 계산기, 무료 온라인 도구, 이미지·PDF 변환과 심리테스트를 이용하세요.",
     url: siteUrl,
     siteName: "UTILWISE",
     locale: "ko_KR",
@@ -27,8 +27,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "UTILWISE | 무료 계산기·온라인 도구·심리테스트",
-    description: "생활 계산기, QR 코드 생성기, 텍스트 도구와 성격·심리테스트를 무료로 이용하세요.",
+    title: "유틸와이즈 UTILWISE | 무료 계산기·온라인 도구",
+    description: "유틸와이즈(UTILWISE)에서 생활 계산기, 무료 온라인 도구, 이미지·PDF 변환과 심리테스트를 이용하세요.",
   },
 };
 
