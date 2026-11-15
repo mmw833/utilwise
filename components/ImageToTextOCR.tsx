@@ -141,27 +141,30 @@ export default function ImageToTextOCR({ lang }: Props) {
         });
       }
 
-      // Compare a normal document layout with a sparse-text layout and keep
-      // the result with the higher engine confidence.
-      setStatus(en ? "Analyzing document layout…" : "문서의 글자 배치를 분석하는 중…");
-      await worker.current.setParameters({
-        tessedit_pageseg_mode: "6",
-        preserve_interword_spaces: "1",
-      });
-      const blockResult = await worker.current.recognize(prepared);
-      let best = blockResult;
-
-      await worker.current.setParameters({
-        tessedit_pageseg_mode: "11",
-        preserve_interword_spaces: "1",
-      });
-      const sparseResult = await worker.current.recognize(prepared);
-      if (
-        (sparseResult.data.confidence ?? 0) > (blockResult.data.confidence ?? 0) &&
-        sparseResult.data.text.trim().length >= blockResult.data.text.trim().length * 0.65
-      ) {
-        best = sparseResult;
+      // Test automatic, single-column, block and sparse-text layouts.
+      // Confidence alone can favor a shorter result, so prefer a more complete
+      // result when its confidence is close to the current best.
+      setStatus(en ? "Comparing text recognition layouts…" : "여러 글자 배치 방식으로 인식 결과를 비교하는 중…");
+      const candidates: OCRResult[] = [];
+      for (const mode of ["3", "4", "6", "11"]) {
+        await worker.current.setParameters({
+          tessedit_pageseg_mode: mode,
+          preserve_interword_spaces: "1",
+        });
+        candidates.push(await worker.current.recognize(prepared));
       }
+      const best = candidates.reduce((currentBest, candidate) => {
+        const currentText = currentBest.data.text.trim();
+        const candidateText = candidate.data.text.trim();
+        const currentConfidence = currentBest.data.confidence ?? 0;
+        const candidateConfidence = candidate.data.confidence ?? 0;
+        if (!currentText) return candidate;
+        if (!candidateText) return currentBest;
+        if (candidateConfidence >= currentConfidence - 8 && candidateText.length > currentText.length) {
+          return candidate;
+        }
+        return candidateConfidence > currentConfidence ? candidate : currentBest;
+      });
 
       const extracted = best.data.text.trim();
       setResult(extracted);
