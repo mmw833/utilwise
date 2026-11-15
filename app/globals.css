@@ -1131,14 +1131,15 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 }
 .journal-masthead-copy{max-width:none;width:100%;display:flex;flex-direction:column;align-items:center}
 .journal-masthead .journal-hero-brand{
-  color:#18212c;
+  display:inline-flex;
+  color:#172033;
   font-family:Arial,Helvetica,sans-serif;
-  font-size:clamp(17px,2vw,25px);
+  font-size:clamp(18px,2vw,26px);
   line-height:1.2;
-  font-weight:400;
-  letter-spacing:-.7px;
+  font-weight:900;
+  letter-spacing:-1.15px;
 }
-.journal-masthead h1{
+.journal-masthead-util{color:#172033;font-weight:900}\n.journal-masthead-wise{color:#315f9e;font-weight:900}\n.journal-masthead h1{
   margin:4px 0 5px;
   color:#080808;
   font-family:Georgia,"Times New Roman",serif;
@@ -1153,7 +1154,7 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
   margin:10px 0 0;
   color:#424242;
   font-family:Arial,Helvetica,sans-serif;
-  font-size:clamp(9px,1vw,12px);
+  font-size:clamp(11px,1vw,14px);
   line-height:1.5;
   letter-spacing:.035em;
   font-weight:400;
@@ -1169,8 +1170,8 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 @media(max-width:620px){
   .journal-masthead{padding:48px 8px 34px}
   .journal-masthead h1{font-size:clamp(58px,16vw,88px);letter-spacing:.12em;padding-left:.12em}
-  .journal-masthead .journal-hero-brand{font-size:18px}
-  .journal-masthead .journal-hero-copy>p{font-size:9px;letter-spacing:0}
+  .journal-masthead .journal-hero-brand{font-size:19px}
+  .journal-masthead .journal-hero-copy>p{font-size:11px;letter-spacing:0}\n  .journal-masthead-actions{flex-direction:column;gap:12px;margin-top:18px}\n  .journal-masthead-actions .journal-primary-link{padding:10px 16px}
   .journal-masthead .journal-visitor-stats{top:9px;right:4px;font-size:8px}
 }
 
