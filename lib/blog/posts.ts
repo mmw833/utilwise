@@ -18,6 +18,7 @@ export interface BlogPostSummary {
   view_count: number;
   is_featured?: number;
   published_at: number;
+  updated_at?: number;
 }
 
 export interface BlogPost extends BlogPostSummary {
@@ -42,7 +43,8 @@ const POST_SUMMARY_SELECT = `
     c.slug AS category_slug,
     p.view_count,
     p.is_featured,
-    p.published_at
+    p.published_at,
+    p.updated_at
   FROM blog_posts p
   LEFT JOIN blog_categories c ON c.id = p.category_id
 `;
@@ -64,6 +66,26 @@ export async function listPublishedPosts(
     .bind(language, safeLimit)
     .all<BlogPostSummary>();
 
+  return result.results ?? [];
+}
+
+
+/** Full published content for language-specific RSS feeds. */
+export async function listPublishedPostsForFeed(language: BlogLanguage, limit = 30): Promise<BlogPost[]> {
+  const safeLimit = Math.min(50, Math.max(1, Math.floor(limit)));
+  const db = getBlogDatabase();
+  const result = await db.prepare(`
+    SELECT p.id, p.translation_group_id, p.language, p.slug, p.title, p.excerpt,
+      p.content_md, p.seo_title, p.seo_description, p.tags_json, p.cover_image_key,
+      CASE WHEN p.language = 'en' THEN COALESCE(c.name_en, c.name_ko) ELSE c.name_ko END AS category_name,
+      c.slug AS category_slug, p.view_count, p.is_featured, p.published_at,
+      p.created_at, p.updated_at
+    FROM blog_posts p
+    LEFT JOIN blog_categories c ON c.id = p.category_id
+    WHERE p.language = ? AND p.status = 'published'
+    ORDER BY p.published_at DESC, p.created_at DESC
+    LIMIT ?
+  `).bind(language, safeLimit).all<BlogPost>();
   return result.results ?? [];
 }
 
