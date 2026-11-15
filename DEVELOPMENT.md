@@ -725,3 +725,10 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - PSM 3(자동 레이아웃), PSM 4(단일 열), PSM 6(문서 블록), PSM 11(흩어진 텍스트)을 각각 실행한다. 신뢰도 차이가 작을 때는 더 많은 글자를 포함한 결과를 우선해 짧은 결과가 선택되는 문제를 줄인다.
 - 한국어+영어 혼합 문서에는 `kor+eng`, 한 언어만 있는 문서에는 해당 언어만 선택하도록 안내한다.
 - OCR 인식률은 글꼴·레이아웃·해상도에 따라 달라지므로 실제 한국어/영어 샘플로 정확도와 모바일 메모리를 확인한 후 배포한다.
+
+
+## 블로그 관련 도구 연결
+- 공통 도구 목록: `lib/tools/registry.ts` (`id`, `category`, 한국어/영어 표시명, 기본 경로).
+- 새 공개 도구를 추가할 때 registry에 항목을 1회 등록한다. 관리자 선택 목록과 게시글 하단 링크는 같은 목록을 사용한다.
+- 게시글별 선택 ID는 D1 `blog_posts.related_tools_json`에 JSON 배열로 저장한다. 링크 경로는 서버의 registry에서만 해석한다.
+- DB 변경은 `0004_blog_related_tools.sql` additive migration이며 Preview D1에 먼저 적용한다.

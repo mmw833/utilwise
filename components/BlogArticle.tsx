@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { BlogPost } from "@/lib/blog/posts";
 import BlogMarkdown from "@/components/BlogMarkdown";
 import BlogVisitorTracker from "@/components/BlogVisitorTracker";
+import { getRelatedTools } from "@/lib/tools/registry";
 
 export default function BlogArticle({ post, language }: { post: BlogPost; language: "ko" | "en" }) {
   const en = language === "en";
@@ -26,7 +27,7 @@ export default function BlogArticle({ post, language }: { post: BlogPost; langua
     ...(post.category_name ? { articleSection: post.category_name } : {}),
     ...(post.tags_json ? { keywords: (() => { try { return JSON.parse(post.tags_json); } catch { return []; } })() } : {}),
   };
-  const date = new Intl.DateTimeFormat(en ? "en-US" : "ko-KR", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(new Date(post.published_at * 1000));
+  const relatedTools = getRelatedTools((() => { try { return JSON.parse(post.related_tools_json || "[]"); } catch { return []; } })());\n  const date = new Intl.DateTimeFormat(en ? "en-US" : "ko-KR", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(new Date(post.published_at * 1000));
   return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} /><BlogVisitorTracker /><main className="journal-page journal-article-page">
     <header className="journal-header">
       <Link href={home} className="journal-brand" aria-label="UTILWISE home">UTIL<span>WISE</span></Link>

@@ -17,12 +17,14 @@ export interface AdminPostInput {
   category_id?: string | null;
   category_name?: string;
   tags?: string[];
+  related_tools?: string[];
   seo_title?: string | null;
   seo_description?: string | null;
   status: AdminPostStatus;
 }
 
 export interface AdminPostRecord extends Omit<AdminPostInput, "category_name"> {
+  related_tools_json?: string;
   id: string;
   translation_group_id: string;
   view_count: number;
@@ -44,7 +46,7 @@ export async function listAdminPosts(): Promise<AdminPostRecord[]> {
   const db = getBlogDatabase();
   const result = await db.prepare(`
     SELECT p.id, p.translation_group_id, p.language, p.slug, p.title,
-      p.excerpt, p.content_md, p.cover_image_key, p.category_id, p.tags_json AS tags_json,
+      p.excerpt, p.content_md, p.cover_image_key, p.category_id, p.tags_json AS tags_json, p.related_tools_json AS related_tools_json,
       p.seo_title, p.seo_description, p.status, p.view_count, p.is_featured,
       p.published_at, p.created_at, p.updated_at,
       c.name_ko AS category_name
@@ -113,9 +115,9 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
   await db.prepare(`
     INSERT INTO blog_posts (
       id, translation_group_id, language, slug, title, excerpt, content_md,
-      cover_image_key, category_id, tags_json, seo_title, seo_description, status,
+      cover_image_key, category_id, tags_json, related_tools_json, seo_title, seo_description, status,
       published_at, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
       CASE WHEN ? = 'published' THEN unixepoch() ELSE NULL END,
       unixepoch(), unixepoch()
     )
@@ -128,6 +130,7 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
       cover_image_key = excluded.cover_image_key,
       category_id = excluded.category_id,
       tags_json = excluded.tags_json,
+      related_tools_json = excluded.related_tools_json,
       seo_title = excluded.seo_title,
       seo_description = excluded.seo_description,
       status = excluded.status,
@@ -148,6 +151,7 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
     input.cover_image_key ?? null,
     input.category_id ?? null,
     JSON.stringify((input.tags ?? []).map((tag) => tag.trim()).filter(Boolean).slice(0, 12)),
+    JSON.stringify((input.related_tools ?? []).filter((id) => typeof id === "string").slice(0, 30)),
     input.seo_title ?? null,
     input.seo_description ?? null,
     input.status,
