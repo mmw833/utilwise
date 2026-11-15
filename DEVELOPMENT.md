@@ -1,3 +1,9 @@
+## AI 배경 제거 수정 검증 기록 (2026-11-15)
+- PR #30 commit `f14f585`: GitHub Actions production build 및 Cloudflare Preview 배포 성공.
+- Preview URL: `https://fix-background-remover-inference-memory-utilwise.mmw833.workers.dev/background-remover`.
+- 브라우저에서 페이지 로드와 업로드 UI/지원 조건 확인. 자동화 환경은 OS 파일 선택 창을 조작하지 못해 실파일 추론 및 PNG 알파 검증은 수행하지 못함.
+- 운영 배포 전 실제 JPG/PNG/WebP 파일 업로드, 모델 다운로드/추론, 투명 PNG 다운로드 및 PC/모바일 확인 필요.
+
 ## AI image background remover compatibility and memory fix (2026-11-15)
 - Shared component: `components/BackgroundRemover.tsx`; Korean route `/background-remover`, English route `/en/background-remover`.
 - Transformers.js image-segmentation pipeline receives decoded `HTMLImageElement` inputs (preview and original) rather than Blob objects.
