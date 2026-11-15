@@ -56,9 +56,13 @@ export default function BlogFeed({ popular, posts, featured, visitorStats, langu
 
     <section className="journal-hero journal-masthead">
       <div className="journal-hero-copy journal-masthead-copy">
-        <span className="journal-hero-brand">UTILWISE</span>
+        <span className="journal-hero-brand"><span className="journal-masthead-util">UTIL</span><span className="journal-masthead-wise">WISE</span></span>
         <h1>BLOG</h1>
         <p>Useful perspectives, practical guides and fresh ideas for a smarter everyday.</p>
+        <div className="journal-hero-actions journal-masthead-actions">
+          <a href="#latest" className="journal-primary-link">{en ? "Explore articles" : "콘텐츠 둘러보기"} <span>↓</span></a>
+          <Link href={home} className="journal-secondary-link">{en ? "Discover useful tools" : "유용한 도구 살펴보기"} ↗</Link>
+        </div>
       </div>
       <div className="journal-visitor-stats"><span>TODAY <b>{visitorStats.today.toLocaleString(locale)}</b></span><i>·</i><span>TOTAL <b>{visitorStats.total.toLocaleString(locale)}</b></span></div>
     </section>
