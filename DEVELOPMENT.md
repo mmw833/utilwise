@@ -1,3 +1,11 @@
+## 이미지 도구 2단계 SEO 개선 (2026-11-15)
+- 대상 페이지: `app/image-converter/page.tsx`, `app/en/image-converter/page.tsx`, `app/image-to-text/page.tsx`, `app/en/image-to-text/page.tsx`
+- 페이지별 고유 title/description/Open Graph와 기존 canonical/hreflang 유지
+- 화면에 표시하는 FAQ 배열로 FAQPage JSON-LD 생성. 구조화 데이터와 화면 문답의 내용 일치 유지
+- 이미지 변환기는 HEIC/HEIF 입력, JPG/PNG/WebP 출력, 파일당 20MB 및 변당 12,000px 제한, 브라우저 처리와 EXIF 보존 주의 안내
+- OCR은 한국어/영어 옵션, 15MB 이미지 제한, 브라우저 처리, 최초 CDN 다운로드 및 인식 한계 안내
+- 검증 시 GitHub Actions production build, 한·영 페이지의 메타데이터/FAQ JSON-LD, 내부 링크, 모바일 UI 확인. 실제 HEIC/HEIF 파일 변환과 한국어/영어 OCR은 실제 샘플로 별도 QA
+
 ## 인기 도구 1단계 SEO 및 내부 연결 개선 (2026-11-15)
 - Background remover: `app/background-remover/page.tsx`, `app/en/background-remover/page.tsx`
 - Text-to-speech: `app/text-to-speech/page.tsx`, `app/en/text-to-speech/page.tsx`
