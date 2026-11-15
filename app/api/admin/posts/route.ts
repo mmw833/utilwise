@@ -36,6 +36,8 @@ function validPost(value: unknown): value is AdminPostInput {
     typeof post.content_md === "string" &&
     post.content_md.length <= 100_000 &&
     (post.status === "draft" || post.status === "published" || post.status === "archived") &&
+    (post.seo_title === undefined || post.seo_title === null || (typeof post.seo_title === "string" && post.seo_title.length <= 180)) &&
+    (post.seo_description === undefined || post.seo_description === null || (typeof post.seo_description === "string" && post.seo_description.length <= 300)) &&
     (!post.id || typeof post.id === "string") &&
     (!post.category_id || typeof post.category_id === "string") &&
     (post.category_name === undefined || (typeof post.category_name === "string" && post.category_name.length <= 40)) &&
