@@ -1023,3 +1023,9 @@
 - 운영 페이지에서 robots allow, index/follow, Naver verification meta, sitemap 119 URLs 확인.
 - `site:utilwise.kr` 검색 결과 없음. 홈 title/description 및 OG/Twitter 메타에 한글 브랜드명 '유틸와이즈'를 명시하도록 main에 반영.
 - 네이버 수집 요청은 접수 기록만 확인되며 색인 완료는 미확인. 서치어드바이저 사이트 진단(색인/수집제한/색인제외) 추가 점검 필요.
+
+
+## 네이버 수집 제한 favicon 오류 수정
+- 2026-11-15 네이버 진단 상세에서 `https://utilwise.kr/favicon.ico`가 HTTP 400으로 수집 제한된 것을 확인했다(갱신시각 2026-11-07 14:55:48).
+- 현재 운영 URL은 `/favicon.ico`, `/favicon.svg` 모두 404였음.
+- `app/favicon.ico/route.ts`를 추가해 `/favicon.ico`에서 브랜드 SVG를 HTTP 200으로 반환하도록 수정했다. 운영 배포 후 응답 및 네이버 재수집을 확인해야 한다.
