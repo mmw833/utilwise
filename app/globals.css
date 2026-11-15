@@ -1173,3 +1173,10 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
   .journal-masthead .journal-hero-copy>p{font-size:9px;letter-spacing:0}
   .journal-masthead .journal-visitor-stats{top:9px;right:4px;font-size:8px}
 }
+
+/* Reliable inline image selection and corner resizing in the blog editor */
+.blog-admin-wysiwyg img{display:block;max-width:100%;height:auto;user-select:none;-webkit-user-drag:none;touch-action:pan-y}
+.blog-admin-wysiwyg img:hover{outline:1px dashed #7da4d0;outline-offset:3px}
+.blog-admin-wysiwyg img:active{cursor:nwse-resize}
+.blog-admin-inline-image-tools input[type=range]{width:min(260px,55vw);accent-color:#315f9e;cursor:ew-resize}
+.blog-admin-crop-panel input[type=range]{min-height:28px;cursor:ew-resize}
