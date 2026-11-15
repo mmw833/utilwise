@@ -1,3 +1,11 @@
+## 블로그 SEO 작성·발행 구조 (2026-11-15)
+- 관리자 컴포넌트 `components/AdminBlogManager.tsx`: SEO 제목/설명 입력 및 검색 미리보기, 키워드 안내, H2/H3·FAQ·본문 이미지 ALT·외부 출처 점검. 체크리스트는 작성 보조이며 검색 순위 보장은 아님.
+- `app/api/admin/posts/route.ts`: SEO 제목 180자, SEO 설명 300자 제한 검증. `seo_title`은 D1에 저장됨.
+- `components/BlogArticle.tsx`: 게시글별 BlogPosting JSON-LD. 발행/수정 시각, 제목, 설명, canonical URL, 작성자/발행자, 언어, 대표 이미지, 카테고리/태그 사용. 대표 이미지 ALT는 게시글 제목.
+- RSS: 한국어 `/blog/rss.xml`, 영어 `/en/blog/rss.xml`; `lib/blog/rss.ts`가 공개 발행 게시글 최대 30개를 RSS 2.0으로 출력.
+- Sitemap: 게시글의 `updated_at`을 lastModified로 사용.
+- 검증: 관리자 SEO 제목 저장 후 재편집 시 유지, JSON-LD 필드와 페이지 본문 일치, RSS XML 파싱 및 언어별 글 필터링, 수정일 기반 sitemap 확인.
+
 ## 이미지 도구 2단계 SEO 개선 (2026-11-15)
 - 대상 페이지: `app/image-converter/page.tsx`, `app/en/image-converter/page.tsx`, `app/image-to-text/page.tsx`, `app/en/image-to-text/page.tsx`
 - 페이지별 고유 title/description/Open Graph와 기존 canonical/hreflang 유지
