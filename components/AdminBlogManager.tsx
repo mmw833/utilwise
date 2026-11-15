@@ -126,6 +126,7 @@ export default function AdminBlogManager() {
   const [error, setError] = useState("");
   const [categoryName, setCategoryName] = useState("");
   const [showEditor, setShowEditor] = useState(false);
+  const [postFilter, setPostFilter] = useState<"all" | PostStatus>("all");
   const [showPreview, setShowPreview] = useState(false);
   const [previewMode, setPreviewMode] = useState<"preview" | "split">("preview");
   const contentRef = useRef<HTMLDivElement>(null);
@@ -167,6 +168,8 @@ export default function AdminBlogManager() {
   useEffect(() => { void loadData(); }, [loadData]);
 
   const publishedCount = useMemo(() => posts.filter((post) => post.status === "published").length, [posts]);
+  const draftCount = useMemo(() => posts.filter((post) => post.status === "draft").length, [posts]);
+  const visiblePosts = useMemo(() => postFilter === "all" ? posts : posts.filter((post) => post.status === postFilter), [posts, postFilter]);
 
   function startNew() {
     setEditor(emptyEditor());
@@ -447,6 +450,14 @@ export default function AdminBlogManager() {
     }
   }
 
+  function reviewAndPreparePublish(post: Post) {
+    editPost(post);
+    setEditor((current) => ({ ...current, status: "published" }));
+    setShowPreview(true);
+    setPreviewMode("preview");
+    setNotice("내용과 대표이미지를 확인하세요. 하단의 ‘저장하고 발행’을 눌러야 실제 공개됩니다.");
+  }
+
   async function featurePost(post: Post) {
     if (post.status !== "published") return;
     try {
@@ -493,8 +504,10 @@ export default function AdminBlogManager() {
     <div className="blog-admin-manager">
       <div className="blog-admin-toolbar">
         <div className="blog-admin-stats">
-          <span>전체 게시글 <strong>{posts.length}</strong></span>
-          <span>발행 중 <strong>{publishedCount}</strong></span>
+          <button type="button" className={`blog-admin-filter${postFilter === "all" ? " is-active" : ""}`} onClick={() => setPostFilter("all")}>전체 게시글 <strong>{posts.length}</strong></button>
+          <button type="button" className={`blog-admin-filter${postFilter === "draft" ? " is-active" : ""}`} onClick={() => setPostFilter("draft")}>임시저장 <strong>{draftCount}</strong></button>
+          <button type="button" className={`blog-admin-filter${postFilter === "published" ? " is-active" : ""}`} onClick={() => setPostFilter("published")}>발행 중 <strong>{publishedCount}</strong></button>
+          <button type="button" className={`blog-admin-filter${postFilter === "archived" ? " is-active" : ""}`} onClick={() => setPostFilter("archived")}>보관 <strong>{posts.filter((post) => post.status === "archived").length}</strong></button>
           <span>카테고리 <strong>{categories.length}</strong></span>
         </div>
         <button className="blog-admin-primary" type="button" onClick={startNew}>+ 새 게시글</button>
@@ -651,9 +664,9 @@ export default function AdminBlogManager() {
             </div>
           </section>
           <div className="blog-admin-list-head"><h2>게시글 목록</h2><button className="blog-admin-text-button" type="button" onClick={() => void loadData()}>새로고침</button></div>
-          {loading ? <p className="blog-admin-empty">불러오는 중...</p> : posts.length === 0 ? <p className="blog-admin-empty">아직 게시글이 없습니다. 새 게시글을 작성해 보세요.</p> : (
+          {loading ? <p className="blog-admin-empty">불러오는 중...</p> : visiblePosts.length === 0 ? <p className="blog-admin-empty">{posts.length === 0 ? "아직 게시글이 없습니다. 새 게시글을 작성해 보세요." : "선택한 상태의 게시글이 없습니다."}</p> : (
             <div className="blog-admin-post-list">
-              {posts.map((post) => (
+              {visiblePosts.map((post) => (
                 <article className="blog-admin-post" key={post.id}>
                   <div className="blog-admin-post-main">
                     <div className="blog-admin-post-meta">
@@ -666,7 +679,7 @@ export default function AdminBlogManager() {
                     <small>수정 {dateLabel(post.updated_at)} · 조회수 {post.view_count.toLocaleString("ko-KR")}</small>
                   </div>
                   <div className="blog-admin-post-actions">
-                    <button type="button" className="blog-admin-secondary" onClick={() => void featurePost(post)} disabled={post.status !== "published"}>{post.is_featured ? "대표글 지정됨" : "대표글 설정"}</button><button type="button" className="blog-admin-secondary" onClick={() => editPost(post)}>수정</button>
+                    <button type="button" className="blog-admin-secondary" onClick={() => void featurePost(post)} disabled={post.status !== "published"}>{post.is_featured ? "대표글 지정됨" : "대표글 설정"}</button>{post.status === "draft" ? <button type="button" className="blog-admin-primary" onClick={() => reviewAndPreparePublish(post)}>검토 후 발행</button> : null}<button type="button" className="blog-admin-secondary" onClick={() => editPost(post)}>수정</button>
                     <button type="button" className="blog-admin-danger" onClick={() => void deletePost(post)}>삭제</button>
                   </div>
                 </article>
