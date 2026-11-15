@@ -626,7 +626,7 @@ export default function AdminBlogManager() {
                 {[
                   [Boolean(editor.title.trim()), "게시글 제목 입력"],
                   [Boolean(tagsInput.trim()), "핵심·연관 검색어 입력"],
-                  [/^##?\s+/m.test(liveContent), "본문에 소제목(H2/H3) 사용"],
+                  [/^#{1,3}\s+/m.test(liveContent), "본문에 소제목(H2/H3) 사용"],
                   [/^#{1,3}\s+.*(FAQ|자주 묻는 질문)/im.test(liveContent) || /Q\s*[:：]/i.test(liveContent), "FAQ 또는 질문·답변 포함"],
                   [/!\[[^\]]+\]\(/.test(liveContent), "설명이 있는 본문 이미지 ALT"],
                   [/https?:\/\//i.test(liveContent), "공식 출처 또는 참고 링크"],
