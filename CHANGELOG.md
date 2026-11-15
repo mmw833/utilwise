@@ -1,3 +1,16 @@
+## 2026-11-15 OCR 인식률 개선
+- Tesseract.js 6.0.1 OCR 전 이미지 확대, 회색조 및 명암 보정 적용
+- PSM 6 문서 블록과 PSM 11 흩어진 텍스트 모드를 비교해 신뢰도가 높은 결과 사용
+- 인식 진행률 표시 및 Worker/미리보기 URL 정리 로직 개선
+- 한국어·영어 사용 가이드 업데이트
+- 빌드 및 실제 이미지 샘플 QA 대기
+
+## 2026-11-15 AI 이미지 배경 제거 RawImage 입력 및 메모리 개선 운영 배포
+- Transformers.js 파이프라인 입력을 `RawImage.fromBlob()`로 수정
+- WebGPU fp16 / WASM fp32 설정 유지, Canvas 알파 마스크 합성으로 메모리 사용 개선
+- PR #30 병합 및 Production Deploy run #69 성공
+- 실제 이미지 추론/투명 PNG 검증은 별도 QA 대기
+
 ## 2026-11-15 AI 배경 제거 수정 검증 진행
 - PR #30: GitHub Actions production build 성공, Cloudflare Preview build/deploy 성공.
 - Preview 페이지 로드 및 업로드 UI 확인 완료. 자동 브라우저의 파일 선택 창 제어 제한으로 실파일 업로드/AI 추론/투명 PNG 다운로드 테스트는 미완료.
