@@ -254,6 +254,7 @@ export default function AdminBlogManager() {
       const image = document.createElement("img");
       image.src = "/api/blog/images/" + data.key;
       image.alt = alt;
+      image.draggable = false;
       image.dataset.width = inlineImageWidth;
       image.dataset.align = inlineImageAlign;
       image.style.width = inlineImageWidth;
@@ -319,11 +320,11 @@ export default function AdminBlogManager() {
     image.style.maxWidth = "100%";
     image.style.height = "auto";
     setInlineImageWidth(normalizedWidth);
-    syncEditorContent();
   }
   function handleInlineImagePointerDown(event: React.PointerEvent<HTMLDivElement>) {
     const target = event.target;
     if (!(target instanceof HTMLImageElement) || !contentRef.current?.contains(target)) return;
+    target.draggable = false;
 
     // Select the image immediately on the first pointer interaction. Previously,
     // resizing was ignored until a separate click had populated the selected ref.
@@ -333,7 +334,7 @@ export default function AdminBlogManager() {
     setInlineImageAlign(target.dataset.align || "center");
 
     const rect = target.getBoundingClientRect();
-    const handleSize = Math.max(28, Math.min(40, Math.round(Math.min(rect.width, rect.height) * 0.12)));
+    const handleSize = Math.max(36, Math.min(48, Math.round(Math.min(rect.width, rect.height) * 0.16)));
     const onResizeHandle = event.clientX >= rect.right - handleSize && event.clientY >= rect.bottom - handleSize;
     if (!onResizeHandle) return;
 
@@ -363,12 +364,14 @@ export default function AdminBlogManager() {
     setUploadingImage(true); setError(""); setNotice("");
     try {
       const source = new Image();
-      source.src = image.src;
-      await new Promise<void>((resolve, reject) => { source.onload = () => resolve(); source.onerror = () => reject(new Error("이미지를 불러오지 못했습니다.")); });
-      const sx = Math.round(source.naturalWidth * cropLeft / 100);
-      const sy = Math.round(source.naturalHeight * cropTop / 100);
-      const sw = Math.max(1, Math.round(source.naturalWidth * cropWidth / 100));
-      const sh = Math.max(1, Math.round(source.naturalHeight * cropHeight / 100));
+      source.src = image.currentSrc || image.src;
+      if (typeof source.decode === "function") await source.decode();
+      else await new Promise<void>((resolve, reject) => { source.onload = () => resolve(); source.onerror = () => reject(new Error("이미지를 불러오지 못했습니다.")); });
+      if (!source.naturalWidth || !source.naturalHeight) throw new Error("이미지 크기를 확인할 수 없습니다.");
+      const sx = Math.min(source.naturalWidth - 1, Math.round(source.naturalWidth * cropLeft / 100));
+      const sy = Math.min(source.naturalHeight - 1, Math.round(source.naturalHeight * cropTop / 100));
+      const sw = Math.max(1, Math.min(source.naturalWidth - sx, Math.round(source.naturalWidth * cropWidth / 100)));
+      const sh = Math.max(1, Math.min(source.naturalHeight - sy, Math.round(source.naturalHeight * cropHeight / 100)));
       const canvas = document.createElement("canvas");
       canvas.width = sw; canvas.height = sh;
       const context = canvas.getContext("2d");
@@ -424,6 +427,7 @@ export default function AdminBlogManager() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...editor,
+          content_md: contentRef.current ? editorHtmlToMarkdown(contentRef.current) : editor.content_md,
           category_id: editor.category_id || null,
           category_name: editor.category_name.trim(),
           tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
@@ -590,6 +594,7 @@ export default function AdminBlogManager() {
                     onFocus={rememberEditorSelection}
                     onClick={(event) => { const target = event.target; if (target instanceof HTMLImageElement) { const previous = selectedInlineImageRef.current; if (previous && previous !== target) previous.style.outline = ""; selectedInlineImageRef.current = target; target.style.outline = "2px solid #7da4d0"; target.style.outlineOffset = "3px"; setHasSelectedInlineImage(true); setInlineImageWidth(target.dataset.width || target.style.width || "100%"); setInlineImageAlign(target.dataset.align || "center"); } else if (target === contentRef.current) { if (selectedInlineImageRef.current) selectedInlineImageRef.current.style.outline = ""; selectedInlineImageRef.current = null; setHasSelectedInlineImage(false); } }}
                     onPointerDown={handleInlineImagePointerDown}
+                    onDragStart={(event) => { if (event.target instanceof HTMLImageElement) event.preventDefault(); }}
                     onDragOver={(event) => event.preventDefault()}
                     onDrop={handleEditorDrop}
                   />
@@ -625,7 +630,6 @@ export default function AdminBlogManager() {
                 <strong>발행 전 검색 최적화 점검</strong>
                 {[
                   [Boolean(editor.title.trim()), "게시글 제목 입력"],
-                  [Boolean(tagsInput.trim()), "핵심·연관 검색어 입력"],
                   [/^#{1,3}\s+/m.test(liveContent), "본문에 소제목(H2/H3) 사용"],
                   [/^#{1,3}\s+.*(FAQ|자주 묻는 질문)/im.test(liveContent) || /Q\s*[:：]/i.test(liveContent), "FAQ 또는 질문·답변 포함"],
                   [/!\[[^\]]+\]\(/.test(liveContent), "설명이 있는 본문 이미지 ALT"],
