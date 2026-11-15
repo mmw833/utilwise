@@ -26,9 +26,9 @@ export default function Page() {
         <h2>Frequently asked questions</h2>
         <h3>Is this tool free?</h3><p>Yes. You can use it without an account or payment. No external inference API is used for image processing.</p>
         <h3>Are my photos uploaded or stored?</h3><p>No. Your photo is processed locally in your browser. The browser downloads the AI model from an external model repository, but your image itself is not uploaded.</p>
-        <h3>Which image formats are supported?</h3><p>JPG, PNG, and WebP images up to 20 MB per file are supported. Results are saved as transparent PNG files.</p>
+        <h3>Which image formats are supported?</h3><p>JPG, PNG, and WebP images up to 20 MB per file and 4,096 px per dimension are supported. Results are saved as transparent PNG files.</p>
         <h3>Can it remove complex backgrounds and fine hair?</h3><p>The AI model is designed to create soft subject edges, but results can vary depending on lighting, background complexity, and the subject in the original photo.</p>
-        <p>AI model: BEN2 ONNX (MIT License), provided by ONNX Community and based on Prama LLC's BEN2.</p>
+        <p>AI model: BiRefNet Lite ONNX (MIT License), based on ZhengPeng7/BiRefNet_lite.</p>
         <h2>Related image tools</h2><p>Try the <Link href="/en/image-compressor">image compressor</Link> or <Link href="/en/image-resizer">image resizer</Link>.</p>
       </div>
     </section>
