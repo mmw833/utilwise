@@ -108,7 +108,7 @@ const messages = {
   },
 };
 
-function blobToImage(blob: Blob): Promise<Blob> {
+function blobToImage(blob: Blob): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(blob);
     const image = new Image();
