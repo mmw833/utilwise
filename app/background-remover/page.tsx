@@ -26,9 +26,9 @@ export default function Page() {
         <h2>자주 묻는 질문</h2>
         <h3>무료로 이용할 수 있나요?</h3><p>네. 회원가입이나 결제 없이 무료로 사용할 수 있습니다. 이미지 처리용 외부 API 요금은 발생하지 않습니다.</p>
         <h3>사진이 서버에 저장되나요?</h3><p>아니요. 사진은 이용자의 브라우저에서 처리됩니다. AI 모델 파일을 내려받기 위해 외부 모델 저장소에 연결하지만 사진 자체는 전송하지 않습니다.</p>
-        <h3>어떤 이미지 형식을 지원하나요?</h3><p>JPG, PNG, WebP를 지원하며 파일당 최대 20MB까지 선택할 수 있습니다. 결과는 투명 배경을 지원하는 PNG로 저장됩니다.</p>
+        <h3>어떤 이미지 형식을 지원하나요?</h3><p>JPG, PNG, WebP를 지원하며 파일당 최대 20MB, 이미지 가로·세로 각각 4,096px까지 선택할 수 있습니다. 결과는 투명 배경을 지원하는 PNG로 저장됩니다.</p>
         <h3>머리카락이나 복잡한 배경도 제거할 수 있나요?</h3><p>AI가 가장자리를 부드럽게 분리하도록 설계되어 있지만 원본 이미지의 조명, 배경, 피사체에 따라 결과가 달라질 수 있습니다.</p>
-        <p>AI 모델: BEN2 ONNX (MIT License), ONNX Community 및 Prama LLC 제공.</p>
+        <p>AI 모델: BiRefNet Lite ONNX (MIT License), ZhengPeng7/BiRefNet_lite 기반 모델.</p>
         <h2>관련 이미지 도구</h2><p><Link href="/image-compressor">이미지 압축기</Link>와 <Link href="/image-resizer">이미지 크기 조절기</Link>도 함께 이용해 보세요.</p>
       </div>
     </section>
