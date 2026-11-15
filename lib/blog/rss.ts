@@ -26,7 +26,6 @@ export async function createBlogRss(language: BlogLanguage): Promise<Response> {
       <pubDate>${new Date(post.published_at * 1000).toUTCString()}</pubDate>
       <category>${escapeXml(post.category_name || (isEnglish ? "Article" : "아티클"))}</category>
       ${tags.map((tag) => `<category>${escapeXml(tag)}</category>`).join("")}
-      ${post.cover_image_key ? `<enclosure url="${siteUrl}/api/blog/images/${post.cover_image_key.split("/").map(encodeURIComponent).join("/")}" type="image/jpeg" />` : ""}
     </item>`;
   }).join("\n");
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
