@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 type Language = "ko" | "en";
 type SegmentationMask = { data: Uint8Array | Uint8ClampedArray | Float32Array; width: number; height: number; channels?: number };
 type PipelineOutput = { mask: SegmentationMask };
-type BackgroundPipeline = (image: HTMLImageElement) => Promise<PipelineOutput[]>;
+type BackgroundPipeline = (image: Blob) => Promise<PipelineOutput[]>;
 type ProgressHandler = (progress: { status?: string; progress?: number }) => void;
 let pipelinePromise: Promise<BackgroundPipeline> | null = null;
 let pipelineProgressHandler: ProgressHandler | null = null;
@@ -15,20 +15,26 @@ async function getBackgroundPipeline(onProgress: ProgressHandler): Promise<Backg
   if (!pipelinePromise) {
     pipelinePromise = (async () => {
       const transformersCdnUrl = "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.8.1/+esm";
-      const { pipeline, env } = (await import(/* webpackIgnore: true */ transformersCdnUrl)) as {
-        pipeline: (task: string, model: string, options?: Record<string, unknown>) => Promise<BackgroundPipeline>;
+      const { pipeline, env, RawImage } = (await import(/* webpackIgnore: true */ transformersCdnUrl)) as {
+        pipeline: (task: string, model: string, options?: Record<string, unknown>) => Promise<(image: unknown) => Promise<PipelineOutput[]>>;
+        RawImage: { fromBlob: (blob: Blob) => Promise<unknown> };
         env: { allowLocalModels: boolean; allowRemoteModels: boolean; useBrowserCache: boolean };
       };
       env.allowLocalModels = false; env.allowRemoteModels = true; env.useBrowserCache = true;
       const options = { progress_callback: (progress: { status?: string; progress?: number }) => pipelineProgressHandler?.(progress) };
       const model = "shozebDev/birefnet-lite-512-onnx";
+      let segmenter: ((image: unknown) => Promise<PipelineOutput[]>) | null = null;
       if (typeof navigator !== "undefined" && "gpu" in navigator) {
-        try { return await pipeline("image-segmentation", model, { ...options, device: "webgpu", dtype: "fp16" }); }
+        try { segmenter = await pipeline("image-segmentation", model, { ...options, device: "webgpu", dtype: "fp16" }); }
         catch (error) { console.warn("BiRefNet Lite WebGPU unavailable; falling back to WASM.", error); }
       }
-      // The model repo has model.onnx and model_fp16.onnx, but no quantized graph.
-      // Keep fp16 on WebGPU and use the full-precision graph for the WASM fallback.
-      return await pipeline("image-segmentation", model, { ...options, device: "wasm", dtype: "fp32" });
+      if (!segmenter) {
+        // The model repo has model.onnx and model_fp16.onnx, but no quantized graph.
+        // Keep fp16 on WebGPU and use the full-precision graph for the WASM fallback.
+        segmenter = await pipeline("image-segmentation", model, { ...options, device: "wasm", dtype: "fp32" });
+      }
+      // Transformers.js image pipelines consume RawImage inputs.
+      return async (blob: Blob) => segmenter!(await RawImage.fromBlob(blob));
     })().catch((error) => { pipelinePromise = null; throw error; });
   }
   return pipelinePromise;
@@ -102,7 +108,7 @@ const messages = {
   },
 };
 
-function blobToImage(blob: Blob): Promise<HTMLImageElement> {
+function blobToImage(blob: Blob): Promise<Blob> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(blob);
     const image = new Image();
@@ -237,8 +243,7 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
       setStage(t.analyzing);
       setProgress(null);
       setStatus(t.previewing);
-      const previewImage = await blobToImage(smallImage);
-      const output = await remover(previewImage);
+      const output = await remover(smallImage);
       if (!output?.[0]?.mask) throw new Error("No preview mask");
       const maskBlob = await maskToBlob(output[0].mask);
       const overlay = await makeEstimatedOverlay(smallImage, maskBlob);
@@ -272,8 +277,7 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
       setStage(t.finalizing);
       setProgress(null);
       setStatus(t.working);
-      const originalImage = await blobToImage(file);
-      const output = await remover(originalImage);
+      const output = await remover(file);
       if (!output?.[0]?.mask) throw new Error("No image mask");
       const maskBlob = await maskToBlob(output[0].mask);
       const blob = await applyMaskToOriginal(file, maskBlob);
