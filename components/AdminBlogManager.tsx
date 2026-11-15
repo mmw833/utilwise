@@ -530,10 +530,6 @@ export default function AdminBlogManager() {
               <input maxLength={40} value={editor.category_name} onChange={(e) => setEditor({ ...editor, category_name: e.target.value, category_id: "" })} placeholder="예: 생활정보" list="blog-category-suggestions" />
               <datalist id="blog-category-suggestions">{categories.map((category) => <option key={category.id} value={category.name_ko} />)}</datalist>
             </label>
-            <label className="blog-admin-full">핵심·연관 검색어 (쉼표로 구분)
-              <input value={tagsInput} maxLength={400} onChange={(e) => setTagsInput(e.target.value)} onBlur={() => setEditor((current) => ({ ...current, tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12) }))} placeholder="생활정보, 가이드, 팁" />
-              <small>가장 중요한 검색어 1개와 관련 검색어를 자연스럽게 입력하세요. 본문에도 실제 내용으로 반영합니다. 최대 12개</small>
-            </label>
             <label className="blog-admin-full">대표 이미지 (선택)
               <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadCoverImage(e.target.files?.[0]); e.currentTarget.value = ""; }} />
               <small>JPG, PNG, WebP, AVIF · 최대 5MB</small>
