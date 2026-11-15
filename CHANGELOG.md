@@ -1,3 +1,8 @@
+## 2026-11-15 AI 배경 제거 수정 검증 진행
+- PR #30: GitHub Actions production build 성공, Cloudflare Preview build/deploy 성공.
+- Preview 페이지 로드 및 업로드 UI 확인 완료. 자동 브라우저의 파일 선택 창 제어 제한으로 실파일 업로드/AI 추론/투명 PNG 다운로드 테스트는 미완료.
+- 운영 병합 및 배포는 실파일 E2E 확인 전까지 보류.
+
 ## 2026-11-15
 - Fix browser inference input by passing decoded HTMLImageElement objects to Transformers.js instead of Blob objects.
 - Keep WebGPU on fp16 and switch the WASM fallback to fp32 because the selected model repository does not publish a quantized ONNX graph.
