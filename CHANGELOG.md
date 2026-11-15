@@ -1,3 +1,15 @@
+## 2026-11-15 AI 배경 제거 수정 검증 진행
+- PR #30: GitHub Actions production build 성공, Cloudflare Preview build/deploy 성공.
+- Preview 페이지 로드 및 업로드 UI 확인 완료. 자동 브라우저의 파일 선택 창 제어 제한으로 실파일 업로드/AI 추론/투명 PNG 다운로드 테스트는 미완료.
+- 운영 병합 및 배포는 실파일 E2E 확인 전까지 보류.
+
+## 2026-11-15
+- Fix browser inference input by passing decoded HTMLImageElement objects to Transformers.js instead of Blob objects.
+- Keep WebGPU on fp16 and switch the WASM fallback to fp32 because the selected model repository does not publish a quantized ONNX graph.
+- Reduce full-resolution compositing memory by applying the segmentation mask with Canvas destination-in compositing instead of allocating multiple full-size ImageData buffers.
+- Limit input dimensions to 4,096 px per side and update Korean/English guidance and model attribution to match the actual BiRefNet Lite ONNX model.
+- Build, WebGPU/WASM inference, transparent PNG, and mobile QA pending.
+
 ## 2026-11-15
 - Add a compact TODAY / TOTAL visitor counter to the top-right area of the Korean and English homepage headers.
 - Reuse the existing D1 site-wide visitor tables and anonymous hashed visitor cookie; preserve existing totals and avoid storing raw IP addresses.

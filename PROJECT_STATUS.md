@@ -1,3 +1,20 @@
+## 2026-11-15 AI 이미지 배경 제거 수정 검증 현황
+- PR #30 작업 브랜치: `fix/background-remover-inference-memory`; GitHub Actions Next.js production build 성공 (run #43665857115).
+- Cloudflare Workers Preview 빌드 및 배포 성공: `https://fix-background-remover-inference-memory-utilwise.mmw833.workers.dev` (commit `f14f585`).
+- TinyFish 브라우저 점검에서 한국어 배경 제거 페이지 로드, 업로드 UI, 지원 형식/용량/치수 및 페이지 안내 표시 확인.
+- 자동화 브라우저의 네이티브 파일 선택 창 제어 제한으로 실제 이미지 업로드 → AI 추론 → 투명 PNG 다운로드 E2E는 미완료. 모델 실행과 PNG 알파 채널도 아직 검증되지 않음.
+- 운영 병합 및 배포는 보류. 다음 검증은 사용자가 Preview에서 샘플 이미지로 직접 실행해 결과 PNG의 투명 배경을 확인한 후 진행.
+
+## 2026-11-15 AI 이미지 배경 제거 호환성 및 메모리 개선 (검증 대기)
+- 작업 브랜치: `fix/background-remover-inference-memory`
+- Transformers.js 입력을 Blob에서 HTMLImageElement로 변경해 이미지 파이프라인 입력 형식 호환성 개선
+- WebGPU는 fp16 유지, WASM 대체 실행은 fp32로 분리. 모델 저장소에는 `model.onnx` 및 `model_fp16.onnx`가 있고 `model_quantized.onnx`는 없어 WASM fp16 요청을 수정
+- 원본 이미지의 알파 마스크 적용을 대용량 ImageData 픽셀 루프에서 Canvas `destination-in` 합성으로 변경해 메모리 사용량 감소
+- 입력 이미지 최대 가로·세로를 각각 4,096px로 제한하고 한·영 오류 안내/FAQ 갱신
+- 한국어·영어 페이지의 모델 이름을 실제 사용 모델인 BiRefNet Lite ONNX로 정정
+- 이미지 원본은 브라우저에서만 처리하며 외부 API/서버 업로드를 추가하지 않음
+- 검증 대기: GitHub Actions production build, WebGPU 추론, WASM(fp32) 대체 추론, 투명 PNG 알파 채널, PC/모바일 메모리 및 다운로드 확인. 통과 전 운영 배포하지 않음
+
 ## 2026-11-15 메인 페이지 통합 방문자 통계 (PR #29, 검증 대기)
 - 작업 브랜치: `feature/homepage-visitor-counter`
 - 한국어 `/` 및 영어 `/en` 메인 헤더 우측에 작은 `TODAY` / `TOTAL` 카운터 추가

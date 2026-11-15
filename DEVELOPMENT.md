@@ -1,3 +1,18 @@
+## AI 배경 제거 수정 검증 기록 (2026-11-15)
+- PR #30 commit `f14f585`: GitHub Actions production build 및 Cloudflare Preview 배포 성공.
+- Preview URL: `https://fix-background-remover-inference-memory-utilwise.mmw833.workers.dev/background-remover`.
+- 브라우저에서 페이지 로드와 업로드 UI/지원 조건 확인. 자동화 환경은 OS 파일 선택 창을 조작하지 못해 실파일 추론 및 PNG 알파 검증은 수행하지 못함.
+- 운영 배포 전 실제 JPG/PNG/WebP 파일 업로드, 모델 다운로드/추론, 투명 PNG 다운로드 및 PC/모바일 확인 필요.
+
+## AI image background remover compatibility and memory fix (2026-11-15)
+- Shared component: `components/BackgroundRemover.tsx`; Korean route `/background-remover`, English route `/en/background-remover`.
+- Transformers.js image-segmentation pipeline receives decoded `HTMLImageElement` inputs (preview and original) rather than Blob objects.
+- WebGPU uses `fp16`. WASM fallback uses `fp32`: the selected Hugging Face repository publishes `onnx/model.onnx` and `onnx/model_fp16.onnx`, but no quantized ONNX graph.
+- Full-resolution PNG alpha composition uses Canvas `destination-in` rather than multiple full-size ImageData buffers to reduce peak memory.
+- Input dimensions are limited to 4,096 px per side; file size remains limited to 20 MB. Images remain local to the browser.
+- Model attribution in both language pages is aligned to BiRefNet Lite ONNX, based on ZhengPeng7/BiRefNet_lite.
+- Verification pending: production build, WebGPU inference, WASM fallback inference, transparent PNG alpha validation, and desktop/mobile memory/download checks.
+
 ## Homepage visitor counter (2026-11-15)
 - Shared UI: `components/SiteVisitorStats.tsx`; shown in the Korean `/` and English `/en` homepage headers only.
 - Shared tracking: existing `components/BlogVisitorTracker.tsx` is mounted in `app/layout.tsx`, so every route under the root layout contributes to one site-wide count regardless of language.
