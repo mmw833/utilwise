@@ -562,6 +562,7 @@ export default function AdminBlogManager() {
               {showPreview ? (
                 <div className={`blog-admin-preview-layout ${previewMode === "split" ? "is-split" : ""}`}>
                   <div className="blog-admin-preview">
+                    {editor.cover_image_key ? <img src={`/api/blog/images/${editor.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt={editor.title || "대표 이미지"} style={{ display: "block", width: "100%", maxHeight: 320, objectFit: "cover", borderRadius: 12, marginBottom: 20 }} /> : null}
                     <h1>{editor.title || "게시글 제목 미리보기"}</h1>
                     {editor.excerpt ? <p className="blog-admin-preview-excerpt">{editor.excerpt}</p> : null}
                     <BlogMarkdown content={editor.content_md || "본문을 입력하면 여기에 미리 표시됩니다."} />
