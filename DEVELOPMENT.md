@@ -1,3 +1,13 @@
+## 인기 도구 1단계 SEO 및 내부 연결 개선 (2026-11-15)
+- Background remover: `app/background-remover/page.tsx`, `app/en/background-remover/page.tsx`
+- Text-to-speech: `app/text-to-speech/page.tsx`, `app/en/text-to-speech/page.tsx`
+- 각 페이지의 Metadata에 검색 의도에 맞는 고유 title/description/Open Graph를 설정하고, 한·영 canonical 및 hreflang 관계를 유지한다.
+- 각 페이지의 안내 콘텐츠는 실제 기능 제한과 처리 방식에 맞춰 지원 형식, 파일 크기/해상도, 지원 언어, WAV 출력, 모델 최초 다운로드, 브라우저 내 개인정보 처리를 설명한다.
+- FAQPage JSON-LD는 화면에 표시되는 동일 FAQ 배열에서 생성한다.
+- 배경 제거기 관련 도구: 이미지 압축기, 이미지 크기 조절기, 이미지 형식 변환기. TTS 관련 도구: 글자 수 세기, 발표 시간 계산기.
+- 이 변경은 SEO/설명/내부 링크만 수정하며 AI 추론 및 TTS 모델 로직은 변경하지 않는다.
+- 검증: GitHub Actions production build, Preview에서 한국어/영어 페이지 및 JSON-LD, 내부 링크, 모바일 레이아웃을 확인한다. 실제 이미지 추론/투명 PNG 및 실제 WAV 생성은 별도 기능 QA로 관리한다.
+
 ## AI 배경 제거 수정 검증 기록 (2026-11-15)
 - PR #30 commit `f14f585`: GitHub Actions production build 및 Cloudflare Preview 배포 성공.
 - Preview URL: `https://fix-background-remover-inference-memory-utilwise.mmw833.workers.dev/background-remover`.
