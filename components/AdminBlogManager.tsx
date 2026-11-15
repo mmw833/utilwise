@@ -409,7 +409,7 @@ export default function AdminBlogManager() {
   }
 
   const liveContent = contentRef.current ? editorHtmlToMarkdown(contentRef.current) : editor.content_md;
-  const wordCount = liveContent.trim() ? liveContent.trim().split(/\\s+/).length : 0;
+  const wordCount = liveContent.trim() ? liveContent.trim().split(/\s+/).length : 0;
   const characterCount = editor.content_md.length;
 
   async function savePost(event: React.FormEvent<HTMLFormElement>) {
@@ -427,7 +427,7 @@ export default function AdminBlogManager() {
           category_id: editor.category_id || null,
           category_name: editor.category_name.trim(),
           tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
-          seo_title: null,
+          seo_title: editor.seo_title.trim() || null,
           seo_description: editor.seo_description || null,
         }),
       });
@@ -526,9 +526,9 @@ export default function AdminBlogManager() {
               <input maxLength={40} value={editor.category_name} onChange={(e) => setEditor({ ...editor, category_name: e.target.value, category_id: "" })} placeholder="예: 생활정보" list="blog-category-suggestions" />
               <datalist id="blog-category-suggestions">{categories.map((category) => <option key={category.id} value={category.name_ko} />)}</datalist>
             </label>
-            <label className="blog-admin-full">태그 (쉼표로 구분)
+            <label className="blog-admin-full">핵심·연관 검색어 (쉼표로 구분)
               <input value={tagsInput} maxLength={400} onChange={(e) => setTagsInput(e.target.value)} onBlur={() => setEditor((current) => ({ ...current, tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12) }))} placeholder="생활정보, 가이드, 팁" />
-              <small>쉼표(,)를 입력해도 지워지지 않습니다. 예: 생활정보, 가이드, 팁 (최대 12개)</small>
+              <small>가장 중요한 검색어 1개와 관련 검색어를 자연스럽게 입력하세요. 본문에도 실제 내용으로 반영합니다. 최대 12개</small>
             </label>
             <label className="blog-admin-full">대표 이미지 (선택)
               <input type="file" accept="image/jpeg,image/png,image/webp,image/avif" disabled={uploadingImage} onChange={(e) => { void uploadCoverImage(e.target.files?.[0]); e.currentTarget.value = ""; }} />
@@ -606,9 +606,35 @@ export default function AdminBlogManager() {
                 </>
               )}
             </div>
-            <label className="blog-admin-full">SEO 설명 (선택)
-              <textarea rows={2} maxLength={300} value={editor.seo_description} onChange={(e) => setEditor({ ...editor, seo_description: e.target.value })} />
-            </label>
+            <section className="blog-admin-full blog-admin-seo-guide">
+              <div className="blog-admin-editor-head"><strong>검색 노출 설정</strong><small>검색 결과에 표시될 제목과 설명입니다.</small></div>
+              <label>SEO 제목
+                <input maxLength={180} value={editor.seo_title} onChange={(e) => setEditor({ ...editor, seo_title: e.target.value })} placeholder={editor.title || "검색 결과에 표시할 제목"} />
+                <small>{editor.seo_title.length || editor.title.length}자 · 비워두면 게시글 제목을 사용합니다.</small>
+              </label>
+              <label>SEO 설명
+                <textarea rows={3} maxLength={300} value={editor.seo_description} onChange={(e) => setEditor({ ...editor, seo_description: e.target.value })} placeholder="글의 핵심 내용과 독자가 얻을 정보를 1~2문장으로 작성하세요." />
+                <small>{editor.seo_description.length}/300자 · 검색 결과에 표시될 수 있는 간결하고 구체적인 설명을 권장합니다.</small>
+              </label>
+              <div className="blog-admin-seo-preview">
+                <strong>{editor.seo_title.trim() || editor.title || "게시글 제목 미리보기"}</strong>
+                <small>https://utilwise.kr/{editor.language === "en" ? "en/" : ""}blog/{editor.slug || "post-address"}</small>
+                <p>{editor.seo_description.trim() || editor.excerpt || "검색 결과에 표시될 게시글 설명 미리보기"}</p>
+              </div>
+              <div className="blog-admin-seo-checks">
+                <strong>발행 전 검색 최적화 점검</strong>
+                {[
+                  [Boolean(editor.title.trim()), "게시글 제목 입력"],
+                  [Boolean(tagsInput.trim()), "핵심·연관 검색어 입력"],
+                  [/^##?\s+/m.test(liveContent), "본문에 소제목(H2/H3) 사용"],
+                  [/^#{1,3}\s+.*(FAQ|자주 묻는 질문)/im.test(liveContent) || /Q\s*[:：]/i.test(liveContent), "FAQ 또는 질문·답변 포함"],
+                  [/!\[[^\]]+\]\(/.test(liveContent), "설명이 있는 본문 이미지 ALT"],
+                  [/https?:\/\//i.test(liveContent), "공식 출처 또는 참고 링크"],
+                  [Boolean(editor.seo_description.trim() || editor.excerpt.trim()), "검색 설명 또는 요약 입력"],
+                ].map(([done, label]) => <span key={String(label)}>{done ? "✓" : "○"} {label}</span>)}
+                <small>체크 항목은 작성 가이드이며, 검색 순위나 노출을 보장하지 않습니다.</small>
+              </div>
+            </section>
           </div>
           <div className="blog-admin-editor-actions">
             <button className="blog-admin-primary" type="submit" disabled={saving || uploadingImage}>{saving ? "저장 중..." : editor.status === "published" ? "저장하고 발행" : "저장"}</button>
