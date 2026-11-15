@@ -1,4 +1,11 @@
 ## 2026-11-15
+- Fix browser inference input by passing decoded HTMLImageElement objects to Transformers.js instead of Blob objects.
+- Keep WebGPU on fp16 and switch the WASM fallback to fp32 because the selected model repository does not publish a quantized ONNX graph.
+- Reduce full-resolution compositing memory by applying the segmentation mask with Canvas destination-in compositing instead of allocating multiple full-size ImageData buffers.
+- Limit input dimensions to 4,096 px per side and update Korean/English guidance and model attribution to match the actual BiRefNet Lite ONNX model.
+- Build, WebGPU/WASM inference, transparent PNG, and mobile QA pending.
+
+## 2026-11-15
 - Add a compact TODAY / TOTAL visitor counter to the top-right area of the Korean and English homepage headers.
 - Reuse the existing D1 site-wide visitor tables and anonymous hashed visitor cookie; preserve existing totals and avoid storing raw IP addresses.
 - Move visitor tracking to the shared root layout so visits across all pages and both languages are counted together.
