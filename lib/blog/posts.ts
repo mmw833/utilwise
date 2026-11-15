@@ -127,6 +127,7 @@ export async function getPublishedPostBySlug(
         p.excerpt,
         p.tags_json,
         p.content_md,
+        p.related_tools_json,
         p.cover_image_key,
         CASE WHEN p.language = 'en' THEN COALESCE(c.name_en, c.name_ko) ELSE c.name_ko END AS category_name,
         c.slug AS category_slug,
