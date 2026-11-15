@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BlogMarkdown from "@/components/BlogMarkdown";
+import { RELATED_TOOLS } from "@/lib/tools/registry";
 
 type PostStatus = "draft" | "published" | "archived";
 type Category = { id: string; slug: string; name_ko: string; name_en: string | null };
@@ -16,6 +17,7 @@ type Post = {
   category_id: string | null;
   category_name: string | null;
   tags_json?: string;
+  related_tools_json?: string;
   seo_title: string | null;
   seo_description: string | null;
   status: PostStatus;
@@ -37,6 +39,7 @@ type Editor = {
   category_id: string;
   category_name: string;
   tags: string[];
+  related_tools: string[];
   seo_title: string;
   seo_description: string;
   status: PostStatus;
@@ -52,6 +55,7 @@ const emptyEditor = (): Editor => ({
   category_id: "",
   category_name: "",
   tags: [],
+  related_tools: [],
   seo_title: "",
   seo_description: "",
   status: "draft",
@@ -190,6 +194,7 @@ export default function AdminBlogManager() {
       category_id: post.category_id || "",
       category_name: post.category_name || "",
       tags: existingTags,
+      related_tools: (() => { try { return JSON.parse(post.related_tools_json || "[]") as string[]; } catch { return []; } })(),
       seo_title: post.seo_title || "",
       seo_description: post.seo_description || "",
       status: post.status,
@@ -427,6 +432,7 @@ export default function AdminBlogManager() {
           category_id: editor.category_id || null,
           category_name: editor.category_name.trim(),
           tags: tagsInput.split(",").map((tag) => tag.trim()).filter(Boolean).slice(0, 12),
+          related_tools: editor.related_tools,
           seo_title: editor.seo_title.trim() || null,
           seo_description: editor.seo_description || null,
         }),
@@ -606,6 +612,18 @@ export default function AdminBlogManager() {
                 </>
               )}
             </div>
+            <section className="blog-admin-full" style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: 16 }}>
+              <div className="blog-admin-editor-head"><strong>관련 계산기·온라인 도구</strong><small>게시글 하단에 선택한 도구 버튼을 표시합니다. 선택하지 않으면 표시하지 않습니다.</small></div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+                {(["calculator", "online"] as const).map((group) => <div key={group}>
+                  <strong style={{ display: "block", marginBottom: 8 }}>{group === "calculator" ? "계산기" : "온라인 도구"}</strong>
+                  {RELATED_TOOLS.filter((tool) => tool.category === group).map((tool) => <label key={tool.id} style={{ display: "flex", alignItems: "center", gap: 8, margin: "7px 0", fontWeight: 400 }}>
+                    <input type="checkbox" checked={editor.related_tools.includes(tool.id)} onChange={(event) => setEditor((current) => ({ ...current, related_tools: event.target.checked ? [...current.related_tools, tool.id] : current.related_tools.filter((id) => id !== tool.id) }))} />
+                    <span>{editor.language === "en" ? tool.en : tool.ko}</span>
+                  </label>)}
+                </div>)}
+              </div>
+            </section>
             <section className="blog-admin-full blog-admin-seo-guide">
               <div className="blog-admin-editor-head"><strong>검색 노출 설정</strong><small>검색 결과에 표시될 제목과 설명입니다.</small></div>
               <label>SEO 제목
