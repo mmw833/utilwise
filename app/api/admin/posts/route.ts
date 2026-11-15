@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/blog/admin-auth";
+import { RELATED_TOOLS } from "@/lib/tools/registry";
 import {
   deleteAdminPost,
   findOrCreateAdminCategory,
@@ -36,6 +37,7 @@ function validPost(value: unknown): value is AdminPostInput {
     typeof post.content_md === "string" &&
     post.content_md.length <= 100_000 &&
     (post.status === "draft" || post.status === "published" || post.status === "archived") &&
+    (post.related_tools === undefined || (Array.isArray(post.related_tools) && post.related_tools.length <= 30 && post.related_tools.every((id) => typeof id === "string" && RELATED_TOOLS.some((tool) => tool.id === id)))) &&
     (post.seo_title === undefined || post.seo_title === null || (typeof post.seo_title === "string" && post.seo_title.length <= 180)) &&
     (post.seo_description === undefined || post.seo_description === null || (typeof post.seo_description === "string" && post.seo_description.length <= 300)) &&
     (!post.id || typeof post.id === "string") &&
