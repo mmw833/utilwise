@@ -1,19 +1,19 @@
-## 2026-11-15 AI 이미지 배경 제거 수정 검증 현황
-- PR #30 작업 브랜치: `fix/background-remover-inference-memory`; GitHub Actions Next.js production build 성공 (run #43665857115).
-- Cloudflare Workers Preview 빌드 및 배포 성공: `https://fix-background-remover-inference-memory-utilwise.mmw833.workers.dev` (commit `f14f585`).
-- TinyFish 브라우저 점검에서 한국어 배경 제거 페이지 로드, 업로드 UI, 지원 형식/용량/치수 및 페이지 안내 표시 확인.
-- 자동화 브라우저의 네이티브 파일 선택 창 제어 제한으로 실제 이미지 업로드 → AI 추론 → 투명 PNG 다운로드 E2E는 미완료. 모델 실행과 PNG 알파 채널도 아직 검증되지 않음.
-- 운영 병합 및 배포는 보류. 다음 검증은 사용자가 Preview에서 샘플 이미지로 직접 실행해 결과 PNG의 투명 배경을 확인한 후 진행.
+## 2026-11-15 이미지 텍스트 추출 OCR 인식률 개선 (빌드 및 실제 샘플 검증 대기)
+- 작업 브랜치: `improve/ocr-recognition-quality`
+- 기존 Tesseract.js 6.0.1 기본 인식 흐름에 이미지 전처리 추가: 작은 이미지 확대, 회색조 변환, 명암 보정
+- 문서형 레이아웃(PSM 6)과 흩어진 텍스트 레이아웃(PSM 11)을 각각 인식하고 엔진 신뢰도를 기준으로 결과 선택
+- 인식 엔진 로딩/처리 진행률 표시 및 이미지 미리보기 변경 시 Worker가 불필요하게 종료되던 effect 정리
+- 한국어·영어 설명과 사용 팁을 실제 처리 방식에 맞게 갱신
+- 브라우저 내 OCR 및 이미지 비업로드 원칙 유지
+- **검증 대기:** GitHub Actions 빌드, 실제 한국어·영어 샘플 이미지 인식 결과 비교, 모바일 메모리/처리 시간, 복사 및 TXT 다운로드
+- 샘플 이미지 검증 전 인식률이 충분히 개선됐다고 단정하지 않으며 운영 배포 전 QA 수행
 
-## 2026-11-15 AI 이미지 배경 제거 호환성 및 메모리 개선 (검증 대기)
-- 작업 브랜치: `fix/background-remover-inference-memory`
-- Transformers.js 입력을 Blob에서 HTMLImageElement로 변경해 이미지 파이프라인 입력 형식 호환성 개선
-- WebGPU는 fp16 유지, WASM 대체 실행은 fp32로 분리. 모델 저장소에는 `model.onnx` 및 `model_fp16.onnx`가 있고 `model_quantized.onnx`는 없어 WASM fp16 요청을 수정
-- 원본 이미지의 알파 마스크 적용을 대용량 ImageData 픽셀 루프에서 Canvas `destination-in` 합성으로 변경해 메모리 사용량 감소
-- 입력 이미지 최대 가로·세로를 각각 4,096px로 제한하고 한·영 오류 안내/FAQ 갱신
-- 한국어·영어 페이지의 모델 이름을 실제 사용 모델인 BiRefNet Lite ONNX로 정정
-- 이미지 원본은 브라우저에서만 처리하며 외부 API/서버 업로드를 추가하지 않음
-- 검증 대기: GitHub Actions production build, WebGPU 추론, WASM(fp32) 대체 추론, 투명 PNG 알파 채널, PC/모바일 메모리 및 다운로드 확인. 통과 전 운영 배포하지 않음
+## 2026-11-15 AI 이미지 배경 제거 수정 운영 배포
+- PR #30 병합 완료: `6f79fc829db0e8563ff0c96c1649f8867bd2369b`
+- GitHub Actions Production Deploy run #69 (`43666850072`) 성공
+- Transformers.js 이미지 입력을 `RawImage.fromBlob()` 방식으로 변경하고 WebGPU fp16 / WASM fp32 경로 유지
+- Canvas `destination-in` 합성 및 최대 이미지 치수 제한으로 메모리 사용 개선
+- **남은 검증:** 실제 브라우저 이미지 추론과 투명 PNG 결과는 별도 실파일 테스트가 필요하며, 배포 성공만으로 AI 추론 완료로 간주하지 않음
 
 ## 2026-11-15 메인 페이지 통합 방문자 통계 (PR #29, 검증 대기)
 - 작업 브랜치: `feature/homepage-visitor-counter`
