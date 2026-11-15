@@ -23,6 +23,7 @@ export interface BlogPostSummary {
 
 export interface BlogPost extends BlogPostSummary {
   content_md: string;
+  related_tools_json?: string;
   seo_title: string | null;
   seo_description: string | null;
   created_at: number;
