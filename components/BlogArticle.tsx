@@ -8,8 +8,26 @@ export default function BlogArticle({ post, language }: { post: BlogPost; langua
   const base = en ? "/en/blog" : "/blog";
   const home = en ? "/en" : "/";
   const tools = en ? "/en/online-tools" : "/online-tools";
+  const articleUrl = `https://utilwise.kr${base}/${post.slug}`;
+  const imageUrl = post.cover_image_key ? `https://utilwise.kr/api/blog/images/${post.cover_image_key.split("/").map(encodeURIComponent).join("/")}` : undefined;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.seo_description || post.excerpt,
+    url: articleUrl,
+    mainEntityOfPage: { "@type": "WebPage", "@id": articleUrl },
+    datePublished: new Date(post.published_at * 1000).toISOString(),
+    dateModified: new Date(post.updated_at * 1000).toISOString(),
+    author: { "@type": "Organization", name: "UTILWISE", url: "https://utilwise.kr/about" },
+    publisher: { "@type": "Organization", name: "UTILWISE", url: "https://utilwise.kr" },
+    inLanguage: en ? "en" : "ko-KR",
+    ...(imageUrl ? { image: [imageUrl] } : {}),
+    ...(post.category_name ? { articleSection: post.category_name } : {}),
+    ...(post.tags_json ? { keywords: (() => { try { return JSON.parse(post.tags_json); } catch { return []; } })() } : {}),
+  };
   const date = new Intl.DateTimeFormat(en ? "en-US" : "ko-KR", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(new Date(post.published_at * 1000));
-  return <><BlogVisitorTracker /><main className="journal-page journal-article-page">
+  return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} /><BlogVisitorTracker /><main className="journal-page journal-article-page">
     <header className="journal-header">
       <Link href={home} className="journal-brand" aria-label="UTILWISE home">UTIL<span>WISE</span></Link>
       <nav className="journal-nav" aria-label={en ? "Main navigation" : "주요 메뉴"}>
@@ -31,7 +49,7 @@ export default function BlogArticle({ post, language }: { post: BlogPost; langua
           
           
         </div>
-        <div className="journal-article-cover" aria-hidden="true">{post.cover_image_key ? <img src={`/api/blog/images/${post.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt="" /> : <><span>UTILWISE JOURNAL</span><strong>U.</strong><i>✳</i><small>IDEAS FOR EVERYDAY</small></>}</div>
+        <div className="journal-article-cover" aria-hidden="true">{post.cover_image_key ? <img src={`/api/blog/images/${post.cover_image_key.split("/").map(encodeURIComponent).join("/")}`} alt={post.title} /> : <><span>UTILWISE JOURNAL</span><strong>U.</strong><i>✳</i><small>IDEAS FOR EVERYDAY</small></>}</div>
       </header>
 
       <div className="journal-article-layout">

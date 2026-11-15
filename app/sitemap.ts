@@ -57,7 +57,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
   const postEntries = [...koPosts, ...enPosts].map((post) => ({
     url: `${siteUrl}/${post.language === "en" ? "en/" : ""}blog/${post.slug}`,
-    lastModified: new Date(post.published_at * 1000),
+    lastModified: new Date((post.updated_at || post.published_at) * 1000),
     changeFrequency: "monthly" as const,
     priority: 0.65,
   }));

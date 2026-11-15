@@ -1,3 +1,14 @@
+## 2026-11-15 블로그 SEO 작성·발행 구조 개선 (작업 브랜치 검증 대기)
+- 작업 브랜치: `seo/blog-publishing-foundation`
+- 관리자 글쓰기 화면에서 SEO 제목 입력값이 저장 시 항상 null로 덮어써지던 문제 수정. SEO 제목/설명 글자 수, 검색 결과 미리보기, 핵심·연관 검색어 안내, 발행 전 체크리스트 추가
+- 게시글 API에서 SEO 제목·설명 입력 길이 검증 추가
+- 공개 게시글에 BlogPosting JSON-LD 추가: 제목, 설명, canonical URL, 발행일, 수정일, UTILWISE 작성자/발행자, 언어, 대표 이미지, 카테고리 및 태그
+- 대표 이미지 ALT를 게시글 제목으로 지정. 본문 이미지 ALT 작성 상태를 관리자 체크리스트에 안내
+- 한국어 `/blog/rss.xml`, 영어 `/en/blog/rss.xml` RSS 2.0 피드 추가. 발행된 글만 최대 30개 제공
+- 사이트맵 게시글 lastModified를 실제 수정일(updated_at) 기준으로 변경
+- 기존 게시글/DB 데이터와 계산기 기능은 변경하지 않음
+- **검증 대기:** GitHub Actions 빌드, RSS XML 유효성 및 한·영 피드, BlogPosting JSON-LD, 기존 SEO 제목 저장/수정, 사이트맵 수정일 확인 후 main 병합 및 운영 배포
+
 ## 2026-11-15 인기 이미지 도구 2단계 SEO 개선 (PR 검증 대기)
 - 작업 브랜치: `growth/image-tools-seo-phase-2`
 - 이미지 변환기 한국어·영어 페이지의 검색 제목/설명, HEIC·HEIF 입력 및 JPG·PNG·WebP 출력 범위, 사용 방법, 파일 제한과 브라우저 내 처리 안내 보강
