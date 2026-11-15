@@ -24,6 +24,7 @@ export interface AdminPostInput {
 }
 
 export interface AdminPostRecord extends Omit<AdminPostInput, "category_name"> {
+  related_tools_json?: string;
   id: string;
   translation_group_id: string;
   view_count: number;
@@ -116,7 +117,7 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
       id, translation_group_id, language, slug, title, excerpt, content_md,
       cover_image_key, category_id, tags_json, related_tools_json, seo_title, seo_description, status,
       published_at, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
       CASE WHEN ? = 'published' THEN unixepoch() ELSE NULL END,
       unixepoch(), unixepoch()
     )
@@ -128,7 +129,8 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
       content_md = excluded.content_md,
       cover_image_key = excluded.cover_image_key,
       category_id = excluded.category_id,
-      tags_json = excluded.tags_json,\n      related_tools_json = excluded.related_tools_json,
+      tags_json = excluded.tags_json,
+      related_tools_json = excluded.related_tools_json,
       seo_title = excluded.seo_title,
       seo_description = excluded.seo_description,
       status = excluded.status,
@@ -149,6 +151,7 @@ export async function saveAdminPost(input: AdminPostInput): Promise<string> {
     input.cover_image_key ?? null,
     input.category_id ?? null,
     JSON.stringify((input.tags ?? []).map((tag) => tag.trim()).filter(Boolean).slice(0, 12)),
+    JSON.stringify((input.related_tools ?? []).filter((id) => typeof id === "string").slice(0, 30)),
     input.seo_title ?? null,
     input.seo_description ?? null,
     input.status,
