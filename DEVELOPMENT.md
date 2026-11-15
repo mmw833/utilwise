@@ -1,3 +1,12 @@
+## AI image background remover compatibility and memory fix (2026-11-15)
+- Shared component: `components/BackgroundRemover.tsx`; Korean route `/background-remover`, English route `/en/background-remover`.
+- Transformers.js image-segmentation pipeline receives decoded `HTMLImageElement` inputs (preview and original) rather than Blob objects.
+- WebGPU uses `fp16`. WASM fallback uses `fp32`: the selected Hugging Face repository publishes `onnx/model.onnx` and `onnx/model_fp16.onnx`, but no quantized ONNX graph.
+- Full-resolution PNG alpha composition uses Canvas `destination-in` rather than multiple full-size ImageData buffers to reduce peak memory.
+- Input dimensions are limited to 4,096 px per side; file size remains limited to 20 MB. Images remain local to the browser.
+- Model attribution in both language pages is aligned to BiRefNet Lite ONNX, based on ZhengPeng7/BiRefNet_lite.
+- Verification pending: production build, WebGPU inference, WASM fallback inference, transparent PNG alpha validation, and desktop/mobile memory/download checks.
+
 ## Homepage visitor counter (2026-11-15)
 - Shared UI: `components/SiteVisitorStats.tsx`; shown in the Korean `/` and English `/en` homepage headers only.
 - Shared tracking: existing `components/BlogVisitorTracker.tsx` is mounted in `app/layout.tsx`, so every route under the root layout contributes to one site-wide count regardless of language.
