@@ -41,7 +41,7 @@ async function prepareOCRImage(file: File): Promise<HTMLCanvasElement> {
   const image = await loadImage(file);
   const maxSide = Math.max(image.naturalWidth, image.naturalHeight);
   const minSide = Math.min(image.naturalWidth, image.naturalHeight);
-  const scale = Math.min(2.5, 4600 / maxSide, Math.max(1, 2200 / minSide));
+  const scale = Math.min(2.5, 4600 / maxSide, minSide < 1100 ? 2200 / minSide : 1);
   const canvas = document.createElement("canvas");
   canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
   canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
@@ -215,10 +215,9 @@ export default function ImageToTextOCR({ lang }: Props) {
 
   const changeLanguage = async (nextLanguage: string) => {
     setLanguage(nextLanguage);
-    if (worker.current) {
-      await worker.current.terminate();
-      worker.current = null;
-    }
+    const currentWorker = worker.current;
+    worker.current = null;
+    if (currentWorker) await currentWorker.terminate();
   };
 
   return (
