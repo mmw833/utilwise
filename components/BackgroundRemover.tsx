@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 type Language = "ko" | "en";
 type SegmentationMask = { data: Uint8Array | Uint8ClampedArray | Float32Array; width: number; height: number; channels?: number };
 type PipelineOutput = { mask: SegmentationMask };
-type BackgroundPipeline = (image: Blob) => Promise<PipelineOutput[]>;
+type BackgroundPipeline = (image: HTMLImageElement) => Promise<PipelineOutput[]>;
 type ProgressHandler = (progress: { status?: string; progress?: number }) => void;
 let pipelinePromise: Promise<BackgroundPipeline> | null = null;
 let pipelineProgressHandler: ProgressHandler | null = null;
@@ -26,7 +26,9 @@ async function getBackgroundPipeline(onProgress: ProgressHandler): Promise<Backg
         try { return await pipeline("image-segmentation", model, { ...options, device: "webgpu", dtype: "fp16" }); }
         catch (error) { console.warn("BiRefNet Lite WebGPU unavailable; falling back to WASM.", error); }
       }
-      return await pipeline("image-segmentation", model, { ...options, device: "wasm", dtype: "fp16" });
+      // The model repo has model.onnx and model_fp16.onnx, but no quantized graph.
+      // Keep fp16 on WebGPU and use the full-precision graph for the WASM fallback.
+      return await pipeline("image-segmentation", model, { ...options, device: "wasm", dtype: "fp32" });
     })().catch((error) => { pipelinePromise = null; throw error; });
   }
   return pipelinePromise;
@@ -55,7 +57,7 @@ const messages = {
     black: "검정",
     tooLarge: "파일 크기는 20MB 이하여야 합니다.",
     invalid: "JPG, PNG 또는 WebP 이미지 파일을 선택해 주세요.",
-    dimensions: "이미지의 가로 또는 세로 길이는 8,000px 이하여야 합니다.",
+    dimensions: "기기 메모리 보호를 위해 이미지의 가로와 세로는 각각 4,096px 이하여야 합니다.",
     error: "이미지를 처리하지 못했습니다. 잠시 후 다시 시도하거나 다른 이미지를 선택해 주세요.",
     guide: "BiRefNet Lite AI 모델로 사람과 상품 등 다양한 피사체를 분리합니다. 복잡한 배경이나 작은 디테일은 결과에 따라 차이가 있을 수 있습니다.",
     modelReady: "배경 제거가 완료되었습니다.",
@@ -88,7 +90,7 @@ const messages = {
     black: "Black",
     tooLarge: "The file must be 20 MB or smaller.",
     invalid: "Please choose a JPG, PNG, or WebP image.",
-    dimensions: "Image width and height must each be 8,000 px or less.",
+    dimensions: "For device memory safety, image width and height must each be 4,096 px or less.",
     error: "Could not process this image. Please try again or choose another file.",
     guide: "BiRefNet Lite separates people and products from a range of photos. Results may vary with complex backgrounds or fine details.",
     modelReady: "Background removal complete.",
@@ -150,13 +152,12 @@ async function applyMaskToOriginal(source: Blob, maskBlob: Blob): Promise<Blob> 
   const sourceImage = await blobToImage(source); const maskImage = await blobToImage(maskBlob);
   const width = sourceImage.naturalWidth; const height = sourceImage.naturalHeight;
   const canvas = document.createElement("canvas"); canvas.width = width; canvas.height = height;
-  const context = canvas.getContext("2d", { willReadFrequently: true }); if (!context) throw new Error("Canvas is unavailable");
-  context.drawImage(sourceImage, 0, 0, width, height); const pixels = context.getImageData(0, 0, width, height);
-  const maskCanvas = document.createElement("canvas"); maskCanvas.width = width; maskCanvas.height = height;
-  const maskContext = maskCanvas.getContext("2d", { willReadFrequently: true }); if (!maskContext) throw new Error("Canvas is unavailable");
-  maskContext.drawImage(maskImage, 0, 0, width, height); const mask = maskContext.getImageData(0, 0, width, height).data;
-  for (let i = 0; i < pixels.data.length; i += 4) pixels.data[i + 3] = Math.round(pixels.data[i + 3] * (mask[i + 3] / 255));
-  context.putImageData(pixels, 0, 0);
+  const context = canvas.getContext("2d"); if (!context) throw new Error("Canvas is unavailable");
+  context.drawImage(sourceImage, 0, 0, width, height);
+  // Use the foreground mask as alpha without allocating multiple full-size ImageData buffers.
+  context.globalCompositeOperation = "destination-in";
+  context.drawImage(maskImage, 0, 0, width, height);
+  context.globalCompositeOperation = "source-over";
   return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("PNG encoding failed")), "image/png"));
 }
 async function makeSmallPreview(file: File): Promise<Blob> {
@@ -213,7 +214,7 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
     if (candidate.size > 20 * 1024 * 1024) { setError(t.tooLarge); return; }
     try {
       const bitmap = await createImageBitmap(candidate);
-      const tooLarge = bitmap.width > 8000 || bitmap.height > 8000;
+      const tooLarge = bitmap.width > 4096 || bitmap.height > 4096;
       bitmap.close();
       if (tooLarge) { setError(t.dimensions); return; }
     } catch { setError(t.invalid); return; }
@@ -236,7 +237,8 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
       setStage(t.analyzing);
       setProgress(null);
       setStatus(t.previewing);
-      const output = await remover(smallImage);
+      const previewImage = await blobToImage(smallImage);
+      const output = await remover(previewImage);
       if (!output?.[0]?.mask) throw new Error("No preview mask");
       const maskBlob = await maskToBlob(output[0].mask);
       const overlay = await makeEstimatedOverlay(smallImage, maskBlob);
@@ -270,7 +272,8 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
       setStage(t.finalizing);
       setProgress(null);
       setStatus(t.working);
-      const output = await remover(file);
+      const originalImage = await blobToImage(file);
+      const output = await remover(originalImage);
       if (!output?.[0]?.mask) throw new Error("No image mask");
       const maskBlob = await maskToBlob(output[0].mask);
       const blob = await applyMaskToOriginal(file, maskBlob);
