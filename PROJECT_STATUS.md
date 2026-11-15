@@ -1,3 +1,10 @@
+## 2026-11-15 AI 이미지 배경 제거 수정 검증 현황
+- PR #30 작업 브랜치: `fix/background-remover-inference-memory`; GitHub Actions Next.js production build 성공 (run #43665857115).
+- Cloudflare Workers Preview 빌드 및 배포 성공: `https://fix-background-remover-inference-memory-utilwise.mmw833.workers.dev` (commit `f14f585`).
+- TinyFish 브라우저 점검에서 한국어 배경 제거 페이지 로드, 업로드 UI, 지원 형식/용량/치수 및 페이지 안내 표시 확인.
+- 자동화 브라우저의 네이티브 파일 선택 창 제어 제한으로 실제 이미지 업로드 → AI 추론 → 투명 PNG 다운로드 E2E는 미완료. 모델 실행과 PNG 알파 채널도 아직 검증되지 않음.
+- 운영 병합 및 배포는 보류. 다음 검증은 사용자가 Preview에서 샘플 이미지로 직접 실행해 결과 PNG의 투명 배경을 확인한 후 진행.
+
 ## 2026-11-15 AI 이미지 배경 제거 호환성 및 메모리 개선 (검증 대기)
 - 작업 브랜치: `fix/background-remover-inference-memory`
 - Transformers.js 입력을 Blob에서 HTMLImageElement로 변경해 이미지 파이프라인 입력 형식 호환성 개선
