@@ -1,3 +1,10 @@
+## 2026-11-16 AI 블로그 에이전트 이미지 업로드 API 추가
+- `POST /api/agent/blog/images`에 별도 Bearer 토큰 인증 적용
+- 기존 R2 이미지 저장 구조 재사용, JPG/PNG/WebP/AVIF 지원 및 5MB 제한
+- MIME 유형뿐 아니라 파일 시그니처도 검사하고 캐시 및 no-store 응답 헤더 적용
+- 기존 관리자 세션 기반 이미지 업로드 API는 변경하지 않음
+- 빌드, 인증 실패/성공, R2 실업로드 테스트 대기
+
 ## 2026-11-15 AI 블로그 관리 API 추가 (작업 브랜치)
 - 관리자 세션과 분리된 `BLOG_AGENT_API_TOKEN` Bearer 인증 모듈 추가
 - 게시글 조회 및 신규 등록/수정 전용 API 추가: `/api/agent/blog/posts`
