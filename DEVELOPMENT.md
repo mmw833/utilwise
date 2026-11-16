@@ -1,3 +1,13 @@
+## Cloudflare 방문자 통계 연동 (2026-11-17 작업 브랜치)
+- 홈 헤더 컴포넌트: `components/SiteVisitorStats.tsx`
+- 통계 API: `GET /api/analytics/visitors`
+- Cloudflare GraphQL endpoint: `https://api.cloudflare.com/client/v4/graphql`
+- Worker runtime 환경변수(Secret): `CLOUDFLARE_API_TOKEN`; 일반 변수 또는 Secret: `CLOUDFLARE_ZONE_ID`
+- 조회 데이터셋: `httpRequests1hGroups`; 한국시간 오늘 00:00부터 현재까지 `uniq.uniques` 조회
+- TODAY는 Cloudflare 고유 IP 수이며, TOTAL은 기존 D1의 브라우저 쿠키 기반 누적 방문자 수다. 두 값은 정의가 다르므로 같은 기준의 숫자로 해석하면 안 된다.
+- 토큰/Zone ID가 없거나 API 오류가 나면 기존 D1 통계로 대체한다. 응답에 `source` 필드가 포함되어 실제 Cloudflare 사용 여부를 구분한다.
+- Cloudflare 설정 전에는 기존 통계가 표시된다. 운영 적용 전 GraphQL 권한, Zone 리소스 범위, API 응답, 한국시간 경계, GitHub Actions 빌드 및 실제 헤더 표시를 검증한다.
+
 ## AI 블로그 관리 API (작업 브랜치)
 - Endpoint: `GET/POST /api/agent/blog/posts`
 - Authentication: `Authorization: Bearer <BLOG_AGENT_API_TOKEN>`
