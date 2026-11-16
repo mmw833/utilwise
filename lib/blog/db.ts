@@ -25,8 +25,6 @@ interface D1Database {
 type BlogCloudflareEnv = {
   BLOG_DB: D1Database;
   BLOG_IMAGES?: R2BucketLike;
-  CLOUDFLARE_API_TOKEN?: string;
-  CLOUDFLARE_ZONE_ID?: string;
 };
 
 export interface R2BucketLike {
@@ -51,7 +49,10 @@ export function getBlogDatabase(): D1Database {
 
 export function getCloudflareAnalyticsConfig(): { apiToken: string; zoneId: string } | null {
   const { env } = getCloudflareContext();
-  const cloudflareEnv = env as unknown as BlogCloudflareEnv;
+  const cloudflareEnv = env as unknown as {
+    CLOUDFLARE_API_TOKEN?: string;
+    CLOUDFLARE_ZONE_ID?: string;
+  };
   const apiToken = cloudflareEnv.CLOUDFLARE_API_TOKEN?.trim();
   const zoneId = cloudflareEnv.CLOUDFLARE_ZONE_ID?.trim();
 
