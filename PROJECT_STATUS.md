@@ -1,10 +1,10 @@
-## 2026-11-16 블로그 이미지 직접 전달 릴레이 보완 (PR #41 작업 중)
-- 요청 JSON에 image_mime_type + image_base64를 포함해 이미지 데이터를 전달하는 방식 추가
-- GitHub Actions에서 Base64 복원 후 5MB 제한, MIME 허용 목록, 파일 시그니처 확인을 거쳐 기존 UTILWISE R2 이미지 API로 업로드
-- 기존 image_path 방식도 유지하고 두 입력 방식의 동시 사용은 거부
-- 이미지 Base64 필드는 게시글 API 전송 전에 제거하며 게시글 상태는 draft로 강제
-- **미완료:** PR 빌드 및 워크플로 구문 검증, GitHub Actions Secret 설정 확인, 실제 이미지 전달·업로드·게시글 임시저장 E2E 테스트
-- **제약:** ChatGPT에 첨부된 로컬 이미지 파일을 GitHub 요청 JSON에 자동으로 주입할 경로는 별도 검증 필요. 이미지 전송 경로까지 실동작 확인해야 완료로 처리
+## 2026-11-16 블로그 글 텍스트 임시저장 연결로 단순화 (PR #42)
+- 대표 이미지 자동 전송은 지원 범위에서 제외하고 제목·요약·본문·SEO·카테고리·태그 텍스트만 전달하도록 변경
+- GitHub Actions에서 요청 JSON 검증 후 기존 `POST /api/agent/blog/posts` 호출
+- 저장 상태는 항상 `draft`로 강제하며 자동 발행·수정·삭제는 수행하지 않음
+- 요청 브랜치 `blog-agent-request/**`의 `requests/post.json` 변경만 처리하며 운영 배포와 분리
+- **미완료:** PR 빌드 및 워크플로 검증, GitHub Actions Secret `BLOG_AGENT_API_TOKEN` 설정 확인, 인증 성공 및 실제 게시글 임시저장 테스트
+- **제약:** 실행 결과는 GitHub Actions Step Summary에서 확인해야 하며 ChatGPT 대화로 자동 회신되지는 않음
 
 ## 2026-11-16 블로그 GitHub 자동 등록 릴레이 구현 (PR 검증 대기)
 - 작업 브랜치: feature/blog-agent-github-relay
