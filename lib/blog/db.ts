@@ -30,6 +30,7 @@ type BlogCloudflareEnv = {
 export interface R2BucketLike {
   put(key: string, value: ArrayBuffer | ArrayBufferView | ReadableStream, options?: { httpMetadata?: { contentType?: string; cacheControl?: string } }): Promise<unknown>;
   get(key: string): Promise<{ body: ReadableStream; httpMetadata?: { contentType?: string }; httpEtag?: string; etag?: string } | null>;
+  list(options?: { prefix?: string; cursor?: string }): Promise<{ objects: Array<{ key: string }>; truncated: boolean; cursor?: string }>;
 }
 
 /**
@@ -45,6 +46,19 @@ export function getBlogDatabase(): D1Database {
   }
 
   return blogEnv.BLOG_DB;
+}
+
+export function getCloudflareAnalyticsConfig(): { apiToken: string; zoneId: string } | null {
+  const { env } = getCloudflareContext();
+  const cloudflareEnv = env as unknown as {
+    CLOUDFLARE_API_TOKEN?: string;
+    CLOUDFLARE_ZONE_ID?: string;
+  };
+  const apiToken = cloudflareEnv.CLOUDFLARE_API_TOKEN?.trim();
+  const zoneId = cloudflareEnv.CLOUDFLARE_ZONE_ID?.trim();
+
+  if (!apiToken || !zoneId) return null;
+  return { apiToken, zoneId };
 }
 
 export function getBlogImageBucket(): R2BucketLike {

@@ -1,3 +1,14 @@
+## Cloudflare 방문자 통계
+- 홈 헤더 컴포넌트: `components/SiteVisitorStats.tsx`
+- 통계 API: `GET /api/analytics/visitors`
+- Cloudflare GraphQL endpoint: `https://api.cloudflare.com/client/v4/graphql`
+- Worker 런타임 환경변수: Secret `CLOUDFLARE_API_TOKEN`, 변수 `CLOUDFLARE_ZONE_ID`
+- TODAY는 한국시간 오늘 00:00부터 현재까지의 Cloudflare 고유 방문자(`uniq.uniques`)
+- 최초 API 실행 시 사용자 제공 기준값 1,260명을 TOTAL 시작값으로 기존 R2 버킷에 1회 저장
+- 이후 날짜별 TODAY 고유 방문자 수를 `visitor-stats/daily/YYYY-MM-DD.json`에 저장하고, 시작값에 날짜별 값을 더해 TOTAL 계산
+- 날짜별 저장값은 같은 날짜 키에 덮어쓰므로 같은 날 API가 여러 번 호출되어도 중복 합산하지 않음. 다른 날짜 재방문은 다시 집계됨
+- D1은 방문자 통계에 사용하지 않으며 블로그 데이터용으로 유지
+- Worker Secret/Zone ID, Analytics 권한, R2 list/get/put 권한, 실제 GraphQL 응답, 빌드 및 운영 헤더 표시를 검증한 뒤 병합
 ## AI 블로그 관리 API (작업 브랜치)
 - Endpoint: `GET/POST /api/agent/blog/posts`
 - Authentication: `Authorization: Bearer <BLOG_AGENT_API_TOKEN>`

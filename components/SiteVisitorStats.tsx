@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type VisitorStats = { today: number; total: number };
+type VisitorStats = { today: number; total: number; source?: "cloudflare" };
 
 export default function SiteVisitorStats() {
   const [stats, setStats] = useState<VisitorStats | null>(null);
@@ -11,25 +11,32 @@ export default function SiteVisitorStats() {
     let active = true;
     const refresh = async () => {
       try {
-        const response = await fetch("/api/blog/visit", { cache: "no-store" });
-        if (!response.ok) return;
+        const response = await fetch("/api/analytics/visitors", { cache: "no-store" });
+        if (!response.ok) {
+          if (active) setStats(null);
+          return;
+        }
         const data = (await response.json()) as VisitorStats;
         if (active && Number.isFinite(data.today) && Number.isFinite(data.total)) setStats(data);
       } catch {
-        // Visitor statistics are non-essential; keep the header clean if unavailable.
+        if (active) setStats(null);
       }
     };
-    const handleTracked = () => { void refresh(); };
-    window.addEventListener("uw:visitor-tracked", handleTracked);
+
     void refresh();
+    const interval = window.setInterval(() => { void refresh(); }, 5 * 60 * 1000);
     return () => {
       active = false;
-      window.removeEventListener("uw:visitor-tracked", handleTracked);
+      window.clearInterval(interval);
     };
   }, []);
 
   return (
-    <div className="site-visitor-stats" aria-label="Site visitors">
+    <div
+      className="site-visitor-stats"
+      aria-label="Site visitors"
+      title="TODAY: Cloudflare unique visitors today (Korea time). TOTAL: one-time 30-day starting count plus daily visitors accumulated since setup."
+    >
       <span><span className="site-visitor-label">TODAY</span> <strong>{stats ? stats.today.toLocaleString() : "—"}</strong></span>
       <span><span className="site-visitor-label">TOTAL</span> <strong>{stats ? stats.total.toLocaleString() : "—"}</strong></span>
     </div>
