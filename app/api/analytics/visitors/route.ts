@@ -1,29 +1,126 @@
 import { NextResponse } from "next/server";
-import { getCloudflareAnalyticsConfig } from "@/lib/blog/db";
+import {
+  getBlogImageBucket,
+  getCloudflareAnalyticsConfig,
+} from "@/lib/blog/db";
 
 export const dynamic = "force-dynamic";
-
-let cachedStats: { today: number; total: number; expiresAt: number } | null = null;
 
 type AnalyticsGroup = { uniq?: { uniques?: number } };
 type CloudflareAnalyticsResponse = {
   data?: {
     viewer?: {
-      zones?: Array<{
-        today: AnalyticsGroup[];
-        total: AnalyticsGroup[];
-      }>;
+      zones?: Array<{ visitors: AnalyticsGroup[] }>;
     };
   };
   errors?: Array<{ message?: string }>;
 };
 
-function koreaDayStart(now: Date): Date {
-  const utcMs = now.getTime();
-  const koreaOffsetMs = 9 * 60 * 60 * 1000;
-  const koreaMidnightUtcMs =
-    Math.floor((utcMs + koreaOffsetMs) / 86400000) * 86400000 - koreaOffsetMs;
-  return new Date(koreaMidnightUtcMs);
+type R2Object = { key: string };
+type R2ListResult = { objects: R2Object[]; truncated: boolean; cursor?: string };
+
+const BASELINE_KEY = "visitor-stats/baseline.json";
+const DAILY_PREFIX = "visitor-stats/daily/";
+const KOREA_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+function koreaDate(now: Date): string {
+  return new Date(now.getTime() + KOREA_OFFSET_MS).toISOString().slice(0, 10);
+}
+
+function koreaMidnightUtc(date: string): Date {
+  return new Date(new Date(`${date}T00:00:00+09:00`).getTime());
+}
+
+function previousKoreaDate(date: string): string {
+  const previous = new Date(`${date}T00:00:00+09:00`);
+  previous.setUTCDate(previous.getUTCDate() - 1);
+  return previous.toISOString().slice(0, 10);
+}
+
+async function readJson<T>(bucket: ReturnType<typeof getBlogImageBucket>, key: string): Promise<T | null> {
+  const object = await bucket.get(key);
+  if (!object) return null;
+  return JSON.parse(await new Response(object.body).text()) as T;
+}
+
+async function queryCloudflareVisitors(
+  apiToken: string,
+  zoneId: string,
+  start: Date,
+  end: Date,
+): Promise<number> {
+  const query = `
+    query SiteVisitors($zoneTag: String!, $start: Time!, $end: Time!) {
+      viewer {
+        zones(filter: { zoneTag: $zoneTag }) {
+          visitors: httpRequests1hGroups(
+            limit: 1
+            filter: { datetime_geq: $start, datetime_lt: $end }
+          ) {
+            uniq { uniques }
+          }
+        }
+      }
+    }
+  `;
+
+  const response = await fetch("https://api.cloudflare.com/client/v4/graphql", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query,
+      variables: {
+        zoneTag: zoneId,
+        start: start.toISOString(),
+        end: end.toISOString(),
+      },
+    }),
+    signal: AbortSignal.timeout(8000),
+  });
+
+  if (!response.ok) throw new Error("Cloudflare Analytics request failed.");
+  const result = (await response.json()) as CloudflareAnalyticsResponse;
+  const value = result.data?.viewer?.zones?.[0]?.visitors?.[0]?.uniq?.uniques;
+  if (result.errors?.length || !Number.isFinite(value)) {
+    throw new Error("Cloudflare Analytics returned incomplete visitor data.");
+  }
+  return Math.max(0, Math.floor(Number(value)));
+}
+
+async function saveDailySnapshot(
+  bucket: ReturnType<typeof getBlogImageBucket>,
+  date: string,
+  visitors: number,
+): Promise<void> {
+  await bucket.put(
+    `${DAILY_PREFIX}${date}.json`,
+    JSON.stringify({ date, visitors }),
+    { httpMetadata: { contentType: "application/json" } },
+  );
+}
+
+async function sumDailySnapshots(
+  bucket: ReturnType<typeof getBlogImageBucket>,
+): Promise<number> {
+  let cursor: string | undefined;
+  let total = 0;
+
+  do {
+    const page: R2ListResult = await (bucket as unknown as {
+      list(options: { prefix: string; cursor?: string }): Promise<R2ListResult>;
+    }).list({ prefix: DAILY_PREFIX, ...(cursor ? { cursor } : {}) });
+
+    for (const object of page.objects) {
+      const snapshot = await readJson<{ visitors?: number }>(bucket, object.key);
+      if (Number.isFinite(snapshot?.visitors)) total += Math.max(0, Math.floor(snapshot!.visitors!));
+    }
+    cursor = page.truncated ? page.cursor : undefined;
+  } while (cursor);
+
+  return total;
 }
 
 export async function GET() {
@@ -36,85 +133,46 @@ export async function GET() {
       );
     }
 
-    if (cachedStats && cachedStats.expiresAt > Date.now()) {
-      return NextResponse.json(
-        { today: cachedStats.today, total: cachedStats.total, source: "cloudflare", totalPeriodDays: 30 },
-        { headers: { "Cache-Control": "private, max-age=60" } },
-      );
-    }
-
+    const bucket = getBlogImageBucket();
     const now = new Date();
-    const todayStart = koreaDayStart(now);
-    const totalStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-    const query = `
-      query SiteVisitors($zoneTag: String!, $todayStart: Time!, $totalStart: Time!, $end: Time!) {
-        viewer {
-          zones(filter: { zoneTag: $zoneTag }) {
-            today: httpRequests1hGroups(
-              limit: 1
-              filter: { datetime_geq: $todayStart, datetime_lt: $end }
-            ) {
-              uniq { uniques }
-            }
-            total: httpRequests1hGroups(
-              limit: 1
-              filter: { datetime_geq: $totalStart, datetime_lt: $end }
-            ) {
-              uniq { uniques }
-            }
-          }
-        }
-      }
-    `;
+    const today = koreaDate(now);
+    const todayStart = koreaMidnightUtc(today);
+    const yesterday = previousKoreaDate(today);
 
-    const response = await fetch("https://api.cloudflare.com/client/v4/graphql", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${config.apiToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query,
-        variables: {
-          zoneTag: config.zoneId,
-          todayStart: todayStart.toISOString(),
-          totalStart: totalStart.toISOString(),
-          end: now.toISOString(),
-        },
-      }),
-      signal: AbortSignal.timeout(8000),
-    });
-
-    if (!response.ok) {
-      return NextResponse.json(
-        { error: "Cloudflare Analytics request failed.", source: "unavailable" },
-        { status: 502, headers: { "Cache-Control": "no-store" } },
+    // Initialize the starting total only once: the 30 full Korea-calendar days
+    // immediately before today. Later requests never query this 30-day range again.
+    let baseline = await readJson<{ total: number; throughDate: string }>(bucket, BASELINE_KEY);
+    if (!baseline) {
+      const baselineEnd = koreaMidnightUtc(today);
+      const baselineStart = new Date(baselineEnd.getTime() - 30 * 86400000);
+      const initialTotal = await queryCloudflareVisitors(
+        config.apiToken,
+        config.zoneId,
+        baselineStart,
+        baselineEnd,
       );
+      baseline = { total: initialTotal, throughDate: yesterday };
+      await bucket.put(BASELINE_KEY, JSON.stringify(baseline), {
+        httpMetadata: { contentType: "application/json" },
+      });
+      // Re-read after writing so simultaneous first requests converge on the saved baseline.
+      baseline = (await readJson<{ total: number; throughDate: string }>(bucket, BASELINE_KEY)) ?? baseline;
     }
 
-    const result = (await response.json()) as CloudflareAnalyticsResponse;
-    const zone = result.data?.viewer?.zones?.[0];
-    const todayValue = zone?.today?.[0]?.uniq?.uniques;
-    const totalValue = zone?.total?.[0]?.uniq?.uniques;
+    const todayVisitors = await queryCloudflareVisitors(
+      config.apiToken,
+      config.zoneId,
+      todayStart,
+      now,
+    );
+    // A date-keyed snapshot is overwritten with the latest daily unique count.
+    // This prevents duplicate additions when multiple visitors load the page.
+    await saveDailySnapshot(bucket, today, todayVisitors);
 
-    if (
-      result.errors?.length ||
-      !Number.isFinite(todayValue) ||
-      !Number.isFinite(totalValue)
-    ) {
-      return NextResponse.json(
-        { error: "Cloudflare Analytics returned incomplete visitor data.", source: "unavailable" },
-        { status: 502, headers: { "Cache-Control": "no-store" } },
-      );
-    }
-
-    const today = Math.max(0, Math.floor(Number(todayValue)));
-    const total = Math.max(today, Math.floor(Number(totalValue)));
-    cachedStats = { today, total, expiresAt: Date.now() + 5 * 60 * 1000 };
-
+    const total = baseline.total + await sumDailySnapshots(bucket);
     return NextResponse.json(
-      { today, total, source: "cloudflare", totalPeriodDays: 30 },
-      { headers: { "Cache-Control": "private, max-age=300, stale-while-revalidate=60" } },
+      { today: todayVisitors, total, source: "cloudflare", totalMode: "initial-30-days-plus-daily" },
+      { headers: { "Cache-Control": "private, max-age=60" } },
     );
   } catch {
     return NextResponse.json(
