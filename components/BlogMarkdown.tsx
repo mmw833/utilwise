@@ -16,6 +16,13 @@ function safeImageSrc(value: string): string | null {
 function inline(text: string, en: boolean): ReactNode[] {
   const parts = text.split(/(\[\[tool:[a-z0-9-]+\]\]|!\[[^\]]*\]\([^)]+\)|\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g);
   return parts.map((part, index) => {
+    const toolToken = part.match(/^\\[\\[tool:([a-z0-9-]+)\\]\\]$/);
+    if (toolToken) {
+      const tool = findRelatedTool(toolToken[1]);
+      if (!tool) return null;
+      const href = en ? `/en${tool.href}` : tool.href;
+      return <Link key={index} className="blog-inline-tool-button" href={href}>{en ? tool.en : tool.ko}<span aria-hidden="true">↗</span></Link>;
+    }
     const image = part.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
     if (image) {
       const src = safeImageSrc(image[2]);
