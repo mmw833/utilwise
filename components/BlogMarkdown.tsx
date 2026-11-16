@@ -29,7 +29,7 @@ function inline(text: string, en: boolean): ReactNode[] {
       if (!src) return null;
       const meta = image[1].match(/^(.*?)\|width=(3[0-9]|[4-9][0-9]|100)%\|align=(left|center|right)$/);
       const alt = (meta ? meta[1] : image[1]).slice(0, 180);
-      const width = meta ? (meta[2].endsWith("%") ? meta[2] : meta[2] + "%") : "100%";
+      const width = meta ? meta[2] + "%" : "100%";
       const align = meta ? meta[3] : "center";
       return <span key={index} className={`blog-markdown-image is-${align}`} style={{ width }}><img src={src} alt={alt} loading="lazy" /></span>;
     }
@@ -44,7 +44,6 @@ function inline(text: string, en: boolean): ReactNode[] {
   });
 }
 
-/** Small safe Markdown subset for editorial posts. Raw HTML is rendered as text, never injected. */
 export default function BlogMarkdown({ content, language = "ko" }: { content: string; language?: "ko" | "en" }) {
   const lines = content.replace(/\r\n?/g, "\n").split("\n");
   const blocks: ReactNode[] = [];
@@ -69,7 +68,7 @@ export default function BlogMarkdown({ content, language = "ko" }: { content: st
     }
     if (/^[-*]\s+/.test(trimmed)) { flushParagraph(); list.push(trimmed.replace(/^[-*]\s+/, "")); continue; }
     flushList();
-    if (/^>\s?/.test(trimmed)) { flushParagraph(); blocks.push(<blockquote key={blocks.length}>{inline(trimmed.replace(/^>\s?/, ""))}</blockquote>); continue; }
+    if (/^>\s?/.test(trimmed)) { flushParagraph(); blocks.push(<blockquote key={blocks.length}>{inline(trimmed.replace(/^>\s?/, ""), language === "en")}</blockquote>); continue; }
     paragraph.push(trimmed);
   }
   flushParagraph(); flushList();
