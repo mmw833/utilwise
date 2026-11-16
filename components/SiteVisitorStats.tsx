@@ -24,7 +24,7 @@ export default function SiteVisitorStats() {
     };
 
     void refresh();
-    const interval = window.setInterval(() => { void refresh(); }, 5 * 60 * 1000);
+    const interval = window.setInterval(() => { void refresh(); }, 60 * 60 * 1000);
     return () => {
       active = false;
       window.clearInterval(interval);
