@@ -1,11 +1,12 @@
-## 2026-11-17 Cloudflare 방문자 통계 연동 (PR 검증 대기)
+## 2026-11-17 Cloudflare 방문자 통계 전용 전환 (PR 검증 대기)
 - 작업 브랜치: `fix/cloudflare-visitor-analytics`
-- 홈 헤더의 TODAY 수치를 Cloudflare GraphQL Analytics의 한국시간 당일 고유 IP 수(`uniq.uniques`)로 조회하도록 전용 서버 API 추가: `GET /api/analytics/visitors`
-- TOTAL은 기존 D1의 쿠키 기반 누적 방문자 수를 유지하며 기존 기록은 삭제·변경하지 않음. TODAY와 TOTAL은 집계 기준이 서로 다름.
-- Cloudflare API 토큰과 Zone ID는 Worker 런타임 환경변수 `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ZONE_ID`로만 읽으며 코드에 비밀값을 저장하지 않음
-- Cloudflare 설정이 없거나 API 오류 시 기존 D1 통계로 대체. TODAY의 실제 Cloudflare 수치 확인 전 완료로 간주하지 않음.
-- **미완료:** Cloudflare Worker Secret/변수 설정, API 토큰의 Zone Analytics 권한 및 Zone 리소스 범위 확인, GitHub Actions 빌드/타입 검사, 운영에서 Cloudflare 수치와 대시보드 비교
-- **주의:** Cloudflare unique visitors는 IP 기준 고유 수치로, 기존 D1의 브라우저 쿠키 기반 사용자 수와 동일한 지표가 아님.
+- 홈 헤더 방문자 수는 Cloudflare GraphQL Analytics 데이터만 사용. D1 방문자 조회·대체·합산 경로 제거
+- TODAY: 한국시간 오늘 00:00부터 현재까지 Cloudflare 고유 방문자(`uniq.uniques`)
+- TOTAL: Cloudflare가 조회할 수 있는 최근 30일 고유 방문자. 평생 누적이 아니며 Cloudflare 보관 기간 내 수치임을 툴팁으로 안내
+- Cloudflare 설정 누락/API 오류 시 D1로 대체하지 않고 숫자 대신 대시(—) 표시
+- 기존 D1은 블로그 콘텐츠 등 다른 기능을 위해 유지하며 방문자 통계의 데이터 소스로만 사용하지 않음
+- **미완료:** Worker Secret/Zone ID 설정, Analytics 권한 확인, GraphQL 실제 응답, 빌드/타입 검사, 운영 대시보드와 수치 비교
+
 
 ## 2026-11-16 블로그 글 텍스트 임시저장 연결 (PR #42)
 - 작업 브랜치: `feature/blog-agent-github-relay`
