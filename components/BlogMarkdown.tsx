@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
+import { findRelatedTool } from "@/lib/tools/registry";
 
 function safeHref(value: string): string | null {
   const href = value.trim();
@@ -11,8 +13,8 @@ function safeImageSrc(value: string): string | null {
   return /^\/api\/blog\/images\/blog\/[0-9a-f-]{36}\.(jpg|png|webp|avif)$/i.test(src) ? src : null;
 }
 
-function inline(text: string): ReactNode[] {
-  const parts = text.split(/(!\[[^\]]*\]\([^)]+\)|\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g);
+function inline(text: string, en: boolean): ReactNode[] {
+  const parts = text.split(/(\[\[tool:[a-z0-9-]+\]\]|!\[[^\]]*\]\([^)]+\)|\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g);
   return parts.map((part, index) => {
     const image = part.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
     if (image) {
@@ -36,16 +38,16 @@ function inline(text: string): ReactNode[] {
 }
 
 /** Small safe Markdown subset for editorial posts. Raw HTML is rendered as text, never injected. */
-export default function BlogMarkdown({ content }: { content: string }) {
+export default function BlogMarkdown({ content, language = "ko" }: { content: string; language?: "ko" | "en" }) {
   const lines = content.replace(/\r\n?/g, "\n").split("\n");
   const blocks: ReactNode[] = [];
   let paragraph: string[] = [];
   let list: string[] = [];
   const flushParagraph = () => {
-    if (paragraph.length) { blocks.push(<p key={`p-${blocks.length}`}>{inline(paragraph.join(" "))}</p>); paragraph = []; }
+    if (paragraph.length) { blocks.push(<p key={`p-${blocks.length}`}>{inline(paragraph.join(" "), language === "en")}</p>); paragraph = []; }
   };
   const flushList = () => {
-    if (list.length) { blocks.push(<ul key={`ul-${blocks.length}`}>{list.map((item, i) => <li key={i}>{inline(item)}</li>)}</ul>); list = []; }
+    if (list.length) { blocks.push(<ul key={`ul-${blocks.length}`}>{list.map((item, i) => <li key={i}>{inline(item, language === "en")}</li>)}</ul>); list = []; }
   };
   for (const line of lines) {
     const trimmed = line.trim();
@@ -54,7 +56,7 @@ export default function BlogMarkdown({ content }: { content: string }) {
     if (heading) {
       flushParagraph(); flushList();
       const level = heading[1].length;
-      const contentNode = inline(heading[2]);
+      const contentNode = inline(heading[2], language === "en");
       blocks.push(level === 1 ? <h2 key={blocks.length}>{contentNode}</h2> : level === 2 ? <h3 key={blocks.length}>{contentNode}</h3> : <h4 key={blocks.length}>{contentNode}</h4>);
       continue;
     }
