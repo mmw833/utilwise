@@ -1,13 +1,11 @@
-## 2026-11-17 Cloudflare 방문자 통계 전용 전환 (PR 검증 대기)
+## 2026-11-17 Cloudflare 방문자 TOTAL 누적 방식 (PR #44 검증 대기)
 - 작업 브랜치: `fix/cloudflare-visitor-analytics`
-- 홈 헤더 방문자 수는 Cloudflare GraphQL Analytics 데이터만 사용. D1 방문자 조회·대체·합산 경로 제거
-- TODAY: 한국시간 오늘 00:00부터 현재까지 Cloudflare 고유 방문자(`uniq.uniques`)
-- TOTAL: Cloudflare가 조회할 수 있는 최근 30일 고유 방문자. 평생 누적이 아니며 Cloudflare 보관 기간 내 수치임을 툴팁으로 안내
-- Cloudflare 설정 누락/API 오류 시 D1로 대체하지 않고 숫자 대신 대시(—) 표시
-- 기존 D1은 블로그 콘텐츠 등 다른 기능을 위해 유지하며 방문자 통계의 데이터 소스로만 사용하지 않음
-- **미완료:** Worker Secret/Zone ID 설정, Analytics 권한 확인, GraphQL 실제 응답, 빌드/타입 검사, 운영 대시보드와 수치 비교
-
-
+- 홈 헤더 TODAY/TOTAL은 Cloudflare Analytics만 사용하며 D1 방문자 데이터는 사용하지 않음
+- 최초 1회 최근 30일(오늘 제외) Cloudflare 고유 방문자 수를 TOTAL 시작값으로 기존 R2에 저장
+- 이후 한국시간 날짜별 TODAY 방문자 수를 R2에 저장하고 합산. 같은 날짜는 덮어쓰기 때문에 중복 호출로 이중 합산되지 않음
+- 다른 날짜에 다시 방문한 사람은 해당 날짜 방문자로 다시 집계. TOTAL은 누적 방문일 합계이지 평생 고유 인원 수가 아님
+- D1은 블로그 등 기존 기능을 위해 그대로 유지
+- **미완료:** Cloudflare API 토큰/Zone ID 설정, Analytics 권한, GraphQL 집계값, R2 list/get/put 동작, 빌드/타입 검사, 운영 수치 비교 및 UI 확인
 ## 2026-11-16 블로그 글 텍스트 임시저장 연결 (PR #42)
 - 작업 브랜치: `feature/blog-agent-github-relay`
 - 대표 이미지 자동 전송은 제외하고 제목·요약·본문·SEO 제목/설명·카테고리·태그 텍스트만 기존 게시글 API로 전달
