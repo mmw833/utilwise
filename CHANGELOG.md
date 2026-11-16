@@ -1,3 +1,12 @@
+## 2026-11-16 블로그 GitHub 자동 등록 릴레이 구현 (PR 검증 대기)
+- 운영 배포와 분리된 전용 GitHub Actions 워크플로 추가
+- blog-agent-request/** 요청 브랜치의 requests/post.json만 처리
+- 선택 대표이미지를 기존 인증 API로 R2 업로드한 뒤 게시글을 D1에 임시저장(draft 강제)
+- main 브랜치에 요청 파일을 쓰지 않고, 운영 배포 워크플로와 분리
+- 설정 문서 추가: docs/blog-agent-github-relay.md
+- GitHub Actions 결과 요약 출력 추가
+- GitHub 저장소 Secret BLOG_AGENT_API_TOKEN 설정 및 실제 API E2E 검증 대기
+
 ## 2026-11-16 AI 블로그 에이전트 이미지 업로드 API 추가
 - `POST /api/agent/blog/images`에 별도 Bearer 토큰 인증 적용
 - 기존 R2 이미지 저장 구조 재사용, JPG/PNG/WebP/AVIF 지원 및 5MB 제한

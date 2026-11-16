@@ -1,3 +1,13 @@
+## 2026-11-16 블로그 GitHub 자동 등록 릴레이 구현 (PR 검증 대기)
+- 작업 브랜치: feature/blog-agent-github-relay
+- 운영 배포와 분리된 GitHub Actions 워크플로 추가: blog-agent-request/** 브랜치의 requests/post.json 변경만 감지
+- 기존 UTILWISE API를 호출해 대표 이미지(R2) 업로드 후 게시글(D1) 임시저장. 상태는 워크플로에서 draft로 강제
+- main 브랜치에 요청 데이터를 쓰지 않으며 운영 배포 워크플로를 실행하지 않음
+- 등록 결과는 GitHub Actions Step Summary에 표시
+- 1회 사용자 설정 필요: GitHub 저장소 Actions Secret BLOG_AGENT_API_TOKEN에 Cloudflare Worker의 동일 토큰 등록
+- **미완료:** PR 빌드/워크플로 정적 검토, GitHub Secret 설정, 인증 성공·이미지 업로드·게시글 임시저장 실동작 테스트, Actions 결과 회신 연결
+- **제약:** 현재 ChatGPT 대화에서 생성된 이미지 바이너리를 GitHub로 직접 전달할 수 있는 경로는 아직 검증되지 않음. 이미지 첨부/전송 경로를 별도로 확인해야 함
+
 ## 2026-11-16 AI 블로그 이미지 업로드 API 추가 (빌드·보안·운영 검증 대기)
 - `POST /api/agent/blog/images` 추가: `BLOG_AGENT_API_TOKEN` Bearer 인증으로 대표 이미지 업로드
 - 기존 관리자 이미지 API와 동일하게 JPG/PNG/WebP/AVIF, 파일당 5MB 제한, 파일 시그니처 검사, 기존 R2 `BLOG_IMAGES` 버킷 재사용

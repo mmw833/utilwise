@@ -1,0 +1,70 @@
+name: UTILWISE Blog Agent Relay
+
+on:
+  push:
+    branches:
+      - 'blog-agent-request/**'
+    paths:
+      - 'requests/post.json'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: utilwise-blog-agent-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  save-draft:
+    name: Upload image and save blog draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout request branch
+        uses: actions/checkout@v4
+
+      - name: Validate request
+        id: request
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f requests/post.json
+          jq -e '(.post | type == "object") and (.post.language == "ko" or .post.language == "en") and (.post.title | type == "string" and length > 0 and length <= 180) and (.post.content_md | type == "string" and length <= 100000)' requests/post.json > /dev/null
+          IMAGE_PATH="$(jq -r '.image_path // empty' requests/post.json)"
+          if [ -n "$IMAGE_PATH" ]; then
+            case "$IMAGE_PATH" in
+              assets/cover.jpg|assets/cover.jpeg|assets/cover.png|assets/cover.webp|assets/cover.avif) ;;
+              *) echo "::error::Unsupported image path"; exit 1 ;;
+            esac
+            test -f "$IMAGE_PATH"
+          fi
+          echo "image_path=$IMAGE_PATH" >> "$GITHUB_OUTPUT"
+
+      - name: Upload cover image to UTILWISE R2
+        id: image
+        if: steps.request.outputs.image_path != ''
+        env:
+          BLOG_AGENT_API_TOKEN: ${{ secrets.BLOG_AGENT_API_TOKEN }}
+          IMAGE_PATH: ${{ steps.request.outputs.image_path }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$BLOG_AGENT_API_TOKEN" || { echo "::error::Repository secret BLOG_AGENT_API_TOKEN is missing"; exit 1; }
+          RESPONSE="$(curl --silent --show-error --fail-with-body -H "Authorization: Bearer $BLOG_AGENT_API_TOKEN" -F "file=@$IMAGE_PATH" https://utilwise.kr/api/agent/blog/images)"
+          KEY="$(printf '%s' "$RESPONSE" | jq -er '.key')"
+          echo "cover_image_key=$KEY" >> "$GITHUB_OUTPUT"
+
+      - name: Save post as draft
+        env:
+          BLOG_AGENT_API_TOKEN: ${{ secrets.BLOG_AGENT_API_TOKEN }}
+          IMAGE_KEY: ${{ steps.image.outputs.cover_image_key }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$BLOG_AGENT_API_TOKEN" || { echo "::error::Repository secret BLOG_AGENT_API_TOKEN is missing"; exit 1; }
+          jq --arg image_key "$IMAGE_KEY" '.post | .status = "draft" | if $image_key != "" then .cover_image_key = $image_key else . end' requests/post.json > /tmp/post.json
+          RESPONSE="$(curl --silent --show-error --fail-with-body -H "Authorization: Bearer $BLOG_AGENT_API_TOKEN" -H "Content-Type: application/json" --data-binary @/tmp/post.json https://utilwise.kr/api/agent/blog/posts)"
+          echo "## UTILWISE 블로그 임시저장 결과" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "$RESPONSE" | jq . >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
