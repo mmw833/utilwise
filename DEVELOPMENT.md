@@ -4,12 +4,11 @@
 - Cloudflare GraphQL endpoint: `https://api.cloudflare.com/client/v4/graphql`
 - Worker 런타임 환경변수: Secret `CLOUDFLARE_API_TOKEN`, 변수 `CLOUDFLARE_ZONE_ID`
 - TODAY는 한국시간 오늘 00:00부터 현재까지의 Cloudflare 고유 방문자(`uniq.uniques`)
-- TOTAL은 Cloudflare Analytics에서 조회하는 최근 30일 고유 방문자이며 평생 누적 수치가 아님
-- 방문자 API는 D1 방문자 집계에 접근하지 않는다. Cloudflare 설정 누락 또는 API 오류 시 D1 fallback 없이 오류 응답을 보내고 화면은 — 표시
-- D1은 블로그 데이터 저장 등 기존 서비스 기능을 위해 그대로 유지
-- Worker 설정, Analytics 권한, 실제 API 응답, 한국시간 경계, 빌드 및 운영 헤더 표시를 검증한 뒤 병합
-
-
+- 최초 API 실행 시 직전 30일(오늘 제외) Cloudflare 고유 방문자를 TOTAL 시작값으로 기존 R2 버킷에 1회 저장
+- 이후 날짜별 TODAY 고유 방문자 수를 `visitor-stats/daily/YYYY-MM-DD.json`에 저장하고, 시작값에 날짜별 값을 더해 TOTAL 계산
+- 날짜별 저장값은 같은 날짜 키에 덮어쓰므로 같은 날 API가 여러 번 호출되어도 중복 합산하지 않음. 다른 날짜 재방문은 다시 집계됨
+- D1은 방문자 통계에 사용하지 않으며 블로그 데이터용으로 유지
+- Worker Secret/Zone ID, Analytics 권한, R2 list/get/put 권한, 실제 GraphQL 응답, 빌드 및 운영 헤더 표시를 검증한 뒤 병합
 ## AI 블로그 관리 API (작업 브랜치)
 - Endpoint: `GET/POST /api/agent/blog/posts`
 - Authentication: `Authorization: Bearer <BLOG_AGENT_API_TOKEN>`
