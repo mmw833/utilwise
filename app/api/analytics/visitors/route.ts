@@ -23,7 +23,7 @@ const BASELINE_KEY = "visitor-stats/baseline.json";
 const DAILY_PREFIX = "visitor-stats/daily/";
 const KOREA_OFFSET_MS = 9 * 60 * 60 * 1000;
 // Set this once to the 30-day visitor count supplied by the site owner before first production use.
-const INITIAL_TOTAL_BASELINE = 0;
+const INITIAL_TOTAL_BASELINE = 1260;
 
 function koreaDate(now: Date): string {
   return new Date(now.getTime() + KOREA_OFFSET_MS).toISOString().slice(0, 10);
