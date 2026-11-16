@@ -16,7 +16,7 @@ function safeImageSrc(value: string): string | null {
 function inline(text: string, en: boolean): ReactNode[] {
   const parts = text.split(/(\[\[tool:[a-z0-9-]+\]\]|!\[[^\]]*\]\([^)]+\)|\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g);
   return parts.map((part, index) => {
-    const toolToken = part.match(/^\\[\\[tool:([a-z0-9-]+)\\]\\]$/);
+    const toolToken = part.match(/^\[\[tool:([a-z0-9-]+)\]\]$/);
     if (toolToken) {
       const tool = findRelatedTool(toolToken[1]);
       if (!tool) return null;
