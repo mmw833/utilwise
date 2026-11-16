@@ -1,19 +1,21 @@
-## 2026-11-16 블로그 글 텍스트 임시저장 연결로 단순화 (PR #42)
-- 대표 이미지 자동 전송은 지원 범위에서 제외하고 제목·요약·본문·SEO·카테고리·태그 텍스트만 전달하도록 변경
-- GitHub Actions에서 요청 JSON 검증 후 기존 `POST /api/agent/blog/posts` 호출
-- 저장 상태는 항상 `draft`로 강제하며 자동 발행·수정·삭제는 수행하지 않음
+## 2026-11-16 블로그 글 텍스트 임시저장 연결 (PR #42)
+- 작업 브랜치: `feature/blog-agent-github-relay`
+- 대표 이미지 자동 전송은 제외하고 제목·요약·본문·SEO 제목/설명·카테고리·태그 텍스트만 기존 게시글 API로 전달
+- GitHub Actions에서 요청 JSON을 검증하고 게시글 상태를 항상 `draft`로 강제
 - 요청 브랜치 `blog-agent-request/**`의 `requests/post.json` 변경만 처리하며 운영 배포와 분리
-- **미완료:** PR 빌드 및 워크플로 검증, GitHub Actions Secret `BLOG_AGENT_API_TOKEN` 설정 확인, 인증 성공 및 실제 게시글 임시저장 테스트
-- **제약:** 실행 결과는 GitHub Actions Step Summary에서 확인해야 하며 ChatGPT 대화로 자동 회신되지는 않음
+- 자동 발행·수정·삭제는 수행하지 않음. 실행 결과는 GitHub Actions Step Summary에서 확인
+- **미완료:** PR 병합 후 GitHub Actions Secret `BLOG_AGENT_API_TOKEN` 설정 여부 확인, 인증 및 실제 임시저장 E2E 테스트
+- **제약:** 실행 결과를 ChatGPT 대화로 자동 회신하지 않음
 
-## 2026-11-16 블로그 GitHub 글 등록 릴레이 구현 (PR #42)
-- 별도 요청 브랜치의 `requests/post.json`에 텍스트 원고를 저장하면 GitHub Actions가 기존 게시글 API를 호출
-- 한국어·영어, 제목, 요약, 본문, SEO 제목/설명, 카테고리, 태그 전달 지원
-- 대표 이미지 자동 전송은 지원 범위에서 제외
-- 신규 글 상태는 항상 draft로 강제하며 자동 발행·수정·삭제 없음
-- main 요청 파일 미작성, 운영 배포 워크플로와 분리
-- **미완료:** PR 빌드/워크플로 검증, GitHub Actions Secret 설정 확인, 실제 인증 및 임시저장 테스트
-- **제약:** 실행 결과는 GitHub Actions Step Summary에서 확인해야 하며 ChatGPT 대화로 자동 회신되지는 않음
+## 2026-11-16 블로그 GitHub 자동 등록 릴레이 구현 (PR 검증 대기)
+- 작업 브랜치: feature/blog-agent-github-relay
+- 운영 배포와 분리된 GitHub Actions 워크플로 추가: blog-agent-request/** 브랜치의 requests/post.json 변경만 감지
+- 기존 UTILWISE API를 호출해 대표 이미지(R2) 업로드 후 게시글(D1) 임시저장. 상태는 워크플로에서 draft로 강제
+- main 브랜치에 요청 데이터를 쓰지 않으며 운영 배포 워크플로를 실행하지 않음
+- 등록 결과는 GitHub Actions Step Summary에 표시
+- 1회 사용자 설정 필요: GitHub 저장소 Actions Secret BLOG_AGENT_API_TOKEN에 Cloudflare Worker의 동일 토큰 등록
+- **미완료:** PR 빌드/워크플로 정적 검토, GitHub Secret 설정, 인증 성공·이미지 업로드·게시글 임시저장 실동작 테스트, Actions 결과 회신 연결
+- **제약:** 현재 ChatGPT 대화에서 생성된 이미지 바이너리를 GitHub로 직접 전달할 수 있는 경로는 아직 검증되지 않음. 이미지 첨부/전송 경로를 별도로 확인해야 함
 
 ## 2026-11-16 AI 블로그 이미지 업로드 API 추가 (빌드·보안·운영 검증 대기)
 - `POST /api/agent/blog/images` 추가: `BLOG_AGENT_API_TOKEN` Bearer 인증으로 대표 이미지 업로드
