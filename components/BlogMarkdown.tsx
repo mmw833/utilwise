@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
+import { findRelatedTool } from "@/lib/tools/registry";
 
 function safeHref(value: string): string | null {
   const href = value.trim();
@@ -11,16 +13,23 @@ function safeImageSrc(value: string): string | null {
   return /^\/api\/blog\/images\/blog\/[0-9a-f-]{36}\.(jpg|png|webp|avif)$/i.test(src) ? src : null;
 }
 
-function inline(text: string): ReactNode[] {
-  const parts = text.split(/(!\[[^\]]*\]\([^)]+\)|\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g);
+function inline(text: string, en: boolean): ReactNode[] {
+  const parts = text.split(/(\[\[tool:[a-z0-9-]+\]\]|!\[[^\]]*\]\([^)]+\)|\*\*[^*]+\*\*|\*[^*]+\*|\[[^\]]+\]\([^)]+\))/g);
   return parts.map((part, index) => {
+    const toolToken = part.match(/^\[\[tool:([a-z0-9-]+)\]\]$/);
+    if (toolToken) {
+      const tool = findRelatedTool(toolToken[1]);
+      if (!tool) return null;
+      const href = en ? `/en${tool.href}` : tool.href;
+      return <Link key={index} className="blog-inline-tool-button" href={href}>{en ? tool.en : tool.ko}<span aria-hidden="true">↗</span></Link>;
+    }
     const image = part.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
     if (image) {
       const src = safeImageSrc(image[2]);
       if (!src) return null;
       const meta = image[1].match(/^(.*?)\|width=(3[0-9]|[4-9][0-9]|100)%\|align=(left|center|right)$/);
       const alt = (meta ? meta[1] : image[1]).slice(0, 180);
-      const width = meta ? (meta[2].endsWith("%") ? meta[2] : meta[2] + "%") : "100%";
+      const width = meta ? meta[2] + "%" : "100%";
       const align = meta ? meta[3] : "center";
       return <span key={index} className={`blog-markdown-image is-${align}`} style={{ width }}><img src={src} alt={alt} loading="lazy" /></span>;
     }
@@ -35,17 +44,16 @@ function inline(text: string): ReactNode[] {
   });
 }
 
-/** Small safe Markdown subset for editorial posts. Raw HTML is rendered as text, never injected. */
-export default function BlogMarkdown({ content }: { content: string }) {
+export default function BlogMarkdown({ content, language = "ko" }: { content: string; language?: "ko" | "en" }) {
   const lines = content.replace(/\r\n?/g, "\n").split("\n");
   const blocks: ReactNode[] = [];
   let paragraph: string[] = [];
   let list: string[] = [];
   const flushParagraph = () => {
-    if (paragraph.length) { blocks.push(<p key={`p-${blocks.length}`}>{inline(paragraph.join(" "))}</p>); paragraph = []; }
+    if (paragraph.length) { blocks.push(<p key={`p-${blocks.length}`}>{inline(paragraph.join(" "), language === "en")}</p>); paragraph = []; }
   };
   const flushList = () => {
-    if (list.length) { blocks.push(<ul key={`ul-${blocks.length}`}>{list.map((item, i) => <li key={i}>{inline(item)}</li>)}</ul>); list = []; }
+    if (list.length) { blocks.push(<ul key={`ul-${blocks.length}`}>{list.map((item, i) => <li key={i}>{inline(item, language === "en")}</li>)}</ul>); list = []; }
   };
   for (const line of lines) {
     const trimmed = line.trim();
@@ -54,13 +62,13 @@ export default function BlogMarkdown({ content }: { content: string }) {
     if (heading) {
       flushParagraph(); flushList();
       const level = heading[1].length;
-      const contentNode = inline(heading[2]);
+      const contentNode = inline(heading[2], language === "en");
       blocks.push(level === 1 ? <h2 key={blocks.length}>{contentNode}</h2> : level === 2 ? <h3 key={blocks.length}>{contentNode}</h3> : <h4 key={blocks.length}>{contentNode}</h4>);
       continue;
     }
     if (/^[-*]\s+/.test(trimmed)) { flushParagraph(); list.push(trimmed.replace(/^[-*]\s+/, "")); continue; }
     flushList();
-    if (/^>\s?/.test(trimmed)) { flushParagraph(); blocks.push(<blockquote key={blocks.length}>{inline(trimmed.replace(/^>\s?/, ""))}</blockquote>); continue; }
+    if (/^>\s?/.test(trimmed)) { flushParagraph(); blocks.push(<blockquote key={blocks.length}>{inline(trimmed.replace(/^>\s?/, ""), language === "en")}</blockquote>); continue; }
     paragraph.push(trimmed);
   }
   flushParagraph(); flushList();

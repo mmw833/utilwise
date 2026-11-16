@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import BlogMarkdown from "@/components/BlogMarkdown";
+import { RELATED_TOOLS } from "@/lib/tools/registry";
 
 type PostStatus = "draft" | "published" | "archived";
 type Category = { id: string; slug: string; name_ko: string; name_en: string | null };
@@ -119,6 +120,7 @@ export default function AdminBlogManager() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [editor, setEditor] = useState<Editor>(emptyEditor);
   const [tagsInput, setTagsInput] = useState("");
+  const [selectedToolId, setSelectedToolId] = useState(RELATED_TOOLS[0]?.id ?? "");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -307,6 +309,21 @@ export default function AdminBlogManager() {
     document.execCommand(command, false, value);
     rememberEditorSelection();
   }
+  function insertRelatedTool() {
+    const tool = RELATED_TOOLS.find((item) => item.id === selectedToolId);
+    if (!tool || !contentRef.current) return;
+    contentRef.current.focus();
+    if (savedSelectionRef.current) {
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(savedSelectionRef.current);
+    }
+    document.execCommand("insertText", false, `[[tool:${tool.id}]]`);
+    rememberEditorSelection();
+    syncEditorContent();
+    setNotice(`본문에 “${editor.language === "en" ? tool.en : tool.ko}” 버튼을 삽입했습니다.`);
+  }
+
   function insertEditorBlock(tag: "h2" | "h3" | "blockquote") {
     applyEditorCommand("formatBlock", tag);
   }
@@ -582,6 +599,8 @@ export default function AdminBlogManager() {
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("removeFormat")}>서식 지우기</button>
                   </div>
                   <div className="blog-admin-inline-image-tools">
+                    <label>도구 버튼 삽입<select value={selectedToolId} onChange={(e) => setSelectedToolId(e.target.value)}>{RELATED_TOOLS.map((tool) => <option key={tool.id} value={tool.id}>{editor.language === "en" ? tool.en : tool.ko}</option>)}</select></label>
+                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={insertRelatedTool}>본문에 버튼 넣기</button>
                     <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; syncEditorContent(); } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage || uploadingImage} onClick={() => { setCropLeft(10); setCropTop(10); setCropWidth(80); setCropHeight(80); setCropOpen(true); }}>선택 이미지 자르기</button>

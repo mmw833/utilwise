@@ -55,7 +55,7 @@ export default function BlogArticle({ post, language }: { post: BlogPost; langua
       <div className="journal-article-layout">
         
         <div className="journal-article-content">
-          <BlogMarkdown content={post.content_md} />
+          <BlogMarkdown content={post.content_md} language={language} />
           
         </div>
       </div>
