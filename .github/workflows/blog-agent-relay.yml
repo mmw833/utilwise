@@ -34,4 +34,4 @@ jobs:
           jq '.post | .status = "draft" | del(.cover_image_key)' requests/post.json > /tmp/post.json
           RESPONSE="$(curl --silent --show-error --fail-with-body -H "Authorization: Bearer $BLOG_AGENT_API_TOKEN" -H "Content-Type: application/json" --data-binary @/tmp/post.json https://utilwise.kr/api/agent/blog/posts)"
           echo "## UTILWISE 블로그 임시저장 결과" >> "$GITHUB_STEP_SUMMARY"
-          printf '%s\\n' "$RESPONSE" | jq . >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "$RESPONSE" | jq . >> "$GITHUB_STEP_SUMMARY"
