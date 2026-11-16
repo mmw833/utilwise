@@ -1,3 +1,11 @@
+## 2026-11-17 Cloudflare 방문자 통계 연동 (작업 브랜치)
+- 홈 헤더 TODAY 수치를 Cloudflare GraphQL Analytics API에서 가져오는 `/api/analytics/visitors` 서버 엔드포인트 추가
+- 한국시간 자정부터 현재까지의 시간 범위로 조회하며, Cloudflare의 고유 IP 지표(`uniq.uniques`) 사용
+- TOTAL은 기존 D1 누적 쿠키 방문자 수를 유지해 과거 통계를 보존
+- Cloudflare 토큰 및 Zone ID는 Worker 런타임 환경변수에서 읽고 코드/클라이언트에 노출하지 않음
+- 설정 누락/API 오류 시 기존 D1 통계로 fallback
+- Worker 설정, 권한, 실제 API 응답, 빌드 및 운영 비교 검증 대기
+
 ## 2026-11-16 블로그 글 텍스트 임시저장 연결 (PR #42)
 - 대표 이미지 자동 전송 단계를 제외하고 텍스트 게시글만 전달하도록 GitHub Actions 수정
 - 제목, 요약, 본문, SEO 제목/설명, 카테고리, 태그를 기존 게시글 API로 전달
