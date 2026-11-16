@@ -22,13 +22,11 @@ type R2ListResult = { objects: R2Object[]; truncated: boolean; cursor?: string }
 const BASELINE_KEY = "visitor-stats/baseline.json";
 const DAILY_PREFIX = "visitor-stats/daily/";
 const KOREA_OFFSET_MS = 9 * 60 * 60 * 1000;
+// Set this once to the 30-day visitor count supplied by the site owner before first production use.
+const INITIAL_TOTAL_BASELINE = 0;
 
 function koreaDate(now: Date): string {
   return new Date(now.getTime() + KOREA_OFFSET_MS).toISOString().slice(0, 10);
-}
-
-function koreaMidnightUtc(date: string): Date {
-  return new Date(new Date(`${date}T00:00:00+09:00`).getTime());
 }
 
 async function readJson<T>(bucket: ReturnType<typeof getBlogImageBucket>, key: string): Promise<T | null> {
@@ -37,12 +35,15 @@ async function readJson<T>(bucket: ReturnType<typeof getBlogImageBucket>, key: s
   return JSON.parse(await new Response(object.body).text()) as T;
 }
 
-async function queryCloudflareVisitors(
+async function queryTodayVisitors(
   apiToken: string,
   zoneId: string,
-  start: Date,
-  end: Date,
+  today: string,
+  now: Date,
 ): Promise<number> {
+  // With no time dimension selected, Cloudflare returns one aggregate for the
+  // requested period instead of one row per hour. This keeps uniq.uniques
+  // deduplicated across the whole Korea calendar day.
   const query = `
     query SiteVisitors($zoneTag: String!, $start: Time!, $end: Time!) {
       viewer {
@@ -58,6 +59,7 @@ async function queryCloudflareVisitors(
     }
   `;
 
+  const start = new Date(`${today}T00:00:00+09:00`);
   const response = await fetch("https://api.cloudflare.com/client/v4/graphql", {
     method: "POST",
     headers: {
@@ -69,7 +71,7 @@ async function queryCloudflareVisitors(
       variables: {
         zoneTag: zoneId,
         start: start.toISOString(),
-        end: end.toISOString(),
+        end: now.toISOString(),
       },
     }),
     signal: AbortSignal.timeout(8000),
@@ -130,41 +132,24 @@ export async function GET() {
     const bucket = getBlogImageBucket();
     const now = new Date();
     const today = koreaDate(now);
-    const todayStart = koreaMidnightUtc(today);
 
-    // Initialize the starting total only once: the 30 full Korea-calendar days
-    // immediately before today. Later requests never query this 30-day range again.
+    // The owner-provided 30-day starting count is stored only once.
     let baseline = await readJson<{ total: number }>(bucket, BASELINE_KEY);
     if (!baseline) {
-      const baselineEnd = koreaMidnightUtc(today);
-      const baselineStart = new Date(baselineEnd.getTime() - 30 * 86400000);
-      const initialTotal = await queryCloudflareVisitors(
-        config.apiToken,
-        config.zoneId,
-        baselineStart,
-        baselineEnd,
-      );
-      baseline = { total: initialTotal };
+      baseline = { total: INITIAL_TOTAL_BASELINE };
       await bucket.put(BASELINE_KEY, new TextEncoder().encode(JSON.stringify(baseline)), {
         httpMetadata: { contentType: "application/json" },
       });
-      // Re-read after writing so simultaneous first requests converge on the saved baseline.
       baseline = (await readJson<{ total: number }>(bucket, BASELINE_KEY)) ?? baseline;
     }
 
-    const todayVisitors = await queryCloudflareVisitors(
-      config.apiToken,
-      config.zoneId,
-      todayStart,
-      now,
-    );
-    // A date-keyed snapshot is overwritten with the latest daily unique count.
-    // This prevents duplicate additions when multiple visitors load the page.
+    const todayVisitors = await queryTodayVisitors(config.apiToken, config.zoneId, today, now);
+    // Replace today's snapshot rather than incrementing it on every API call.
     await saveDailySnapshot(bucket, today, todayVisitors);
 
     const total = baseline.total + await sumDailySnapshots(bucket);
     return NextResponse.json(
-      { today: todayVisitors, total, source: "cloudflare", totalMode: "initial-30-days-plus-daily" },
+      { today: todayVisitors, total, source: "cloudflare", totalMode: "owner-baseline-plus-daily" },
       { headers: { "Cache-Control": "private, max-age=60" } },
     );
   } catch {
