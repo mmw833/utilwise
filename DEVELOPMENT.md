@@ -1,3 +1,14 @@
+## AI 블로그 관리 API (작업 브랜치)
+- Endpoint: `GET/POST /api/agent/blog/posts`
+- Authentication: `Authorization: Bearer <BLOG_AGENT_API_TOKEN>`
+- Cloudflare Worker Secret `BLOG_AGENT_API_TOKEN`에 최소 32자의 별도 무작위 토큰을 설정한다. `ADMIN_PASSWORD`와 재사용하지 않는다.
+- 토큰은 GitHub 저장소, 코드, 브라우저 프론트엔드, 채팅, 로그에 기록하지 않는다.
+- GET은 게시글 목록을 조회한다. POST는 `id`가 없으면 신규 글을 만들고, 기존 게시글 ID가 있으면 수정한다.
+- 요청 본문 주요 필드: `language`(ko/en), `title`, `content_md`, `status`(draft/published/archived), 선택 필드 `id`, `excerpt`, `category_name`, `tags`, `seo_title`, `seo_description`, `cover_image_key`.
+- 삭제 API는 제공하지 않는다. 이미지 업로드는 `POST /api/agent/blog/images`를 사용하며, 동일한 Bearer 토큰 인증으로 기존 R2 버킷에 JPG/PNG/WebP/AVIF(최대 5MB)를 저장한다. 응답의 `key`를 게시글 저장 요청의 `cover_image_key`에 전달한다.
+- 이 API는 main 병합 및 운영 Worker Secret 설정 전까지 사용할 수 없다.
+- 필수 검증: 토큰 누락/오류 시 401, 유효 토큰으로 목록 조회, 초안 생성 및 기존 ID 수정, 허용되지 않은 필드/길이 검증, 기존 관리자 화면 로그인·저장 회귀 테스트.
+
 ## 블로그 SEO 작성·발행 구조 (2026-11-15)
 - 관리자 컴포넌트 `components/AdminBlogManager.tsx`: SEO 제목/설명 입력 및 검색 미리보기, 키워드 안내, H2/H3·FAQ·본문 이미지 ALT·외부 출처 점검. 체크리스트는 작성 보조이며 검색 순위 보장은 아님.
 - `app/api/admin/posts/route.ts`: SEO 제목 180자, SEO 설명 300자 제한 검증. `seo_title`은 D1에 저장됨.

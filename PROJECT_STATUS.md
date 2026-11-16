@@ -1,3 +1,21 @@
+## 2026-11-16 AI 블로그 이미지 업로드 API 추가 (빌드·보안·운영 검증 대기)
+- `POST /api/agent/blog/images` 추가: `BLOG_AGENT_API_TOKEN` Bearer 인증으로 대표 이미지 업로드
+- 기존 관리자 이미지 API와 동일하게 JPG/PNG/WebP/AVIF, 파일당 5MB 제한, 파일 시그니처 검사, 기존 R2 `BLOG_IMAGES` 버킷 재사용
+- 업로드 결과는 게시글 API가 사용하는 `blog/<uuid>.<ext>` 키와 이미지 URL 반환
+- 기존 `/api/admin/blog-images` 관리자 세션 인증은 변경하지 않음
+- **미완료:** GitHub Actions 빌드/타입 검사, 미인증·잘못된 토큰 401, 유효 토큰 이미지 업로드 및 R2 확인, 게시글 저장·수정 테스트 필요
+
+## 2026-11-15 AI 블로그 관리 API 구현 (빌드·보안·운영 검증 대기)
+- 작업 브랜치: `feature/ai-blog-agent-api` (main 기준)
+- 기존 관리자 세션 쿠키와 비밀번호 인증은 그대로 유지하고, 별도 `BLOG_AGENT_API_TOKEN` Cloudflare Worker Secret으로 인증하는 전용 API 추가
+- `GET /api/agent/blog/posts`: 관리자 게시글 목록 조회
+- `POST /api/agent/blog/posts`: 게시글 신규 생성 및 ID 기반 수정, 한국어/영어, 초안/발행/보관, 카테고리·태그·SEO 제목/설명 지원
+- 삭제 기능은 의도적으로 제공하지 않으며 기존 D1/R2 데이터 구조와 저장 함수를 재사용
+- Bearer 토큰 최소 32자, SHA-256 비교 및 상수 시간 비교, 입력 길이/형식 검증, no-store 응답 적용
+- **미완료:** GitHub Actions 빌드/타입 검사, 미인증·잘못된 토큰 401, 유효 토큰 GET/POST, 기존 관리자 화면 회귀 테스트 필요
+- **운영 연결 전제:** Cloudflare Worker `utilwise`에 별도 `BLOG_AGENT_API_TOKEN` Secret을 설정하고 배포해야 함. 토큰 값은 코드·GitHub·채팅에 기록하지 않음
+- 현재 main에는 미반영이며 운영에서 사용할 수 있는 상태가 아님
+
 ## 2026-11-15 블로그 SEO 작성·발행 구조 개선 (작업 브랜치 검증 대기)
 - 작업 브랜치: `seo/blog-publishing-foundation`
 - 관리자 글쓰기 화면에서 SEO 제목 입력값이 저장 시 항상 null로 덮어써지던 문제 수정. SEO 제목/설명 글자 수, 검색 결과 미리보기, 핵심·연관 검색어 안내, 발행 전 체크리스트 추가
