@@ -91,7 +91,7 @@ async function saveDailySnapshot(
 ): Promise<void> {
   await bucket.put(
     `${DAILY_PREFIX}${date}.json`,
-    JSON.stringify({ date, visitors }),
+    new TextEncoder().encode(JSON.stringify({ date, visitors })),
     { httpMetadata: { contentType: "application/json" } },
   );
 }
@@ -145,7 +145,7 @@ export async function GET() {
         baselineEnd,
       );
       baseline = { total: initialTotal };
-      await bucket.put(BASELINE_KEY, JSON.stringify(baseline), {
+      await bucket.put(BASELINE_KEY, new TextEncoder().encode(JSON.stringify(baseline)), {
         httpMetadata: { contentType: "application/json" },
       });
       // Re-read after writing so simultaneous first requests converge on the saved baseline.
