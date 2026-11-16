@@ -5,7 +5,7 @@
 - 토큰은 GitHub 저장소, 코드, 브라우저 프론트엔드, 채팅, 로그에 기록하지 않는다.
 - GET은 게시글 목록을 조회한다. POST는 `id`가 없으면 신규 글을 만들고, 기존 게시글 ID가 있으면 수정한다.
 - 요청 본문 주요 필드: `language`(ko/en), `title`, `content_md`, `status`(draft/published/archived), 선택 필드 `id`, `excerpt`, `category_name`, `tags`, `seo_title`, `seo_description`, `cover_image_key`.
-- 삭제 및 이미지 업로드는 이 API 범위에 포함하지 않는다. 본문 이미지가 필요하면 기존 관리자 R2 업로드 흐름을 별도 확장·검증해야 한다.
+- 삭제 API는 제공하지 않는다. 이미지 업로드는 `POST /api/agent/blog/images`를 사용하며, 동일한 Bearer 토큰 인증으로 기존 R2 버킷에 JPG/PNG/WebP/AVIF(최대 5MB)를 저장한다. 응답의 `key`를 게시글 저장 요청의 `cover_image_key`에 전달한다.
 - 이 API는 main 병합 및 운영 Worker Secret 설정 전까지 사용할 수 없다.
 - 필수 검증: 토큰 누락/오류 시 401, 유효 토큰으로 목록 조회, 초안 생성 및 기존 ID 수정, 허용되지 않은 필드/길이 검증, 기존 관리자 화면 로그인·저장 회귀 테스트.
 
