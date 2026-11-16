@@ -1,19 +1,17 @@
 import { NextResponse } from "next/server";
 import { getCloudflareAnalyticsConfig } from "@/lib/blog/db";
-import { getBlogVisitorStats } from "@/lib/blog/posts";
 
 export const dynamic = "force-dynamic";
 
-let cloudflareCache: { today: number; expiresAt: number } | null = null;
+let cachedStats: { today: number; total: number; expiresAt: number } | null = null;
 
+type AnalyticsGroup = { uniq?: { uniques?: number } };
 type CloudflareAnalyticsResponse = {
   data?: {
     viewer?: {
       zones?: Array<{
-        httpRequests1hGroups?: Array<{
-          sum?: { pageViews?: number; requests?: number };
-          uniq?: { uniques?: number };
-        }>;
+        today: AnalyticsGroup[];
+        total: AnalyticsGroup[];
       }>;
     };
   };
@@ -21,38 +19,46 @@ type CloudflareAnalyticsResponse = {
 };
 
 function koreaDayStart(now: Date): Date {
-  const timestamp = Math.floor((now.getTime() / 1000 + 9 * 60 * 60) / 86400) * 86400 - 9 * 60 * 60;
-  return new Date(timestamp * 1000);
+  const utcMs = now.getTime();
+  const koreaOffsetMs = 9 * 60 * 60 * 1000;
+  const koreaMidnightUtcMs =
+    Math.floor((utcMs + koreaOffsetMs) / 86400000) * 86400000 - koreaOffsetMs;
+  return new Date(koreaMidnightUtcMs);
 }
 
 export async function GET() {
   try {
-    const localStats = await getBlogVisitorStats();
     const config = getCloudflareAnalyticsConfig();
-
     if (!config) {
       return NextResponse.json(
-        { ...localStats, source: "local", cloudflareConfigured: false },
-        { headers: { "Cache-Control": "private, max-age=60" } },
+        { error: "Cloudflare Analytics is not configured.", source: "unavailable" },
+        { status: 503, headers: { "Cache-Control": "no-store" } },
       );
     }
 
-    if (cloudflareCache && cloudflareCache.expiresAt > Date.now()) {
+    if (cachedStats && cachedStats.expiresAt > Date.now()) {
       return NextResponse.json(
-        { today: cloudflareCache.today, total: localStats.total, source: "cloudflare", cloudflareConfigured: true, metric: "unique_ips" },
+        { today: cachedStats.today, total: cachedStats.total, source: "cloudflare", totalPeriodDays: 30 },
         { headers: { "Cache-Control": "private, max-age=60" } },
       );
     }
 
     const now = new Date();
-    const start = koreaDayStart(now);
+    const todayStart = koreaDayStart(now);
+    const totalStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     const query = `
-      query SiteVisitors($zoneTag: String!, $start: Time!, $end: Time!) {
+      query SiteVisitors($zoneTag: String!, $todayStart: Time!, $totalStart: Time!, $end: Time!) {
         viewer {
           zones(filter: { zoneTag: $zoneTag }) {
-            httpRequests1hGroups(
+            today: httpRequests1hGroups(
               limit: 1
-              filter: { datetime_geq: $start, datetime_lt: $end }
+              filter: { datetime_geq: $todayStart, datetime_lt: $end }
+            ) {
+              uniq { uniques }
+            }
+            total: httpRequests1hGroups(
+              limit: 1
+              filter: { datetime_geq: $totalStart, datetime_lt: $end }
             ) {
               uniq { uniques }
             }
@@ -71,7 +77,8 @@ export async function GET() {
         query,
         variables: {
           zoneTag: config.zoneId,
-          start: start.toISOString(),
+          todayStart: todayStart.toISOString(),
+          totalStart: totalStart.toISOString(),
           end: now.toISOString(),
         },
       }),
@@ -80,38 +87,38 @@ export async function GET() {
 
     if (!response.ok) {
       return NextResponse.json(
-        { ...localStats, source: "local-fallback", cloudflareConfigured: true },
-        { headers: { "Cache-Control": "private, max-age=60" } },
+        { error: "Cloudflare Analytics request failed.", source: "unavailable" },
+        { status: 502, headers: { "Cache-Control": "no-store" } },
       );
     }
 
     const result = (await response.json()) as CloudflareAnalyticsResponse;
-    const group = result.data?.viewer?.zones?.[0]?.httpRequests1hGroups?.[0];
-    const cloudflareToday = group?.uniq?.uniques;
+    const zone = result.data?.viewer?.zones?.[0];
+    const todayValue = zone?.today?.[0]?.uniq?.uniques;
+    const totalValue = zone?.total?.[0]?.uniq?.uniques;
 
-    if (result.errors?.length || !Number.isFinite(cloudflareToday)) {
+    if (
+      result.errors?.length ||
+      !Number.isFinite(todayValue) ||
+      !Number.isFinite(totalValue)
+    ) {
       return NextResponse.json(
-        { ...localStats, source: "local-fallback", cloudflareConfigured: true },
-        { headers: { "Cache-Control": "private, max-age=60" } },
+        { error: "Cloudflare Analytics returned incomplete visitor data.", source: "unavailable" },
+        { status: 502, headers: { "Cache-Control": "no-store" } },
       );
     }
 
-    const today = Math.max(0, Math.floor(Number(cloudflareToday)));
-    cloudflareCache = { today, expiresAt: Date.now() + 5 * 60 * 1000 };
+    const today = Math.max(0, Math.floor(Number(todayValue)));
+    const total = Math.max(today, Math.floor(Number(totalValue)));
+    cachedStats = { today, total, expiresAt: Date.now() + 5 * 60 * 1000 };
 
     return NextResponse.json(
-      {
-        today,
-        total: localStats.total,
-        source: "cloudflare",
-        cloudflareConfigured: true,
-        metric: "unique_ips",
-      },
+      { today, total, source: "cloudflare", totalPeriodDays: 30 },
       { headers: { "Cache-Control": "private, max-age=300, stale-while-revalidate=60" } },
     );
   } catch {
     return NextResponse.json(
-      { today: 0, total: 0, source: "unavailable", cloudflareConfigured: false },
+      { error: "Visitor analytics are temporarily unavailable.", source: "unavailable" },
       { status: 503, headers: { "Cache-Control": "no-store" } },
     );
   }
