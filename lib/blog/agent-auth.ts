@@ -28,7 +28,9 @@ export async function isBlogAgentAuthorized(request: Request): Promise<boolean> 
   if (!expected || expected.length < 32) return false;
 
   const authorization = request.headers.get("authorization") || "";
-  const match = authorization.match(/^Bearer ([A-Za-z0-9._~-]{32,256})$/);
+  // Allow printable ASCII token characters so password-generator symbols work,
+  // while rejecting whitespace and control characters in the HTTP header.
+  const match = authorization.match(/^Bearer ([\x21-\x7E]{32,256})$/);
   if (!match) return false;
 
   const [expectedHash, suppliedHash] = await Promise.all([
