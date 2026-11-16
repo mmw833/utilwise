@@ -1,3 +1,10 @@
+## 2026-11-16 블로그 이미지 직접 전달 릴레이 보완
+- GitHub Actions 요청 JSON의 Base64 이미지 전달 지원 추가
+- JPEG/PNG/WebP/AVIF 허용, 실제 파일 크기 5MB 제한 및 파일 시그니처 검증 추가
+- 기존 image_path 파일 전달 방식과 호환 유지
+- 게시글 API로 이미지 Base64 문자열이 전달되지 않도록 메타데이터 제거
+- 빌드 및 이미지 업로드 실동작 검증 대기
+
 ## 2026-11-16 블로그 GitHub 자동 등록 릴레이 구현 (PR 검증 대기)
 - 운영 배포와 분리된 전용 GitHub Actions 워크플로 추가
 - blog-agent-request/** 요청 브랜치의 requests/post.json만 처리
