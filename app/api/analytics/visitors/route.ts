@@ -31,12 +31,6 @@ function koreaMidnightUtc(date: string): Date {
   return new Date(new Date(`${date}T00:00:00+09:00`).getTime());
 }
 
-function previousKoreaDate(date: string): string {
-  const previous = new Date(`${date}T00:00:00+09:00`);
-  previous.setUTCDate(previous.getUTCDate() - 1);
-  return previous.toISOString().slice(0, 10);
-}
-
 async function readJson<T>(bucket: ReturnType<typeof getBlogImageBucket>, key: string): Promise<T | null> {
   const object = await bucket.get(key);
   if (!object) return null;
@@ -137,11 +131,10 @@ export async function GET() {
     const now = new Date();
     const today = koreaDate(now);
     const todayStart = koreaMidnightUtc(today);
-    const yesterday = previousKoreaDate(today);
 
     // Initialize the starting total only once: the 30 full Korea-calendar days
     // immediately before today. Later requests never query this 30-day range again.
-    let baseline = await readJson<{ total: number; throughDate: string }>(bucket, BASELINE_KEY);
+    let baseline = await readJson<{ total: number }>(bucket, BASELINE_KEY);
     if (!baseline) {
       const baselineEnd = koreaMidnightUtc(today);
       const baselineStart = new Date(baselineEnd.getTime() - 30 * 86400000);
@@ -151,12 +144,12 @@ export async function GET() {
         baselineStart,
         baselineEnd,
       );
-      baseline = { total: initialTotal, throughDate: yesterday };
+      baseline = { total: initialTotal };
       await bucket.put(BASELINE_KEY, JSON.stringify(baseline), {
         httpMetadata: { contentType: "application/json" },
       });
       // Re-read after writing so simultaneous first requests converge on the saved baseline.
-      baseline = (await readJson<{ total: number; throughDate: string }>(bucket, BASELINE_KEY)) ?? baseline;
+      baseline = (await readJson<{ total: number }>(bucket, BASELINE_KEY)) ?? baseline;
     }
 
     const todayVisitors = await queryCloudflareVisitors(
