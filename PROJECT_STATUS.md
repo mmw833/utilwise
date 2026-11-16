@@ -1,3 +1,10 @@
+## 2026-11-17 방문자 통계 자동 갱신 주기 조정 (PR 예정)
+- 메인 헤더 TODAY/TOTAL 통계는 최초 페이지 접속 시 즉시 조회하고, 이후 페이지가 열려 있는 동안 1시간마다 갱신
+- 5분 간격에서 60분 간격으로 변경해 Cloudflare Analytics 조회 및 R2 읽기/쓰기 호출 빈도를 낮춤
+- 페이지 종료 시 타이머 정리. 조회 실패 시 숫자 대신 — 표시
+- 기존 TODAY/TOTAL 집계 공식, R2 저장 구조, D1 사용 여부는 변경하지 않음
+- 빌드 및 운영 반영은 PR 검증 후 별도 확인
+
 ## 2026-11-17 Cloudflare 방문자 TOTAL 누적 방식 (PR #44 검증 대기)
 - 작업 브랜치: `fix/cloudflare-visitor-analytics`
 - 홈 헤더 TODAY/TOTAL은 Cloudflare Analytics만 사용하며 D1 방문자 데이터는 사용하지 않음
