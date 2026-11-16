@@ -4,6 +4,8 @@ import { getBlogVisitorStats } from "@/lib/blog/posts";
 
 export const dynamic = "force-dynamic";
 
+let cloudflareCache: { today: number; expiresAt: number } | null = null;
+
 type CloudflareAnalyticsResponse = {
   data?: {
     viewer?: {
@@ -35,6 +37,13 @@ export async function GET() {
       );
     }
 
+    if (cloudflareCache && cloudflareCache.expiresAt > Date.now()) {
+      return NextResponse.json(
+        { today: cloudflareCache.today, total: localStats.total, source: "cloudflare", cloudflareConfigured: true, metric: "unique_ips" },
+        { headers: { "Cache-Control": "private, max-age=60" } },
+      );
+    }
+
     const now = new Date();
     const start = koreaDayStart(now);
     const query = `
@@ -45,7 +54,6 @@ export async function GET() {
               limit: 1
               filter: { datetime_geq: $start, datetime_lt: $end }
             ) {
-              sum { pageViews requests }
               uniq { uniques }
             }
           }
@@ -88,9 +96,12 @@ export async function GET() {
       );
     }
 
+    const today = Math.max(0, Math.floor(Number(cloudflareToday)));
+    cloudflareCache = { today, expiresAt: Date.now() + 5 * 60 * 1000 };
+
     return NextResponse.json(
       {
-        today: Math.max(0, Math.floor(Number(cloudflareToday))),
+        today,
         total: localStats.total,
         source: "cloudflare",
         cloudflareConfigured: true,
