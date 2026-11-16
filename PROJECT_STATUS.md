@@ -1,3 +1,12 @@
+## 2026-11-16 블로그 글 텍스트 임시저장 연결 (PR #42)
+- 작업 브랜치: `feature/blog-agent-github-relay`
+- 대표 이미지 자동 전송은 제외하고 제목·요약·본문·SEO 제목/설명·카테고리·태그 텍스트만 기존 게시글 API로 전달
+- GitHub Actions에서 요청 JSON을 검증하고 게시글 상태를 항상 `draft`로 강제
+- 요청 브랜치 `blog-agent-request/**`의 `requests/post.json` 변경만 처리하며 운영 배포와 분리
+- 자동 발행·수정·삭제는 수행하지 않음. 실행 결과는 GitHub Actions Step Summary에서 확인
+- **미완료:** PR 병합 후 GitHub Actions Secret `BLOG_AGENT_API_TOKEN` 설정 여부 확인, 인증 및 실제 임시저장 E2E 테스트
+- **제약:** 실행 결과를 ChatGPT 대화로 자동 회신하지 않음
+
 ## 2026-11-16 블로그 GitHub 자동 등록 릴레이 구현 (PR 검증 대기)
 - 작업 브랜치: feature/blog-agent-github-relay
 - 운영 배포와 분리된 GitHub Actions 워크플로 추가: blog-agent-request/** 브랜치의 requests/post.json 변경만 감지
