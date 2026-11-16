@@ -1,3 +1,10 @@
+## 2026-11-16 AI 블로그 이미지 업로드 API 추가 (빌드·보안·운영 검증 대기)
+- `POST /api/agent/blog/images` 추가: `BLOG_AGENT_API_TOKEN` Bearer 인증으로 대표 이미지 업로드
+- 기존 관리자 이미지 API와 동일하게 JPG/PNG/WebP/AVIF, 파일당 5MB 제한, 파일 시그니처 검사, 기존 R2 `BLOG_IMAGES` 버킷 재사용
+- 업로드 결과는 게시글 API가 사용하는 `blog/<uuid>.<ext>` 키와 이미지 URL 반환
+- 기존 `/api/admin/blog-images` 관리자 세션 인증은 변경하지 않음
+- **미완료:** GitHub Actions 빌드/타입 검사, 미인증·잘못된 토큰 401, 유효 토큰 이미지 업로드 및 R2 확인, 게시글 저장·수정 테스트 필요
+
 ## 2026-11-15 AI 블로그 관리 API 구현 (빌드·보안·운영 검증 대기)
 - 작업 브랜치: `feature/ai-blog-agent-api` (main 기준)
 - 기존 관리자 세션 쿠키와 비밀번호 인증은 그대로 유지하고, 별도 `BLOG_AGENT_API_TOKEN` Cloudflare Worker Secret으로 인증하는 전용 API 추가
