@@ -1,9 +1,11 @@
-## 방문자 통계 연동 원칙
-- Cloudflare Analytics와 자체 D1 방문자 통계는 집계 기준을 구분한다. Cloudflare `uniq.uniques`는 고유 IP 기반이며 D1은 익명 브라우저 쿠키 기반이다.
-- 기존 D1 방문자 이력과 테이블은 삭제하거나 Cloudflare 수치로 덮어쓰지 않는다.
+## 방문자 통계 원칙
+- 홈 헤더의 TODAY/TOTAL은 Cloudflare Analytics 데이터만 사용한다. D1 방문자 수를 조회·합산·대체 데이터로 사용하지 않는다.
+- TODAY는 한국시간 당일 고유 방문자, TOTAL은 Cloudflare 조회 가능 기간 내 최근 30일 고유 방문자이며 평생 누적이라고 표현하지 않는다.
 - Cloudflare API 토큰은 Worker Secret으로만 저장하고 클라이언트 코드, GitHub 파일, 로그, 채팅에 기록하지 않는다. Zone ID도 환경변수로 관리한다.
-- API 미설정/실패 시 기존 통계 fallback을 유지하되 Cloudflare 연동 완료로 보고하지 않는다.
+- Cloudflare 설정 누락/API 오류 시 D1로 fallback하지 않고 통계값을 숨긴다.
+- D1 자체는 블로그 등 기존 기능이 사용하므로 삭제하거나 스키마를 변경하지 않는다.
 - 빌드, 권한, API 응답, 한국시간 일자 경계, 운영 화면을 검증하기 전 병합·배포 완료로 보고하지 않는다.
+
 
 ## AI 블로그 관리 API 보안
 - AI 연동은 관리자 비밀번호나 관리자 세션 쿠키를 공유하지 않고 별도 Cloudflare Worker Secret `BLOG_AGENT_API_TOKEN`으로 인증한다.
