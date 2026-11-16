@@ -1,0 +1,166 @@
+openapi: 3.1.0
+info:
+  title: UTILWISE Blog Publishing API
+  version: 1.0.0
+  description: >
+    Private API for managing UTILWISE Korean and English blog posts.
+    All operations require the BLOG_AGENT_API_TOKEN configured as a Bearer
+    credential in the GPT Action authentication settings. Never put the token
+    in prompts, request bodies, or this file.
+servers:
+  - url: https://utilwise.kr
+security:
+  - BearerAuth: []
+paths:
+  /api/agent/blog/posts:
+    get:
+      operationId: listBlogPosts
+      summary: List UTILWISE blog posts
+      description: Returns existing posts. Requires the private Bearer token.
+      responses:
+        "200":
+          description: Post list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  posts:
+                    type: array
+                    items:
+                      type: object
+                      additionalProperties: true
+        "401":
+          description: Missing or invalid token
+    post:
+      operationId: saveBlogPost
+      summary: Create or update a blog post
+      description: >
+        Creates a post when id is omitted, or updates the post matching id.
+        Use status draft for safe initial saves. This API does not delete posts.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlogPostInput"
+      responses:
+        "200":
+          description: Post saved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  id:
+                    type: string
+                  slug:
+                    type: string
+                    nullable: true
+                  status:
+                    type: string
+        "400":
+          description: Invalid input
+        "401":
+          description: Missing or invalid token
+        "409":
+          description: Save conflict or invalid existing post ID
+  /api/agent/blog/images:
+    post:
+      operationId: uploadBlogImage
+      summary: Upload a blog cover or inline image
+      description: >
+        Uploads one JPG, PNG, WebP, or AVIF image up to 5 MB. The response key
+        can be supplied as cover_image_key when saving a post. Uses multipart
+        form data with the file field named file.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Image uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    type: string
+                  url:
+                    type: string
+        "400":
+          description: Invalid image or upload format
+        "401":
+          description: Missing or invalid token
+        "403":
+          description: Origin rejected
+        "503":
+          description: Image storage unavailable
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: BLOG_AGENT_API_TOKEN
+  schemas:
+    BlogPostInput:
+      type: object
+      required:
+        - language
+        - title
+        - content_md
+        - status
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Omit to create a new post; provide an existing post ID to update.
+        language:
+          type: string
+          enum: [ko, en]
+        title:
+          type: string
+          maxLength: 180
+        excerpt:
+          type: string
+          maxLength: 500
+        content_md:
+          type: string
+          maxLength: 100000
+          description: Full article body in Markdown.
+        status:
+          type: string
+          enum: [draft, published, archived]
+        seo_title:
+          type: [string, "null"]
+          maxLength: 180
+        seo_description:
+          type: [string, "null"]
+          maxLength: 300
+        category_id:
+          type: [string, "null"]
+          format: uuid
+        category_name:
+          type: string
+          maxLength: 40
+          description: Creates or reuses a category by name.
+        tags:
+          type: array
+          maxItems: 12
+          items:
+            type: string
+            maxLength: 30
+        cover_image_key:
+          type: [string, "null"]
+          pattern: "^blog/[0-9a-fA-F-]{36}\\.(jpg|png|webp|avif)$"
