@@ -1,19 +1,15 @@
 name: UTILWISE Blog Agent Relay
-
 on:
   push:
     branches:
       - 'blog-agent-request/**'
     paths:
       - 'requests/post.json'
-
 permissions:
   contents: read
-
 concurrency:
   group: utilwise-blog-agent-${{ github.ref }}
   cancel-in-progress: false
-
 jobs:
   save-draft:
     name: Upload image and save blog draft
@@ -22,8 +18,7 @@ jobs:
     steps:
       - name: Checkout request branch
         uses: actions/checkout@v4
-
-      - name: Validate request
+      - name: Validate request and restore image
         id: request
         shell: bash
         run: |
@@ -31,15 +26,37 @@ jobs:
           test -f requests/post.json
           jq -e '(.post | type == "object") and (.post.language == "ko" or .post.language == "en") and (.post.title | type == "string" and length > 0 and length <= 180) and (.post.content_md | type == "string" and length <= 100000)' requests/post.json > /dev/null
           IMAGE_PATH="$(jq -r '.image_path // empty' requests/post.json)"
-          if [ -n "$IMAGE_PATH" ]; then
+          IMAGE_BASE64="$(jq -r '.image_base64 // empty' requests/post.json)"
+          IMAGE_MIME="$(jq -r '.image_mime_type // empty' requests/post.json)"
+          if [ -n "$IMAGE_BASE64" ]; then
+            [ -z "$IMAGE_PATH" ] || { echo "::error::Use only one image input method"; exit 1; }
+            case "$IMAGE_MIME" in
+              image/jpeg) IMAGE_PATH="assets/cover.jpg";;
+              image/png) IMAGE_PATH="assets/cover.png";;
+              image/webp) IMAGE_PATH="assets/cover.webp";;
+              image/avif) IMAGE_PATH="assets/cover.avif";;
+              *) echo "::error::Unsupported image MIME type"; exit 1;;
+            esac
+            mkdir -p assets
+            printf '%s' "$IMAGE_BASE64" | base64 --decode > "$IMAGE_PATH"
+            SIZE="$(wc -c < "$IMAGE_PATH" | tr -d ' ')"
+            [ "$SIZE" -gt 0 ] && [ "$SIZE" -le 5242880 ] || { echo "::error::Image must be 1 byte to 5 MB"; exit 1; }
+            case "$IMAGE_MIME" in
+              image/jpeg) MAGIC="$(od -An -tx1 -N3 "$IMAGE_PATH" | tr -d ' \n')"; [ "$MAGIC" = "ffd8ff" ] || { echo "::error::JPEG signature mismatch"; exit 1; };;
+              image/png) MAGIC="$(od -An -tx1 -N8 "$IMAGE_PATH" | tr -d ' \n')"; [ "$MAGIC" = "89504e470d0a1a0a" ] || { echo "::error::PNG signature mismatch"; exit 1; };;
+              image/webp) [ "$(dd if="$IMAGE_PATH" bs=1 count=4 2>/dev/null)" = "RIFF" ] && [ "$(dd if="$IMAGE_PATH" bs=1 skip=8 count=4 2>/dev/null)" = "WEBP" ] || { echo "::error::WebP signature mismatch"; exit 1; };;
+              image/avif) grep -a -q 'ftypavif\|ftypavis' "$IMAGE_PATH" || { echo "::error::AVIF signature mismatch"; exit 1; };;
+            esac
+          elif [ -n "$IMAGE_PATH" ]; then
             case "$IMAGE_PATH" in
               assets/cover.jpg|assets/cover.jpeg|assets/cover.png|assets/cover.webp|assets/cover.avif) ;;
               *) echo "::error::Unsupported image path"; exit 1 ;;
             esac
             test -f "$IMAGE_PATH"
+            SIZE="$(wc -c < "$IMAGE_PATH" | tr -d ' ')"
+            [ "$SIZE" -le 5242880 ] || { echo "::error::Image exceeds 5 MB"; exit 1; }
           fi
           echo "image_path=$IMAGE_PATH" >> "$GITHUB_OUTPUT"
-
       - name: Upload cover image to UTILWISE R2
         id: image
         if: steps.request.outputs.image_path != ''
@@ -53,7 +70,6 @@ jobs:
           RESPONSE="$(curl --silent --show-error --fail-with-body -H "Authorization: Bearer $BLOG_AGENT_API_TOKEN" -F "file=@$IMAGE_PATH" https://utilwise.kr/api/agent/blog/images)"
           KEY="$(printf '%s' "$RESPONSE" | jq -er '.key')"
           echo "cover_image_key=$KEY" >> "$GITHUB_OUTPUT"
-
       - name: Save post as draft
         env:
           BLOG_AGENT_API_TOKEN: ${{ secrets.BLOG_AGENT_API_TOKEN }}
@@ -62,9 +78,7 @@ jobs:
         run: |
           set -euo pipefail
           test -n "$BLOG_AGENT_API_TOKEN" || { echo "::error::Repository secret BLOG_AGENT_API_TOKEN is missing"; exit 1; }
-          jq --arg image_key "$IMAGE_KEY" '.post | .status = "draft" | if $image_key != "" then .cover_image_key = $image_key else . end' requests/post.json > /tmp/post.json
+          jq --arg image_key "$IMAGE_KEY" 'del(.image_base64, .image_mime_type, .image_path) | .post | .status = "draft" | if $image_key != "" then .cover_image_key = $image_key else . end' requests/post.json > /tmp/post.json
           RESPONSE="$(curl --silent --show-error --fail-with-body -H "Authorization: Bearer $BLOG_AGENT_API_TOKEN" -H "Content-Type: application/json" --data-binary @/tmp/post.json https://utilwise.kr/api/agent/blog/posts)"
           echo "## UTILWISE 블로그 임시저장 결과" >> "$GITHUB_STEP_SUMMARY"
-          echo '```json' >> "$GITHUB_STEP_SUMMARY"
           printf '%s\n' "$RESPONSE" | jq . >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
