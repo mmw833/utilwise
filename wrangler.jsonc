@@ -5,6 +5,9 @@
   "compatibility_date": "2026-11-05",
   "compatibility_flags": ["nodejs_compat"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  "vars": {
+    "CLOUDFLARE_ZONE_ID": "caad14f3d32670b5acd9d2c7d2417f4b"
+  },
   "r2_buckets": [{ "binding": "BLOG_IMAGES", "bucket_name": "utilwise-blog-images" }],
   "d1_databases": [
     {
