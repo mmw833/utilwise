@@ -69,7 +69,8 @@ export default function YearEndTaxCalculator() {
   const [withheld, setWithheld] = useState("1800000");
   const [dependents, setDependents] = useState("1");
   const [nationalPension, setNationalPension] = useState("0");
-  const [privatePension, setPrivatePension] = useState("0");
+  const [pensionSavings, setPensionSavings] = useState("0");
+  const [irp, setIrp] = useState("0");
 
   const result = useMemo(() => {
     const annualSalary = amount(salary);
@@ -81,7 +82,9 @@ export default function YearEndTaxCalculator() {
     const taxBase = Math.max(0, earnedAmount - personalDeduction - publicPensionDeduction);
     const calculatedTax = progressiveTax(taxBase);
     const earnedCredit = Math.min(calculatedTax, earnedIncomeTaxCredit(calculatedTax, grossPay));
-    const pensionLimit = Math.min(9_000_000, amount(privatePension));
+    const pensionSavingsEligible = Math.min(6_000_000, amount(pensionSavings));
+    const irpEligible = Math.min(9_000_000 - pensionSavingsEligible, amount(irp));
+    const pensionLimit = pensionSavingsEligible + irpEligible;
     const pensionRate = grossPay <= 55_000_000 ? 0.15 : 0.12;
     const pensionCredit = Math.min(Math.max(0, calculatedTax - earnedCredit), pensionLimit * pensionRate);
     const estimatedDecisionTax = Math.max(0, calculatedTax - earnedCredit - pensionCredit);
@@ -94,7 +97,7 @@ export default function YearEndTaxCalculator() {
       incomeTaxDifference: difference, localTaxDifference, totalDifference: difference + localTaxDifference,
       pensionRate,
     };
-  }, [salary, nonTaxable, withheld, dependents, nationalPension, privatePension]);
+  }, [salary, nonTaxable, withheld, dependents, nationalPension, pensionSavings, irp]);
 
   const isRefund = result.totalDifference >= 0;
   const valid = amount(salary) > 0 && amount(withheld) >= 0 && amount(dependents) >= 1;
@@ -116,7 +119,8 @@ export default function YearEndTaxCalculator() {
         <details style={{ borderTop: "1px solid #e5eaf0", paddingTop: 16, marginTop: 20 }}>
           <summary style={{ cursor: "pointer", fontWeight: 700, fontSize: 14 }}>추가 정보 입력 (선택)</summary>
           <Input label="⑤ 국민연금 본인 부담액" value={nationalPension} onChange={setNationalPension} hint="올해 급여에서 공제된 국민연금 근로자 부담액 합계. 모르면 0원" />
-          <Input label="⑥ 연금저축·IRP 납입액" value={privatePension} onChange={setPrivatePension} hint="올해 본인이 납입한 연금저축과 IRP 합계. 세액공제 대상 한도는 최대 900만원" />
+          <Input label="⑥ 연금저축 납입액" value={pensionSavings} onChange={setPensionSavings} hint="연금저축 세액공제 대상 납입액은 최대 600만원" />
+          <Input label="⑦ IRP 납입액" value={irp} onChange={setIrp} hint="연금저축과 합산해 세액공제 대상 납입액 최대 900만원" />
         </details>
         <p className="hint" style={{ marginTop: 18 }}>입력한 금액은 이 브라우저 안에서만 계산하며 서버로 전송하지 않습니다.</p>
       </section>
