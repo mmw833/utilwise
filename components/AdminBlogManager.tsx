@@ -476,7 +476,6 @@ export default function AdminBlogManager() {
   }
 
   async function featurePost(post: Post) {
-    if (post.status !== "published") return;
     try {
       const response = await fetch("/api/admin/posts/feature", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: post.id, language: post.language }) });
       const data = await response.json();
@@ -699,7 +698,7 @@ export default function AdminBlogManager() {
                     <small>수정 {dateLabel(post.updated_at)} · 조회수 {post.view_count.toLocaleString("ko-KR")}</small>
                   </div>
                   <div className="blog-admin-post-actions">
-                    <button type="button" className="blog-admin-secondary" onClick={() => void featurePost(post)} disabled={post.status !== "published"}>{post.is_featured ? "대표글 지정됨" : "대표글 설정"}</button>{post.status === "draft" ? <button type="button" className="blog-admin-primary" onClick={() => reviewAndPreparePublish(post)}>검토 후 발행</button> : null}<button type="button" className="blog-admin-secondary" onClick={() => editPost(post)}>수정</button>
+                    <button type="button" className="blog-admin-secondary" onClick={() => void featurePost(post)} >{post.is_featured ? "대표글 지정됨" : "대표글 설정"}</button>{post.status === "draft" ? <button type="button" className="blog-admin-primary" onClick={() => reviewAndPreparePublish(post)}>검토 후 발행</button> : null}<button type="button" className="blog-admin-secondary" onClick={() => editPost(post)}>수정</button>
                     <button type="button" className="blog-admin-danger" onClick={() => void deletePost(post)}>삭제</button>
                   </div>
                 </article>
