@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/blog/admin-auth";
-import { PublishedPostNotFoundError, setFeaturedPost } from "@/lib/blog/admin-posts";
+import { AdminPostNotFoundError, setFeaturedPost } from "@/lib/blog/admin-posts";
 export const dynamic = "force-dynamic";
 export async function POST(request: NextRequest) {
   if (!(await isAdminAuthenticated())) return NextResponse.json({ error: "인증이 필요합니다." }, { status: 401 });
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (error instanceof PublishedPostNotFoundError) {
-      return NextResponse.json({ error: "해당 언어의 발행된 게시글을 찾을 수 없습니다." }, { status: 404, headers: { "Cache-Control": "no-store" } });
+      return NextResponse.json({ error: "해당 언어의 게시글을 찾을 수 없습니다." }, { status: 404, headers: { "Cache-Control": "no-store" } });
     }
     // Keep implementation details out of the client response, but retain the
     // original error in Worker logs so D1/binding/SQL failures are diagnosable.
