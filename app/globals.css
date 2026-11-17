@@ -1193,3 +1193,25 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 .blog-inline-tool-button{display:inline-flex;align-items:center;gap:9px;margin:8px 4px;padding:11px 17px;border:1px solid #d8e1ec;border-radius:8px;background:#f4f7fb;color:#24364b;font-size:.94em;font-weight:650;text-decoration:none;line-height:1.35;transition:background .15s ease,border-color .15s ease}
 .blog-inline-tool-button:hover{background:#eaf1f9;border-color:#aebfd3}
 .blog-inline-tool-button span{font-size:.9em;color:#647b96}
+
+
+/* Blog popular section: editor-selected lead story plus ranked compact reads */
+.journal-popular-layout{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:24px;align-items:stretch}
+.journal-popular-lead{display:block;min-width:0;color:inherit;text-decoration:none}
+.journal-popular-lead-image{position:relative;aspect-ratio:16/9;overflow:hidden;background:#efeee8}
+.journal-popular-lead-image>img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .35s}
+.journal-popular-lead:hover .journal-popular-lead-image>img{transform:scale(1.025)}
+.journal-popular-lead-label{position:absolute;left:14px;top:14px;padding:6px 9px;background:#263d59;color:#fff;font-size:9px;font-weight:750;letter-spacing:.12em}
+.journal-popular-lead-copy{padding:14px 2px 4px}
+.journal-popular-lead-copy h3{margin:0 0 12px;font-size:clamp(21px,2.2vw,30px);line-height:1.35;letter-spacing:-.045em;word-break:keep-all}
+.journal-popular-ranking{display:flex;flex-direction:column;justify-content:stretch}
+.journal-popular-rank-item{display:grid;grid-template-columns:26px 92px minmax(0,1fr);gap:12px;align-items:center;min-height:88px;padding:10px 0;border-bottom:1px solid #e9e7e1;color:inherit;text-decoration:none}
+.journal-popular-rank-item:first-child{padding-top:0}
+.journal-popular-rank-number{font-size:22px;font-weight:800;letter-spacing:-.06em;color:#a6a5b7;text-align:center}
+.journal-popular-rank-thumb{display:block;aspect-ratio:1.25/1;overflow:hidden;background:#efeee8}
+.journal-popular-rank-thumb img{display:block;width:100%;height:100%;object-fit:cover}
+.journal-popular-rank-thumb>span{display:flex;width:100%;height:100%;align-items:center;justify-content:center;color:#7891ae;font-size:24px;font-weight:800}
+.journal-popular-rank-copy{display:flex;min-width:0;flex-direction:column;gap:7px}
+.journal-popular-rank-copy strong{font-size:14px;line-height:1.45;word-break:keep-all}
+.journal-popular-rank-copy small{font-size:10px;color:#89939a}
+@media(max-width:760px){.journal-popular-layout{grid-template-columns:1fr;gap:18px}.journal-popular-lead-image{aspect-ratio:16/9}.journal-popular-lead-copy h3{font-size:22px}.journal-popular-rank-item{grid-template-columns:24px 82px minmax(0,1fr);min-height:76px;padding:9px 0}.journal-popular-rank-copy strong{font-size:13px}}
