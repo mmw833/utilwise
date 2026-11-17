@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { listPublishedPosts } from "@/lib/blog/posts";
 const siteUrl = "https://utilwise.kr";
-const calculators = ["/area","/date","/loan","/brokerage","/salary","/severance","/savings","/dsr","/rent-conversion","/fuel","/vat","/volume","/tip"];
+const calculators = ["/area","/date","/loan","/brokerage","/salary","/year-end-tax","/severance","/savings","/dsr","/rent-conversion","/fuel","/vat","/volume","/tip"];
 const englishCalculators = calculators.map((route) => `/en${route}`);
 const pdfToolPages = ["/pdf-merge","/pdf-split","/pdf-rotate","/pdf-organize","/image-to-pdf"];
 const onlineToolPages = ["/online-tools","/qr-code-generator","/image-compressor","/image-resizer","/background-remover","/image-converter",...pdfToolPages];
