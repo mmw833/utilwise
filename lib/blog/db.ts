@@ -20,6 +20,7 @@ interface D1Statement {
 
 interface D1Database {
   prepare(query: string): D1Statement;
+  batch<T = Record<string, unknown>>(statements: D1Statement[]): Promise<D1Result<T>[]>;
 }
 
 type BlogCloudflareEnv = {
