@@ -167,7 +167,12 @@ export async function setFeaturedPost(id: string, language: BlogLanguage): Promi
   const db = getBlogDatabase();
   const post = await db.prepare("SELECT id FROM blog_posts WHERE id = ? AND language = ? LIMIT 1").bind(id, language).first<{ id: string }>();
   if (!post) throw new AdminPostNotFoundError();
-  await db.prepare("UPDATE blog_posts SET is_featured = CASE WHEN id = ? THEN 1 ELSE 0 END WHERE language = ?").bind(id, language).run();
+  // D1 batch runs both statements atomically. Clear the old featured row first
+  // so the partial unique index on (language) never sees two featured posts.
+  await db.batch([
+    db.prepare("UPDATE blog_posts SET is_featured = 0 WHERE language = ? AND is_featured = 1").bind(language),
+    db.prepare("UPDATE blog_posts SET is_featured = 1 WHERE id = ? AND language = ?").bind(id, language),
+  ]);
 }
 
 export async function deleteAdminPost(id: string): Promise<void> {
