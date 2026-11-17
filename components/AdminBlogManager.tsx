@@ -68,10 +68,11 @@ function dateLabel(timestamp: number | null) {
 function escapeEditorHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
-function markdownToEditorHtml(markdown: string) {
+function markdownToEditorHtml(markdown: string, language: "ko" | "en") {
   const inline = (value: string) => escapeEditorHtml(value)
     .replace(/!\[([^\]]*)\]\((\/api\/blog\/images\/[^)]+)\)/g, (_m, meta, src) => { const match = meta.match(/^(.*?)\|width=((?:3[0-9]|[4-9][0-9]|100)%)\|align=(left|center|right)$/); const alt = match ? match[1] : meta; const width = match ? match[2] : "100%"; const align = match ? match[3] : "center"; return '<img src="' + src + '" alt="' + alt + '" data-width="' + width + '" data-align="' + align + '" />'; })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\[\[tool:([a-z0-9-]+)\]\]/g, (_m, id) => { const tool = RELATED_TOOLS.find((item) => item.id === id); return tool ? '<span class="blog-editor-tool-token" data-tool-token="' + id + '" contenteditable="false">' + escapeEditorHtml(language === "en" ? tool.en : tool.ko) + ' button</span>' : _m; })
     .replace(/\*([^*]+)\*/g, "<em>$1</em>")
     .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
   return markdown.replace(/\r\n?/g, "\n").split(/\n{2,}/).map((block) => {
@@ -90,6 +91,7 @@ function editorHtmlToMarkdown(root: HTMLElement) {
     if (!(node instanceof HTMLElement)) return "";
     const tag = node.tagName.toLowerCase();
     if (tag === "br") return "\n";
+    if (tag === "span" && node.dataset.toolToken) return `[[tool:${node.dataset.toolToken}]]`;
     if (tag === "img") {
       const src = node.getAttribute("src") || "";
       if (!src.startsWith("/api/blog/images/blog/")) return "";
@@ -120,7 +122,8 @@ export default function AdminBlogManager() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [editor, setEditor] = useState<Editor>(emptyEditor);
   const [tagsInput, setTagsInput] = useState("");
-  const [selectedToolId, setSelectedToolId] = useState(RELATED_TOOLS[0]?.id ?? "");
+  const [selectedToolId, setSelectedToolId] = useState("");
+  const [toolSearch, setToolSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -172,6 +175,7 @@ export default function AdminBlogManager() {
   const publishedCount = useMemo(() => posts.filter((post) => post.status === "published").length, [posts]);
   const draftCount = useMemo(() => posts.filter((post) => post.status === "draft").length, [posts]);
   const visiblePosts = useMemo(() => postFilter === "all" ? posts : posts.filter((post) => post.status === postFilter), [posts, postFilter]);
+  const filteredTools = useMemo(() => RELATED_TOOLS.filter((tool) => `${tool.ko} ${tool.en} ${tool.href}`.toLocaleLowerCase().includes(toolSearch.trim().toLocaleLowerCase())), [toolSearch]);
 
   function startNew() {
     setEditor(emptyEditor());
@@ -311,17 +315,42 @@ export default function AdminBlogManager() {
   }
   function insertRelatedTool() {
     const tool = RELATED_TOOLS.find((item) => item.id === selectedToolId);
-    if (!tool || !contentRef.current) return;
-    contentRef.current.focus();
-    if (savedSelectionRef.current) {
-      const selection = window.getSelection();
-      selection?.removeAllRanges();
-      selection?.addRange(savedSelectionRef.current);
+    const root = contentRef.current;
+    if (!tool || !root) {
+      setError("먼저 삽입할 도구를 검색하고 선택해 주세요.");
+      return;
     }
-    document.execCommand("insertText", false, `[[tool:${tool.id}]]`);
-    rememberEditorSelection();
+    root.focus();
+    const selection = window.getSelection();
+    let range = savedSelectionRef.current && root.contains(savedSelectionRef.current.commonAncestorContainer)
+      ? savedSelectionRef.current.cloneRange()
+      : null;
+    if (!range && selection?.rangeCount && root.contains(selection.anchorNode)) range = selection.getRangeAt(0).cloneRange();
+    if (!range) {
+      range = document.createRange();
+      range.selectNodeContents(root);
+      range.collapse(false);
+    }
+    range.deleteContents();
+    const token = document.createElement("span");
+    token.className = "blog-editor-tool-token";
+    token.dataset.toolToken = tool.id;
+    token.contentEditable = "false";
+    token.textContent = `${editor.language === "en" ? tool.en : tool.ko} 버튼`;
+    const before = document.createTextNode(" ");
+    const after = document.createTextNode(" ");
+    range.insertNode(after);
+    range.insertNode(token);
+    range.insertNode(before);
+    const caret = document.createRange();
+    caret.setStartAfter(after);
+    caret.collapse(true);
+    selection?.removeAllRanges();
+    selection?.addRange(caret);
+    savedSelectionRef.current = caret.cloneRange();
     syncEditorContent();
-    setNotice(`본문에 “${editor.language === "en" ? tool.en : tool.ko}” 버튼을 삽입했습니다.`);
+    setError("");
+    setNotice(`본문에 “${editor.language === "en" ? tool.en : tool.ko}” 버튼을 삽입했습니다. 저장 후 공개 글에서도 연결됩니다.`);
   }
 
   function insertEditorBlock(tag: "h2" | "h3" | "blockquote") {
@@ -598,8 +627,16 @@ export default function AdminBlogManager() {
                     <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={() => applyEditorCommand("removeFormat")}>서식 지우기</button>
                   </div>
                   <div className="blog-admin-inline-image-tools">
-                    <label>도구 버튼 삽입<select value={selectedToolId} onChange={(e) => setSelectedToolId(e.target.value)}>{RELATED_TOOLS.map((tool) => <option key={tool.id} value={tool.id}>{editor.language === "en" ? tool.en : tool.ko}</option>)}</select></label>
-                    <button type="button" className="blog-admin-secondary" onMouseDown={(e) => e.preventDefault()} onClick={insertRelatedTool}>본문에 버튼 넣기</button>
+                    <div className="blog-admin-tool-picker">
+                      <strong>본문에 연결할 도구 선택</strong>
+                      <input type="search" value={toolSearch} onChange={(e) => setToolSearch(e.target.value)} placeholder="도구 이름 검색 (예: 평수, PDF, 글자 수)" aria-label="도구 검색" />
+                      <select value={selectedToolId} onChange={(e) => setSelectedToolId(e.target.value)} aria-label="삽입할 도구 선택">
+                        <option value="">도구를 선택하세요</option>
+                        {filteredTools.map((tool) => <option key={tool.id} value={tool.id}>{editor.language === "en" ? tool.en : tool.ko}</option>)}
+                      </select>
+                      <button type="button" className="blog-admin-secondary" disabled={!selectedToolId} onMouseDown={(e) => e.preventDefault()} onClick={insertRelatedTool}>선택한 도구 버튼 삽입</button>
+                      <small>본문에서 버튼을 넣을 위치에 커서를 놓은 다음 도구를 선택하세요. 검색어로 원하는 도구를 찾을 수 있습니다.</small>
+                    </div>
                     <label>이미지 너비 <strong>{inlineImageWidth}</strong><input type="range" min="30" max="100" step="5" value={parseInt(inlineImageWidth, 10) || 100} onChange={(e) => resizeSelectedInlineImage(e.target.value + "%")} /></label>
                     <label>정렬<select value={inlineImageAlign} onChange={(e) => { const align = e.target.value; setInlineImageAlign(align); const image = selectedInlineImageRef.current; if (image) { image.dataset.align = align; image.style.margin = align === "left" ? "16px auto 16px 0" : align === "right" ? "16px 0 16px auto" : "16px auto"; syncEditorContent(); } }}><option value="center">가운데</option><option value="left">왼쪽</option><option value="right">오른쪽</option></select></label>
                     <button type="button" className="blog-admin-secondary" disabled={!hasSelectedInlineImage || uploadingImage} onClick={() => { setCropLeft(10); setCropTop(10); setCropWidth(80); setCropHeight(80); setCropOpen(true); }}>선택 이미지 자르기</button>
@@ -615,7 +652,7 @@ export default function AdminBlogManager() {
                     aria-label="본문 편집 영역"
                     aria-multiline="true"
                     data-placeholder="여기에 글을 작성하세요. 서식 버튼을 누르면 입력한 글에 바로 적용됩니다."
-                    dangerouslySetInnerHTML={{ __html: markdownToEditorHtml(editor.content_md) }}
+                    dangerouslySetInnerHTML={{ __html: markdownToEditorHtml(editor.content_md, editor.language) }}
                     onBlur={syncEditorContent}
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
