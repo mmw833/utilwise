@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     await setFeaturedPost(data.id, data.language);
     return NextResponse.json({ success: true }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    if (error instanceof PublishedPostNotFoundError) {
+    if (error instanceof AdminPostNotFoundError) {
       return NextResponse.json({ error: "해당 언어의 게시글을 찾을 수 없습니다." }, { status: 404, headers: { "Cache-Control": "no-store" } });
     }
     // Keep implementation details out of the client response, but retain the
