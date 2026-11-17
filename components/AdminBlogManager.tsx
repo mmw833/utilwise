@@ -68,11 +68,11 @@ function dateLabel(timestamp: number | null) {
 function escapeEditorHtml(value: string) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
-function markdownToEditorHtml(markdown: string) {
+function markdownToEditorHtml(markdown: string, language: "ko" | "en") {
   const inline = (value: string) => escapeEditorHtml(value)
     .replace(/!\[([^\]]*)\]\((\/api\/blog\/images\/[^)]+)\)/g, (_m, meta, src) => { const match = meta.match(/^(.*?)\|width=((?:3[0-9]|[4-9][0-9]|100)%)\|align=(left|center|right)$/); const alt = match ? match[1] : meta; const width = match ? match[2] : "100%"; const align = match ? match[3] : "center"; return '<img src="' + src + '" alt="' + alt + '" data-width="' + width + '" data-align="' + align + '" />'; })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\[\[tool:([a-z0-9-]+)\]\]/g, (_m, id) => { const tool = RELATED_TOOLS.find((item) => item.id === id); return tool ? '<span class="blog-editor-tool-token" data-tool-token="' + id + '" contenteditable="false">' + escapeEditorHtml(tool.ko) + ' 버튼</span>' : _m; })
+    .replace(/\[\[tool:([a-z0-9-]+)\]\]/g, (_m, id) => { const tool = RELATED_TOOLS.find((item) => item.id === id); return tool ? '<span class="blog-editor-tool-token" data-tool-token="' + id + '" contenteditable="false">' + escapeEditorHtml(language === "en" ? tool.en : tool.ko) + ' button</span>' : _m; })
     .replace(/\\*([^*]+)\\*/g, "<em>$1</em>")
     .replace(/\\[([^\\]]+)\\]\\((https?:\\/\\/[^)]+)\\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
   return markdown.replace(/\r\n?/g, "\n").split(/\n{2,}/).map((block) => {
@@ -652,7 +652,7 @@ export default function AdminBlogManager() {
                     aria-label="본문 편집 영역"
                     aria-multiline="true"
                     data-placeholder="여기에 글을 작성하세요. 서식 버튼을 누르면 입력한 글에 바로 적용됩니다."
-                    dangerouslySetInnerHTML={{ __html: markdownToEditorHtml(editor.content_md) }}
+                    dangerouslySetInnerHTML={{ __html: markdownToEditorHtml(editor.content_md, editor.language) }}
                     onBlur={syncEditorContent}
                     onKeyUp={rememberEditorSelection}
                     onMouseUp={rememberEditorSelection}
