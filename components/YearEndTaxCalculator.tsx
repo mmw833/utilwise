@@ -69,6 +69,7 @@ export default function YearEndTaxCalculator() {
   const [withheld, setWithheld] = useState("");
   const [dependents, setDependents] = useState("1");
   const [nationalPension, setNationalPension] = useState("0");
+  const [healthEmploymentInsurance, setHealthEmploymentInsurance] = useState("0");
   const [pensionSavings, setPensionSavings] = useState("0");
   const [irp, setIrp] = useState("0");
 
@@ -79,7 +80,8 @@ export default function YearEndTaxCalculator() {
     const earnedAmount = Math.max(0, grossPay - earnedIncomeDeduction(grossPay));
     const personalDeduction = Math.min(20, Math.max(1, Math.floor(amount(dependents)))) * 1_500_000;
     const publicPensionDeduction = Math.min(earnedAmount, amount(nationalPension));
-    const taxBase = Math.max(0, earnedAmount - personalDeduction - publicPensionDeduction);
+    const healthEmploymentDeduction = Math.min(Math.max(0, earnedAmount - personalDeduction - publicPensionDeduction), amount(healthEmploymentInsurance));
+    const taxBase = Math.max(0, earnedAmount - personalDeduction - publicPensionDeduction - healthEmploymentDeduction);
     const calculatedTax = progressiveTax(taxBase);
     const earnedCredit = Math.min(calculatedTax, earnedIncomeTaxCredit(calculatedTax, grossPay));
     const pensionSavingsEligible = Math.min(6_000_000, amount(pensionSavings));
@@ -92,12 +94,12 @@ export default function YearEndTaxCalculator() {
     const difference = paidTax - estimatedDecisionTax;
     const localTaxDifference = difference * 0.1;
     return {
-      grossPay, earnedAmount, personalDeduction, publicPensionDeduction, taxBase,
+      grossPay, earnedAmount, personalDeduction, publicPensionDeduction, healthEmploymentDeduction, taxBase,
       calculatedTax, earnedCredit, pensionCredit, estimatedDecisionTax, paidTax,
       incomeTaxDifference: difference, localTaxDifference, totalDifference: difference + localTaxDifference,
       pensionRate,
     };
-  }, [salary, nonTaxable, withheld, dependents, nationalPension, pensionSavings, irp]);
+  }, [salary, nonTaxable, withheld, dependents, nationalPension, healthEmploymentInsurance, pensionSavings, irp]);
 
   const isRefund = result.totalDifference >= 0;
   const valid = salary.trim() !== "" && amount(salary) > 0 && withheld.trim() !== "" && amount(dependents) >= 1;
@@ -106,7 +108,7 @@ export default function YearEndTaxCalculator() {
     <div className="calc-layout">
       <section className="panel">
         <h2>기본 정보 입력</h2>
-        <Input label="① 연간 총급여" value={salary} onChange={setSalary} hint="세전 연봉과 상여금 등 과세 대상 급여 합계" />
+        <Input label="① 연간 총급여" value={salary} onChange={setSalary} hint="급여·상여·수당 등 비과세 급여를 포함한 연간 금액" />
         <Input label="② 연간 비과세 급여" value={nonTaxable} onChange={setNonTaxable} hint="급여명세서의 식대·자가운전보조금 등 비과세 금액 합계. 모르면 0원" />
         <Input label="③ 올해 미리 낸 소득세" value={withheld} onChange={setWithheld} hint="급여명세서의 소득세 누계 또는 연말까지 예상액. 지방소득세는 제외" />
         <div className="field">
@@ -119,8 +121,9 @@ export default function YearEndTaxCalculator() {
         <details style={{ borderTop: "1px solid #e5eaf0", paddingTop: 16, marginTop: 20 }}>
           <summary style={{ cursor: "pointer", fontWeight: 700, fontSize: 14 }}>추가 정보 입력 (선택)</summary>
           <Input label="⑤ 국민연금 본인 부담액" value={nationalPension} onChange={setNationalPension} hint="올해 급여에서 공제된 국민연금 근로자 부담액 합계. 모르면 0원" />
-          <Input label="⑥ 연금저축 납입액" value={pensionSavings} onChange={setPensionSavings} hint="연금저축 세액공제 대상 납입액은 최대 600만원" />
-          <Input label="⑦ IRP 납입액" value={irp} onChange={setIrp} hint="연금저축과 합산해 세액공제 대상 납입액 최대 900만원" />
+          <Input label="⑥ 건강보험·고용보험 본인 부담액" value={healthEmploymentInsurance} onChange={setHealthEmploymentInsurance} hint="올해 납부한 건강보험·장기요양보험·고용보험 근로자 부담액 합계. 모르면 0원" />
+          <Input label="⑦ 연금저축 납입액" value={pensionSavings} onChange={setPensionSavings} hint="연금저축 세액공제 대상 납입액은 최대 600만원" />
+          <Input label="⑧ IRP 납입액" value={irp} onChange={setIrp} hint="연금저축과 합산해 세액공제 대상 납입액 최대 900만원" />
         </details>
         <p className="hint" style={{ marginTop: 18 }}>입력한 금액은 이 브라우저 안에서만 계산하며 서버로 전송하지 않습니다.</p>
       </section>
@@ -144,6 +147,7 @@ export default function YearEndTaxCalculator() {
               ["근로소득금액", won(result.earnedAmount)],
               ["기본공제", won(result.personalDeduction)],
               ["국민연금 소득공제", won(result.publicPensionDeduction)],
+              ["건강보험·고용보험 소득공제", won(result.healthEmploymentDeduction)],
               ["예상 과세표준", won(result.taxBase)],
               ["산출세액", won(result.calculatedTax)],
               ["근로소득세액공제", won(result.earnedCredit)],
@@ -159,7 +163,7 @@ export default function YearEndTaxCalculator() {
       <h2>연말정산 환급액은 어떻게 결정될까요?</h2>
       <p>연말정산은 1년 동안 미리 낸 소득세와 각종 공제를 반영해 확정한 세금을 비교하는 과정입니다. 이미 낸 세금이 최종 세금보다 많으면 환급받고, 적으면 추가 납부합니다.</p>
       <h3>계산에 반영한 항목</h3>
-      <p>2026년 귀속 근로소득공제, 기본공제, 국민연금 본인 부담액, 누진세율, 근로소득세액공제, 연금계좌 세액공제를 간단히 반영합니다. 지방소득세는 소득세 차액의 10%로 추정합니다.</p>
+      <p>2026년 귀속 근로소득공제, 기본공제, 국민연금·건강보험·고용보험 본인 부담액, 누진세율, 근로소득세액공제, 연금계좌 세액공제를 간단히 반영합니다. 지방소득세는 소득세 차액의 10%로 추정합니다.</p>
       <h3>정확한 결과가 필요하다면</h3>
       <p><a href="https://www.hometax.go.kr/" target="_blank" rel="noreferrer">국세청 홈택스</a>의 연말정산 예상세액 계산 서비스를 이용하면 간소화 자료와 공제신고서를 바탕으로 더 구체적으로 확인할 수 있습니다.</p>
       <p style={{ fontSize: 12, color: "#718096" }}>공식 기준: <a href="https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7870" target="_blank" rel="noreferrer">국세청 연말정산 세액계산방법</a> · <a href="https://www.nts.go.kr/nts/cm/cntnts/cntntsView.do?cntntsId=7871" target="_blank" rel="noreferrer">국세청 근로소득공제</a> · <a href="https://www.law.go.kr/lsLinkCommonInfo.do?lsJoLnkSeq=1032884481" target="_blank" rel="noreferrer">소득세법 제59조 근로소득세액공제</a></p>
