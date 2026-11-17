@@ -72,7 +72,7 @@ function markdownToEditorHtml(markdown: string) {
   const inline = (value: string) => escapeEditorHtml(value)
     .replace(/!\[([^\]]*)\]\((\/api\/blog\/images\/[^)]+)\)/g, (_m, meta, src) => { const match = meta.match(/^(.*?)\|width=((?:3[0-9]|[4-9][0-9]|100)%)\|align=(left|center|right)$/); const alt = match ? match[1] : meta; const width = match ? match[2] : "100%"; const align = match ? match[3] : "center"; return '<img src="' + src + '" alt="' + alt + '" data-width="' + width + '" data-align="' + align + '" />'; })
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
-    .replace(/\\[\\[tool:([a-z0-9-]+)\\]\\]/g, (_m, id) => { const tool = RELATED_TOOLS.find((item) => item.id === id); return tool ? '<span class="blog-editor-tool-token" data-tool-token="' + id + '" contenteditable="false">' + escapeEditorHtml(tool.ko) + ' 버튼</span>' : _m; })
+    .replace(/\[\[tool:([a-z0-9-]+)\]\]/g, (_m, id) => { const tool = RELATED_TOOLS.find((item) => item.id === id); return tool ? '<span class="blog-editor-tool-token" data-tool-token="' + id + '" contenteditable="false">' + escapeEditorHtml(tool.ko) + ' 버튼</span>' : _m; })
     .replace(/\\*([^*]+)\\*/g, "<em>$1</em>")
     .replace(/\\[([^\\]]+)\\]\\((https?:\\/\\/[^)]+)\\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
   return markdown.replace(/\r\n?/g, "\n").split(/\n{2,}/).map((block) => {
