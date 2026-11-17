@@ -64,9 +64,9 @@ function Input({ label, value, onChange, hint, suffix = "원" }: {
 }
 
 export default function YearEndTaxCalculator() {
-  const [salary, setSalary] = useState("50000000");
+  const [salary, setSalary] = useState("");
   const [nonTaxable, setNonTaxable] = useState("0");
-  const [withheld, setWithheld] = useState("1800000");
+  const [withheld, setWithheld] = useState("");
   const [dependents, setDependents] = useState("1");
   const [nationalPension, setNationalPension] = useState("0");
   const [pensionSavings, setPensionSavings] = useState("0");
@@ -100,7 +100,7 @@ export default function YearEndTaxCalculator() {
   }, [salary, nonTaxable, withheld, dependents, nationalPension, pensionSavings, irp]);
 
   const isRefund = result.totalDifference >= 0;
-  const valid = amount(salary) > 0 && amount(withheld) >= 0 && amount(dependents) >= 1;
+  const valid = salary.trim() !== "" && amount(salary) > 0 && withheld.trim() !== "" && amount(dependents) >= 1;
 
   return <div className="year-end-tax">
     <div className="calc-layout">
@@ -127,7 +127,7 @@ export default function YearEndTaxCalculator() {
 
       <section className="panel">
         <h2>예상 연말정산 결과</h2>
-        {!valid ? <div className="notice">총급여와 공제 대상 가족 수를 확인해 주세요.</div> : <>
+        {!valid ? <div className="notice">연간 총급여와 올해 미리 낸 소득세를 입력하면 예상 결과를 확인할 수 있습니다.</div> : <>
           <div className="result" style={{ background: isRefund ? "#f1f7fd" : "#fff7ed", borderColor: isRefund ? "#dce9f7" : "#f4dfc7" }}>
             <small>{isRefund ? "예상 환급액" : "예상 추가 납부액"}</small>
             <strong style={{ color: isRefund ? "#245b91" : "#9a5b20" }}>{won(Math.abs(result.totalDifference))}</strong>
