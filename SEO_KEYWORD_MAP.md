@@ -248,3 +248,11 @@ Notes:
 |---|---|---|
 | /image-converter | 이미지 파일 변환기 | HEIC JPG 변환, HEIF JPG 변환, 아이폰 사진 JPG 변환, JPG PNG WebP 변환 |
 | /en/image-converter | image converter | HEIC to JPG, HEIF to JPG, iPhone photo converter, convert HEIC to PNG, WebP converter |
+
+
+## 연말정산 환급액 계산기
+- 대표 키워드: 연말정산 환급액 계산기
+- 보조 키워드: 연말정산 예상 환급금, 연말정산 간편 계산, 2026 연말정산 계산
+- 검색 의도: 연봉과 기납부 소득세를 바탕으로 예상 환급/추가 납부 규모를 빠르게 파악
+- 기능 범위: 2026년 귀속 근로소득자용 간편 추정. 실제 공제자료 전체를 반영하는 세무 신고 도구가 아님
+- 페이지: `/year-end-tax`

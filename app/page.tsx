@@ -9,6 +9,7 @@ const tools=[
 {icon:"₩",title:"대출 이자 계산기",desc:"월 상환금과 총 이자 부담을 비교해요.",href:"/loan"},
 {icon:"⌂",title:"부동산 중개수수료",desc:"매매·전세·월세 중개보수 상한을 확인해요.",href:"/brokerage"},
 {icon:"▤",title:"연봉 실수령액",desc:"4대 보험과 세금을 고려한 예상 금액을 확인해요.",href:"/salary"},
+{icon:"₩",title:"연말정산 환급액",desc:"간단한 급여 정보로 예상 환급액을 확인해요.",href:"/year-end-tax"},
 {icon:"◷",title:"퇴직금 계산기",desc:"근속기간과 평균임금으로 예상 퇴직금을 계산해요.",href:"/severance"},
 {icon:"₩",title:"예금·적금 이자 계산기",desc:"저축 만기 이자와 세후 수령액을 계산해요.",href:"/savings"},
 {icon:"▣",title:"DSR 대출 한도 계산기",desc:"소득과 대출 상환액으로 DSR을 추정해요.",href:"/dsr"},
