@@ -1215,3 +1215,25 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 .journal-popular-rank-copy strong{font-size:14px;line-height:1.45;word-break:keep-all}
 .journal-popular-rank-copy small{font-size:10px;color:#89939a}
 @media(max-width:760px){.journal-popular-layout{grid-template-columns:1fr;gap:18px}.journal-popular-lead-image{aspect-ratio:16/9}.journal-popular-lead-copy h3{font-size:22px}.journal-popular-rank-item{grid-template-columns:24px 82px minmax(0,1fr);min-height:76px;padding:9px 0}.journal-popular-rank-copy strong{font-size:13px}}
+
+
+/* Featured story thumbnail: square frame with the entire cover visible. */
+.journal-popular-lead-image{
+  aspect-ratio:1 / 1 !important;
+  height:auto !important;
+  min-height:0 !important;
+  background:#f7f5f1;
+}
+.journal-popular-lead-image>img{
+  width:100%;
+  height:100%;
+  object-fit:contain !important;
+  object-position:center;
+}
+.journal-popular-lead:hover .journal-popular-lead-image>img{transform:none}
+@media(max-width:760px){
+  .journal-popular-lead-image{
+    aspect-ratio:1 / 1 !important;
+    height:auto !important;
+  }
+}
