@@ -1,3 +1,10 @@
+## 2026-11-18 — 운영 배포 경로 단일화 및 재배포 트리거
+- Cloudflare Worker 배포 이력에서 GitHub main 자동 배포(`#59`, version `ff3f77c6`) 이후 Wrangler 수동 배포(version `56fc1bf0`)가 다시 운영 활성 버전으로 올라온 것을 확인.
+- 현재 활성 수동 배포에는 Git 커밋 SHA가 없어 main 코드와 운영 코드의 일치 여부를 추적할 수 없었음.
+- Production Deploy workflow에 `workflow_dispatch`를 추가해 최신 main을 변경 커밋 없이 공식 배포 경로로 재실행할 수 있도록 함.
+- 이후 운영 배포는 GitHub Actions Production Deploy를 기준으로 확인하고, 수동 Wrangler 배포를 혼용하지 않도록 함.
+- 배포 후 실제 HTML의 canonical/robots를 검증하기 전까지 SEO 수정 완료로 처리하지 않음.
+
 ## 2026-11-18 — MBTI 결과 페이지 robots/canonical 후속 보완
 - 결과 URL 전용 한·영 layout에 `noindex, follow` 및 Googlebot noindex 명시.
 - 한·영 MBTI 결과 canonical을 `utilwise.kr` 절대 URL로 고정.
