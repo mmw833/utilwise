@@ -8,6 +8,8 @@ const sitemap = readFileSync(sitemapPath, "utf8");
 const routes = [...registry.matchAll(/href:\s*"([^"]+)"/g)].map((match) => match[1]);
 const koreanMbtiResultPage = readFileSync("app/mbti/result/[type]/page.tsx", "utf8");
 const englishMbtiResultPage = readFileSync("app/en/mbti/result/[type]/page.tsx", "utf8");
+const koreanMbtiResultLayout = readFileSync("app/mbti/result/layout.tsx", "utf8");
+const englishMbtiResultLayout = readFileSync("app/en/mbti/result/layout.tsx", "utf8");
 
 const errors = [];
 
@@ -15,6 +17,10 @@ const errors = [];
 if (sitemap.includes("/mbti/result/")) errors.push("MBTI result URLs must not be included in the sitemap.");
 if (!koreanMbtiResultPage.includes("robots:{index:false,follow:true}")) errors.push("Korean MBTI result pages must set robots noindex,follow.");
 if (!englishMbtiResultPage.includes("robots:{index:false,follow:true}")) errors.push("English MBTI result pages must set robots noindex,follow.");
+if (!koreanMbtiResultLayout.includes("index:false") || !koreanMbtiResultLayout.includes("follow:true")) errors.push("Korean MBTI result layout must enforce noindex,follow.");
+if (!englishMbtiResultLayout.includes("index:false") || !englishMbtiResultLayout.includes("follow:true")) errors.push("English MBTI result layout must enforce noindex,follow.");
+if (!koreanMbtiResultPage.includes("https://utilwise.kr/mbti/result/")) errors.push("Korean MBTI result canonical must use utilwise.kr.");
+if (!englishMbtiResultPage.includes("https://utilwise.kr/en/mbti/result/")) errors.push("English MBTI result canonical must use utilwise.kr.");
 const duplicates = routes.filter((route, index) => routes.indexOf(route) !== index);
 if (duplicates.length) {
   errors.push(`Duplicate tool routes in ${registryPath}: ${[...new Set(duplicates)].join(", ")}`);
