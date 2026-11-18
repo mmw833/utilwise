@@ -1183,3 +1183,12 @@
 
 ## 최근 수정 — 2026-11-17
 - 메인 페이지 문서·텍스트 도구 목록의 텍스트 음성 변환기 중복 등록을 1개로 수정. PR 병합 및 운영 배포 확인 필요.
+
+
+## 2026-11-18 사이트맵·도구 경로 자동 검증 추가 (PR 검증 대기)
+- 현재 구조 확인 결과: 블로그 게시글은 `listPublishedPosts`로 동적 수집하지만, 계산기·온라인 도구 경로는 `app/sitemap.ts`의 배열에 수동 등록하는 방식.
+- `lib/tools/registry.ts`의 도구 27개 경로를 기준으로 한국어 페이지 파일 존재, 사이트맵 경로 등록, 중복 경로 여부, 영어 페이지 또는 영어 동적 라우트 존재를 검사하는 `scripts/check-sitemap-tools.mjs` 추가.
+- `npm run check:sitemap-tools` 명령 추가 및 GitHub Actions Build Check에서 Next.js 빌드 전에 자동 실행하도록 연결.
+- 한국 전용 연말정산 도구의 영어 페이지 제외 정책은 기존대로 유지.
+- 작업 브랜치: `seo/automated-sitemap-route-check`.
+- **미완료:** CI에서 경로 검사와 Next.js 빌드 실행 결과 확인, 운영 사이트맵 URL 및 중복 여부 재확인, PR 검토/병합.
