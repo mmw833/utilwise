@@ -6,7 +6,7 @@ const englishCalculators = calculators.filter((route) => route !== "/year-end-ta
 const pdfToolPages = ["/pdf-merge","/pdf-split","/pdf-rotate","/pdf-organize","/image-to-pdf"];
 const onlineToolPages = ["/online-tools","/qr-code-generator","/image-compressor","/image-resizer","/background-remover","/image-converter",...pdfToolPages];
 const englishOnlineToolPages = onlineToolPages.map((route) => `/en${route}`);
-const textToolPages = ["/text-tools","/image-to-text","/text-to-speech","/text-to-speech","/text-tools/character-counter","/text-tools/text-compare","/text-tools/remove-duplicates","/text-tools/speech-time"];
+const textToolPages = ["/text-tools","/image-to-text","/text-to-speech","/text-tools/character-counter","/text-tools/text-compare","/text-tools/remove-duplicates","/text-tools/speech-time"];
 const englishTextToolPages = textToolPages.map((route) => `/en${route}`);
 const mbtiTypes = ["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"];
 const pages = [
@@ -61,5 +61,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "monthly" as const,
     priority: 0.65,
   }));
-  return [...staticEntries, ...postEntries];
+  const uniqueEntries = new Map<string, MetadataRoute.Sitemap[number]>();
+  for (const entry of [...staticEntries, ...postEntries]) {
+    // Keep one canonical sitemap entry per URL even if route arrays overlap.
+    uniqueEntries.set(entry.url, entry);
+  }
+  return [...uniqueEntries.values()];
 }
