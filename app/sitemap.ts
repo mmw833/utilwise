@@ -8,7 +8,6 @@ const onlineToolPages = ["/online-tools","/qr-code-generator","/image-compressor
 const englishOnlineToolPages = onlineToolPages.map((route) => `/en${route}`);
 const textToolPages = ["/text-tools","/image-to-text","/text-to-speech","/text-tools/character-counter","/text-tools/text-compare","/text-tools/remove-duplicates","/text-tools/speech-time"];
 const englishTextToolPages = textToolPages.map((route) => `/en${route}`);
-const mbtiTypes = ["ISTJ","ISFJ","INFJ","INTJ","ISTP","ISFP","INFP","INTP","ESTP","ESFP","ENFP","ENTP","ESTJ","ESFJ","ENFJ","ENTJ"];
 const pages = [
 {route:"/blog",priority:0.75,changeFrequency:"daily" as const},
 {route:"/en/blog",priority:0.7,changeFrequency:"daily" as const},
@@ -26,7 +25,6 @@ const pages = [
 {route:"/psychology/desire",priority:0.7,changeFrequency:"monthly" as const},
 {route:"/psychology/mirror",priority:0.7,changeFrequency:"monthly" as const},
 {route:"/psychology/zombie",priority:0.7,changeFrequency:"monthly" as const},
-...mbtiTypes.map(type=>({route:`/mbti/result/${type}`,priority:0.45,changeFrequency:"yearly" as const})),
 {route:"/en",priority:0.8,changeFrequency:"weekly" as const},
 {route:"/en/about",priority:0.5,changeFrequency:"yearly" as const},
 {route:"/en/privacy",priority:0.4,changeFrequency:"yearly" as const},
@@ -41,7 +39,6 @@ const pages = [
 {route:"/en/psychology/desire",priority:0.6,changeFrequency:"monthly" as const},
 {route:"/en/psychology/mirror",priority:0.6,changeFrequency:"monthly" as const},
 {route:"/en/psychology/zombie",priority:0.6,changeFrequency:"monthly" as const},
-...mbtiTypes.map(type=>({route:`/en/mbti/result/${type}`,priority:0.4,changeFrequency:"yearly" as const}))
 ];
 export const dynamic = "force-dynamic";
 

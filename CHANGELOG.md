@@ -1,3 +1,10 @@
+## 2026-11-18 — 크롤링 효율 개선
+- 개인별 MBTI 결과 페이지(한국어·영어 32개)를 사이트맵에서 제외하고 해당 페이지에 noindex, follow 적용.
+- MBTI 검사 소개/시작 페이지는 검색 유입 대상이므로 사이트맵에 유지.
+- sitemap 자동 검사에 결과 URL 제외 및 양 언어 noindex 규칙 추가.
+- 기존 계산기·온라인 도구·블로그 주소, robots.txt 허용 정책은 변경하지 않음.
+- PR 및 빌드 검증 대기.
+
 ## 2026-11-18 — Google Search Console 색인 검사 및 운영 배포 확인
 - PR #56 병합 후 Build Check 및 Production Deploy 성공, Cloudflare Worker 배포와 D1 마이그레이션 완료.
 - 운영 sitemap 123개 URL 확인, robots.txt 및 영어 홈페이지 canonical/index 설정 확인. 기존 sitemap 재제출.
