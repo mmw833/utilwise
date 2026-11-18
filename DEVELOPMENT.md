@@ -759,3 +759,10 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 편집기에서 도구를 선택하고 `본문에 버튼 넣기`를 누르면 커서 위치에 `[[tool:tool-id]]` 토큰이 삽입된다.
 - `components/BlogMarkdown.tsx`는 토큰을 `lib/tools/registry.ts`의 실제 페이지 링크 버튼으로 렌더링한다. 알 수 없는 ID는 출력하지 않는다.
 - 한국어·영어 대응 페이지가 모두 존재하는 항목만 registry에 등록하며 D1 스키마 변경은 없다.
+
+
+## 사이트맵 및 도구 경로 검증
+- 도구를 추가하거나 `lib/tools/registry.ts`를 수정한 경우 `npm run check:sitemap-tools`를 실행한다.
+- 검사는 registry의 모든 도구에 대해 한국어 페이지 파일, 사이트맵 경로 등록, 중복 경로, 영어 페이지 또는 영어 동적 라우트 존재 여부를 확인한다.
+- 한국 전용 연말정산 도구의 영어 페이지는 현재 정책에 따라 검사 대상에서 제외한다.
+- GitHub Actions Build Check에서도 이 검사를 Next.js 빌드 전에 자동 실행한다.
