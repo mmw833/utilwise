@@ -26,5 +26,7 @@ jobs:
           node-version: 22
       - name: Install dependencies
         run: npm install
+      - name: Validate sitemap and tool routes
+        run: npm run check:sitemap-tools
       - name: Build
         run: npm run build

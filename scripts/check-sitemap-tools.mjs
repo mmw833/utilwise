@@ -1,0 +1,46 @@
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+
+const registryPath = "lib/tools/registry.ts";
+const sitemapPath = "app/sitemap.ts";
+const registry = readFileSync(registryPath, "utf8");
+const sitemap = readFileSync(sitemapPath, "utf8");
+const routes = [...registry.matchAll(/href:\s*"([^"]+)"/g)].map((match) => match[1]);
+
+const errors = [];
+const duplicates = routes.filter((route, index) => routes.indexOf(route) !== index);
+if (duplicates.length) {
+  errors.push(`Duplicate tool routes in ${registryPath}: ${[...new Set(duplicates)].join(", ")}`);
+}
+
+for (const route of routes) {
+  const koreanPage = join("app", route.slice(1), "page.tsx");
+  if (!existsSync(koreanPage)) {
+    errors.push(`Missing Korean page for tool route ${route}: expected ${koreanPage}`);
+  }
+
+  // Every tool route must be explicitly listed in one of the sitemap route groups.
+  const quotedRoute = JSON.stringify(route);
+  if (!sitemap.includes(quotedRoute)) {
+    errors.push(`Tool route is missing from sitemap route groups: ${route}`);
+  }
+
+  // The English year-end tax calculator is intentionally excluded because it is Korea-specific.
+  if (route !== "/year-end-tax") {
+    const englishRoute = `/en${route}`;
+    const exactEnglishPage = join("app", englishRoute.slice(1), "page.tsx");
+    const oneSegmentDynamicPage = route.split("/").filter(Boolean).length === 1
+      && existsSync("app/en/[tool]/page.tsx");
+    if (!existsSync(exactEnglishPage) && !oneSegmentDynamicPage) {
+      errors.push(`Missing English page or dynamic route for tool route ${route}: expected ${exactEnglishPage}`);
+    }
+  }
+}
+
+if (errors.length) {
+  console.error("Sitemap/tool route check failed:");
+  for (const error of errors) console.error(`- ${error}`);
+  process.exit(1);
+}
+
+console.log(`Sitemap/tool route check passed: ${routes.length} registered tools, no duplicate routes, Korean pages and English counterparts verified.`);
