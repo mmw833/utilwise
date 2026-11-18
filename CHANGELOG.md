@@ -1,3 +1,9 @@
+## 2026-11-18 — Google Search Console 색인 검사 및 운영 배포 확인
+- PR #56 병합 후 Build Check 및 Production Deploy 성공, Cloudflare Worker 배포와 D1 마이그레이션 완료.
+- 운영 sitemap 123개 URL 확인, robots.txt 및 영어 홈페이지 canonical/index 설정 확인. 기존 sitemap 재제출.
+- /area, /loan, /brokerage, /severance 색인 요청 접수 확인. 홈은 이미 색인됨.
+- /salary, /dsr, /blog 실시간 검사에서 크롤링/가져오기/색인 허용 모두 정상. 색인 요청 최종 접수 확인은 일부 미확보.
+- 색인 요청은 등록 보장이 아니며 Google의 실제 색인 결과를 추후 재확인해야 함.
 ## 2026-11-18 — Google 크롤링 및 사이트맵 점검
 - Search Console 색인 현황과 `/area` URL 검사를 확인하고, 운영 공개 HTML·robots.txt·sitemap을 비교 점검.
 - sitemap의 중복 `/text-to-speech` 선언 제거 및 최종 URL 단위 중복 방지 로직 추가.
