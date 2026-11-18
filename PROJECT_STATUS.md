@@ -1,3 +1,10 @@
+## 2026-11-18 크롤링 효율 개선 (PR 검증 대기)
+- 사이트맵에 포함되어 있던 한국어·영어 MBTI 개인 결과 URL 32개를 제외하도록 수정. 테스트 랜딩 페이지(/mbti, /en/mbti)는 유지.
+- 한국어·영어 MBTI 결과 페이지 메타데이터에 noindex, follow를 명시해 개인화 결과 페이지가 검색 색인 대상이 되지 않도록 함.
+- 기존 계산기·온라인 도구·블로그 URL 및 robots.txt의 전체 크롤링 허용 정책은 변경하지 않음.
+- sitemap 검사 스크립트에 MBTI 결과 URL 제외 및 한·영 noindex 설정 검증 추가.
+- **검증 대기:** GitHub Actions Build Check, sitemap 결과 URL 수/중복, 결과 페이지 robots 메타, 운영 배포 후 공개 응답 확인.
+
 ## 2026-11-18 Google Search Console 색인 검사 및 요청 후속
 - PR #56 병합 후 GitHub Actions Build Check 및 Production Deploy 모두 성공. 운영 Worker 배포와 D1 마이그레이션 완료.
 - 운영 sitemap 123개 URL 및 중복 URL 정리 확인. robots.txt 크롤링 허용, 영어 /en canonical 및 index, follow 확인.
