@@ -1,3 +1,11 @@
+## 2026-11-18 Google Search Console 색인 검사 및 요청 후속
+- PR #56 병합 후 GitHub Actions Build Check 및 Production Deploy 모두 성공. 운영 Worker 배포와 D1 마이그레이션 완료.
+- 운영 sitemap 123개 URL 및 중복 URL 정리 확인. robots.txt 크롤링 허용, 영어 /en canonical 및 index, follow 확인.
+- 기존 sitemap을 삭제하지 않고 Search Console에서 재제출. 이전 보고서의 발견 URL은 125개였으며 재처리 후 새 집계값은 아직 미확인.
+- /area, /loan, /brokerage, /severance 색인 요청 접수 확인. 홈 /는 이미 색인됨.
+- /salary 실시간 검사: 페이지 사용 가능, 크롤링 허용, 가져오기 성공, 색인 허용, canonical https://utilwise.kr/salary. 기술적 차단 근거 없음. 색인 요청 최종 접수 확인 문구는 미확보.
+- /dsr, /blog 실시간 검사 통과 및 미색인 확인. 색인 요청 버튼을 눌렀으나 최종 접수 확인 문구는 미확보.
+- 색인 요청은 색인 보장이 아님. 다음 작업은 /salary, /dsr, /blog 요청 접수 상태 재확인 및 색인 모니터링. 현재 근거만으로 코드를 수정하지 않음.
 ## 2026-11-18 Google 검색 크롤링 기반 정리 (PR 검증 대기)
 - Google Search Console 직접 확인: 색인 1개, 미색인 107개. 미색인 사유는 `발견됨 - 현재 색인이 생성되지 않음`; URL 검사에서 `/area`는 Google 미등록 상태로 확인됨.
 - 운영 공개 페이지 직접 점검: `/`, `/area`, `/loan`, `/blog` 모두 서버 렌더링 본문과 검색용 제목/설명 확인. `/area`와 `/loan`은 fetch 결과상 각자 canonical이 존재하고 `index, follow` 지시가 확인됨. robots.txt는 전체 허용 및 sitemap 경로를 안내함.
