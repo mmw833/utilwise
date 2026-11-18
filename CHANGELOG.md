@@ -1,3 +1,10 @@
+## 2026-11-18 — MBTI 결과 페이지 robots/canonical 후속 보완
+- 결과 URL 전용 한·영 layout에 `noindex, follow` 및 Googlebot noindex 명시.
+- 한·영 MBTI 결과 canonical을 `utilwise.kr` 절대 URL로 고정.
+- sitemap 검사 스크립트에서 결과 layout noindex와 canonical 도메인 검증.
+- PR #58 배포 후 실제 HTML에서 기존 `index, follow` 및 `utilwise.com` canonical이 확인되어 추가 보완.
+- 운영 raw HTML 재검증 전까지 완료 처리하지 않음.
+
 ## 2026-11-18 — 크롤링 효율 개선
 - 개인별 MBTI 결과 페이지(한국어·영어 32개)를 사이트맵에서 제외하고 해당 페이지에 noindex, follow 적용.
 - MBTI 검사 소개/시작 페이지는 검색 유입 대상이므로 사이트맵에 유지.
