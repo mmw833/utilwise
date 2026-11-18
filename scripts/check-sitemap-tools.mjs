@@ -6,8 +6,15 @@ const sitemapPath = "app/sitemap.ts";
 const registry = readFileSync(registryPath, "utf8");
 const sitemap = readFileSync(sitemapPath, "utf8");
 const routes = [...registry.matchAll(/href:\s*"([^"]+)"/g)].map((match) => match[1]);
+const koreanMbtiResultPage = readFileSync("app/mbti/result/[type]/page.tsx", "utf8");
+const englishMbtiResultPage = readFileSync("app/en/mbti/result/[type]/page.tsx", "utf8");
 
 const errors = [];
+
+// Personalized MBTI result pages are intentionally noindex and must not be in the sitemap.
+if (sitemap.includes("/mbti/result/")) errors.push("MBTI result URLs must not be included in the sitemap.");
+if (!koreanMbtiResultPage.includes("robots:{index:false,follow:true}")) errors.push("Korean MBTI result pages must set robots noindex,follow.");
+if (!englishMbtiResultPage.includes("robots:{index:false,follow:true}")) errors.push("English MBTI result pages must set robots noindex,follow.");
 const duplicates = routes.filter((route, index) => routes.indexOf(route) !== index);
 if (duplicates.length) {
   errors.push(`Duplicate tool routes in ${registryPath}: ${[...new Set(duplicates)].join(", ")}`);
