@@ -1,3 +1,8 @@
+## 2026-11-21 — favicon 캐시 후속 조치
+- 운영에서 PNG/Apple 아이콘은 정상 제공되고 /favicon.ico는 cache-busting query가 있을 때 실제 ICO로 표시되는 것을 확인.
+- /favicon.ico의 이전 캐시 응답 재사용 가능성에 대응해 정적 파일 응답에 Cache-Control: no-store를 지정하고, 운영 배포 후 Cloudflare에서 해당 URL만 선택적으로 purge하도록 workflow 보완.
+- 네이버 재진단은 캐시 없는 기본 URL 응답을 확인한 뒤 진행.
+
 ## 2026-11-21 — favicon 정적 파일 및 메타데이터 경로 복구
 - Next.js 빌드 라우트에 포함되지 않던 `app/favicon.ico/route.ts`를 제거하고 `public/` 정적 아이콘으로 전환.
 - ICO, 16x16/32x32 PNG, Apple Touch Icon 및 manifest를 추가하고 `app/layout.tsx` 메타데이터 경로와 일치시킴.
