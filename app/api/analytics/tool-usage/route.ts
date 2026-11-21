@@ -33,7 +33,15 @@ export async function GET(req:NextRequest){
    db.prepare("SELECT SUM(CASE WHEN event_type IN ('run','complete') THEN 1 ELSE 0 END) AS usage,SUM(CASE WHEN event_type='start' THEN 1 ELSE 0 END) AS starts,SUM(CASE WHEN event_type='complete' THEN 1 ELSE 0 END) AS completions FROM tool_usage_events WHERE event_date BETWEEN ? AND ?").bind(start,end).first()
   ]);
   const labels:Record<string,[string,string]>={mbti:["MBTI 성격유형 테스트","MBTI Personality Test"],"big-five":["빅파이브 성격검사","Big Five Personality Test"],eq:["감성지능(EQ) 테스트","Emotional Intelligence Test"],psychology:["나도 몰랐던 나의 진짜 모습","Discover Your Hidden Self"],"psychology-desire":["내 마음속 진짜 욕망","What Do I Truly Want?"],"psychology-mirror":["사람들이 보는 나 vs 진짜 나","How Others See Me vs. Who I Really Am"],"psychology-zombie":["좀비 생존 테스트","Zombie Survival Quiz"]};
-  const names=Object.fromEntries(RELATED_TOOLS.map(x=>[x.id,[x.ko,x.en]]));
-  return json({start,end,totals:totals||{usage:0,starts:0,completions:0},daily:daily.results||[],tools:(toolsRows.results||[]).map((x:any)=>({...x,name:labels[x.toolId]||names[x.toolId]||[x.toolId,x.toolId]})),categories:cats.results||[],locales:langs.results||[]});
+  const catalog=[
+   ...RELATED_TOOLS.map(x=>({toolId:x.id,category:online.has(x.id)?"online-tool":"calculator",name:[x.ko,x.en] as [string,string]})),
+   ...Object.entries(tests).map(([toolId,category])=>({toolId,category,name:labels[toolId]||[toolId,toolId] as [string,string]}))
+  ];
+  const actual=new Map((toolsRows.results||[]).map((x:any)=>[x.toolId+":"+x.locale,x]));
+  const expanded=catalog.flatMap(tool=>[("ko" as const),("en" as const)].map(locale=>{
+   const x:any=actual.get(tool.toolId+":"+locale);
+   return {toolId:tool.toolId,category:tool.category,locale,usage:Number(x?.usage)||0,starts:Number(x?.starts)||0,completions:Number(x?.completions)||0,name:tool.name};
+  }));
+  return json({start,end,totals:totals||{usage:0,starts:0,completions:0},daily:daily.results||[],tools:expanded,categories:cats.results||[],locales:langs.results||[]});
  }catch{return json({error:"사용량 통계를 불러오지 못했습니다. D1 migration 적용 여부를 확인해 주세요."},503)}
 }
