@@ -10,6 +10,7 @@ on:
       - feat/blog-inline-image-placement
       - feat/blog-editor-and-card-polish
       - feat/tool-usage-analytics
+      - fix/favicon-ico-static-rewrite-2026-11-22
 
 permissions:
   contents: read
