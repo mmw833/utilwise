@@ -1,5 +1,6 @@
 "use client";
-import {useMemo,useState} from "react";
+import {useEffect,useMemo,useState} from "react";
+import {trackToolUsage} from "@/lib/analytics/tool-usage";
 
 type Mode="counter"|"compare"|"dedupe";
 const countWords=(text:string)=>text.trim()?text.trim().split(/\s+/u).length:0;
@@ -11,6 +12,7 @@ export default function TextTools({mode,english=false}:{mode:Mode;english?:boole
  const [left,setLeft]=useState("");
  const [right,setRight]=useState("");
  const [copied,setCopied]=useState(false);
+ useEffect(()=>{if(mode!=="counter"||!text.trim())return;const timer=setTimeout(()=>trackToolUsage("character-counter","online-tool","run",english?"en":"ko"),1200);return()=>clearTimeout(timer);},[mode,text,english]);
  const copy=(value:string)=>{if(typeof navigator!=="undefined"&&navigator.clipboard){navigator.clipboard.writeText(value).then(()=>setCopied(true)).catch(()=>setCopied(false));}};
  const deduped=useMemo(()=>{
   const seen=new Set<string>();

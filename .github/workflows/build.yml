@@ -30,5 +30,7 @@ jobs:
         run: npm run check:sitemap-tools
       - name: Validate visitor analytics query
         run: npm run check:visitor-analytics
+      - name: Validate tool usage analytics
+        run: npm run check:tool-usage-analytics
       - name: Build
         run: npm run build

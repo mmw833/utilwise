@@ -1,4 +1,5 @@
 "use client";
+import {trackToolUsage} from "@/lib/analytics/tool-usage";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -102,6 +103,7 @@ export default function TextToSpeechTool({ lang }: { lang: "ko" | "en" }) {
       const wav = engine.writeWavFile(result.wav, tts.sampleRate);
       const url = URL.createObjectURL(new Blob([wav], { type: "audio/wav" }));
       setAudioUrl(previous => { if (previous) URL.revokeObjectURL(previous); return url; });
+      trackToolUsage("text-to-speech","online-tool","run",lang);
       setDuration(result.duration[0] || 0);
       setProgress(100); setStatus(en ? "Speech generated. Preview or download the WAV file." : "음성 생성이 완료됐습니다. 미리 듣거나 WAV 파일을 저장하세요.");
     } catch (e) {

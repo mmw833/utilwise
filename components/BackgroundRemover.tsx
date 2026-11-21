@@ -1,4 +1,5 @@
 "use client";
+import {trackToolUsage} from "@/lib/analytics/tool-usage";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -283,6 +284,7 @@ export default function BackgroundRemover({ lang = "ko" }: { lang?: Language }) 
       const blob = await applyMaskToOriginal(file, maskBlob);
       if (!blob || blob.size === 0) throw new Error("Empty image output");
       setResultUrl(URL.createObjectURL(blob));
+      trackToolUsage("background-remover","online-tool","run",lang);
       setStatus(t.modelReady);
       setStage(t.done);
       setProgress(100);

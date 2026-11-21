@@ -9,7 +9,8 @@
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "check:sitemap-tools": "node scripts/check-sitemap-tools.mjs",
-    "check:visitor-analytics": "node scripts/check-visitor-analytics.mjs"
+    "check:visitor-analytics": "node scripts/check-visitor-analytics.mjs",
+    "check:tool-usage-analytics": "node scripts/check-tool-usage-analytics.mjs"
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.6.5",

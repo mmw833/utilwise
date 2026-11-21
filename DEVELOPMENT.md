@@ -772,3 +772,17 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 검사는 registry의 모든 도구에 대해 한국어 페이지 파일, 사이트맵 경로 등록, 중복 경로, 영어 페이지 또는 영어 동적 라우트 존재 여부를 확인한다.
 - 한국 전용 연말정산 도구의 영어 페이지는 현재 정책에 따라 검사 대상에서 제외한다.
 - GitHub Actions Build Check에서도 이 검사를 Next.js 빌드 전에 자동 실행한다.
+
+
+## 도구 사용량 분석
+- 관리자 URL: `/admin/blog/usage` (기존 관리자 로그인 필요).
+- API: `POST /api/analytics/tool-usage`는 이벤트 수집, `GET`은 관리자 통계 조회.
+- D1 migration: `migrations/0004_tool_usage_analytics.sql`.
+- 날짜는 한국시간(KST) 기준으로 저장한다. 날짜별 합계와 기간별 합계를 제공하며 오늘의 실시간 카운터는 제공하지 않는다.
+- 이벤트는 UUID를 기본키로 중복 삽입을 방지한다. 개인정보 및 테스트 답변은 수집하지 않는다.
+- 클라이언트 함수: `trackToolUsage(toolId, category, eventType, locale)`, `trackToolUsageStart(...)`.
+- 공통 한국어 계산기 및 영어 동적 계산기는 입력 변경 후 포커스 이탈/입력 중단 시 `run` 이벤트를 집계한다. 값 자체는 API로 전송하지 않는다.
+- 날짜/부피/팁 계산기는 CalculatorShell 이벤트 캡처로 추적한다.
+- 이미지/PDF/QR/OCR/텍스트/음성 등 주요 온라인 도구는 변환·생성·인식 성공 또는 결과 다운로드 시 `run` 이벤트를 전송한다. 이벤트에는 기능 ID/카테고리/언어만 포함한다.
+- CI의 구조 검사와 Next.js production build, Preview OpenNext build 및 D1 migration/Worker 배포/한·영 블로그 smoke test까지 통과했다. 관리자 UI 로그인과 실제 통계 이벤트 집계는 별도 브라우저 확인이 필요하다.
+- 로컬 검증: `npm run check:tool-usage-analytics`, `npm run build`; D1 migration 적용 후 Preview에서 API 및 관리자 UI를 테스트한다.

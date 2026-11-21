@@ -1,12 +1,15 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useRef, useState } from "react";
+import { trackToolUsage } from "@/lib/analytics/tool-usage";
 
+const CalculatorUsageContext=createContext<{changed:()=>void;commit:()=>void}|null>(null);
 const won=(n:number)=>Math.round(n).toLocaleString("ko-KR")+"원";
 const num=(s:string)=>Math.max(0,Number(s)||0);
 function Field({label,value,onChange,suffix="",step="1",type="number"}:{label:string,value:string,onChange:(v:string)=>void,suffix?:string,step?:string,type?:string}){
- return <div className="field"><label>{label}</label><div style={{display:"flex",alignItems:"center",gap:8}}><input type={type} min="0" step={step} value={value} onChange={e=>onChange(e.target.value)}/>{suffix&&<span className="hint">{suffix}</span>}</div></div>
+ const usage=useContext(CalculatorUsageContext);
+ return <div className="field"><label>{label}</label><div style={{display:"flex",alignItems:"center",gap:8}}><input type={type} min="0" step={step} value={value} onChange={e=>{onChange(e.target.value);usage?.changed();}} onBlur={()=>usage?.commit()}/>{suffix&&<span className="hint">{suffix}</span>}</div></div>
 }
 function Result({title,value,rows=[]}:{title:string,value:string,rows?:[string,string][]}){
  return <div className="result"><small>{title}</small><strong>{value}</strong>{rows.map(([a,b])=><div className="result-row" key={a}><span>{a}</span><b>{b}</b></div>)}</div>
@@ -124,6 +127,10 @@ const relatedCalculators:Record<string,[string,string][]>={
 };
 export function CalculatorShell({title,desc,children}:{title:string,desc:string,children:React.ReactNode}){
  const pathname = usePathname();
+ const toolId=pathname.split("/").filter(Boolean)[0]||"";
+ const changed=useRef(false);
+ const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const usage=useMemo(()=>({changed:()=>{changed.current=true;},commit:()=>{if(!changed.current)return;if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{changed.current=false;trackToolUsage(toolId,"calculator","run","ko");},700);}}),[toolId]);
  const pageUrl = `https://utilwise.kr${pathname}`;
  const structuredData = {
   "@context": "https://schema.org",
@@ -149,6 +156,6 @@ export function CalculatorShell({title,desc,children}:{title:string,desc:string,
   <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData)}} />
   <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify(breadcrumbData)}} />
   <header className="wrap header"><Link href="/" className="logo">UTIL<span>WISE</span>.</Link><nav className="nav" aria-label="도구 탐색"><Link href="/#calculators">계산기</Link><Link href="/online-tools">온라인 도구</Link><Link href="/text-tools">문서·텍스트 도구</Link></nav><Link href="/" className="sub">← 전체 도구</Link></header>
-  <section className="wrap section"><div className="eyebrow">UTILWISE CALCULATOR</div><h1 style={{fontSize:32,letterSpacing:"-1px",margin:"12px 0 8px"}}>{title}</h1><p className="sub">{desc}</p>{["/brokerage","/salary","/severance","/dsr","/rent-conversion","/vat","/savings"].includes(pathname)&&<div className="country-basis">대한민국 기준 적용 · 대한민국 법률·세금·금융 제도를 바탕으로 한 계산입니다.</div>}{children}<CalculatorGuide pathname={pathname}/><nav className="related-calculators" aria-label="UTILWISE 도구 카테고리"><h2>다른 도구도 이용해 보세요</h2><div><Link href="/#calculators">생활 계산기 전체 보기 →</Link><Link href="/online-tools">온라인 도구 전체 보기 →</Link><Link href="/text-tools">문서·텍스트 도구 전체 보기 →</Link></div></nav>{relatedCalculators[pathname]&&<nav className="related-calculators" aria-label="관련 계산기"><h2>함께 사용하면 좋은 계산기</h2><div>{relatedCalculators[pathname].map(([label,href])=><Link key={href} href={href}>{label} →</Link>)}</div></nav>}<div className="footer">계산 결과는 참고용이며 실제 거래·세금·금융 판단 전 관련 기관의 최신 기준을 확인하세요.</div></section>
+  <section className="wrap section"><div className="eyebrow">UTILWISE CALCULATOR</div><h1 style={{fontSize:32,letterSpacing:"-1px",margin:"12px 0 8px"}}>{title}</h1><p className="sub">{desc}</p>{["/brokerage","/salary","/severance","/dsr","/rent-conversion","/vat","/savings"].includes(pathname)&&<div className="country-basis">대한민국 기준 적용 · 대한민국 법률·세금·금융 제도를 바탕으로 한 계산입니다.</div>}<CalculatorUsageContext.Provider value={usage}><div onChangeCapture={()=>usage.changed()} onBlurCapture={()=>usage.commit()}>{children}</div></CalculatorUsageContext.Provider><CalculatorGuide pathname={pathname}/><nav className="related-calculators" aria-label="UTILWISE 도구 카테고리"><h2>다른 도구도 이용해 보세요</h2><div><Link href="/#calculators">생활 계산기 전체 보기 →</Link><Link href="/online-tools">온라인 도구 전체 보기 →</Link><Link href="/text-tools">문서·텍스트 도구 전체 보기 →</Link></div></nav>{relatedCalculators[pathname]&&<nav className="related-calculators" aria-label="관련 계산기"><h2>함께 사용하면 좋은 계산기</h2><div>{relatedCalculators[pathname].map(([label,href])=><Link key={href} href={href}>{label} →</Link>)}</div></nav>}<div className="footer">계산 결과는 참고용이며 실제 거래·세금·금융 판단 전 관련 기관의 최신 기준을 확인하세요.</div></section>
  </main>;
 }
