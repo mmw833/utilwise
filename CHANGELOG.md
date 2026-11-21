@@ -992,4 +992,5 @@
 - CI 구조 검사 및 Next.js production build 성공. Preview OpenNext build, D1 migration, Worker deploy, 한·영 블로그 smoke test 성공.
 - 관리자 통계 화면의 실제 로그인/집계 이벤트 검증 및 일반 온라인 도구 추적은 후속 확인 필요.
 - 공통 한국어 계산기 및 영어 동적 계산기의 입력 변경 기반 실행 이벤트를 연결. 입력값 자체는 전송하지 않음.
-- 부피/날짜/팁 계산기 등 별도 컴포넌트와 일반 온라인 도구는 후속 연결 필요.
+- 날짜/부피/팁 계산기는 CalculatorShell 이벤트 캡처로 추적.
+- 이미지/PDF/QR/OCR/텍스트/음성 등 주요 온라인 도구의 성공 처리 지점에 실행 이벤트 연결.
