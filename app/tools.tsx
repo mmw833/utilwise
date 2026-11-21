@@ -8,7 +8,8 @@ const CalculatorUsageContext=createContext<{changed:()=>void;commit:()=>void}|nu
 const won=(n:number)=>Math.round(n).toLocaleString("ko-KR")+"원";
 const num=(s:string)=>Math.max(0,Number(s)||0);
 function Field({label,value,onChange,suffix="",step="1",type="number"}:{label:string,value:string,onChange:(v:string)=>void,suffix?:string,step?:string,type?:string}){
- return <div className="field"><label>{label}</label><div style={{display:"flex",alignItems:"center",gap:8}}><input type={type} min="0" step={step} value={value} onChange={e=>onChange(e.target.value)}/>{suffix&&<span className="hint">{suffix}</span>}</div></div>
+ const usage=useContext(CalculatorUsageContext);
+ return <div className="field"><label>{label}</label><div style={{display:"flex",alignItems:"center",gap:8}}><input type={type} min="0" step={step} value={value} onChange={e=>{onChange(e.target.value);usage?.changed();}} onBlur={()=>usage?.commit()}/>{suffix&&<span className="hint">{suffix}</span>}</div></div>
 }
 function Result({title,value,rows=[]}:{title:string,value:string,rows?:[string,string][]}){
  return <div className="result"><small>{title}</small><strong>{value}</strong>{rows.map(([a,b])=><div className="result-row" key={a}><span>{a}</span><b>{b}</b></div>)}</div>
@@ -126,6 +127,10 @@ const relatedCalculators:Record<string,[string,string][]>={
 };
 export function CalculatorShell({title,desc,children}:{title:string,desc:string,children:React.ReactNode}){
  const pathname = usePathname();
+ const toolId=pathname.split("/").filter(Boolean)[0]||"";
+ const changed=useRef(false);
+ const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const usage=useMemo(()=>({changed:()=>{changed.current=true;},commit:()=>{if(!changed.current)return;if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{changed.current=false;trackToolUsage(toolId,"calculator","run","ko");},700);}}),[toolId]);
  const pageUrl = `https://utilwise.kr${pathname}`;
  const structuredData = {
   "@context": "https://schema.org",
