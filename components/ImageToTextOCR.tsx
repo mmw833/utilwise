@@ -1,4 +1,5 @@
 "use client";
+import {trackToolUsage} from "@/lib/analytics/tool-usage";
 
 import { useEffect, useRef, useState } from "react";
 
@@ -168,6 +169,7 @@ export default function ImageToTextOCR({ lang }: Props) {
 
       const extracted = best.data.text.trim();
       setResult(extracted);
+      if(extracted)trackToolUsage("image-to-text","online-tool","run",lang);
       setProgress(100);
       setStatus(
         en
