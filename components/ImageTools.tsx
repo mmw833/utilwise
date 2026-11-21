@@ -1,4 +1,5 @@
 "use client";
+import {trackToolUsage} from "@/lib/analytics/tool-usage";
 
 import { useEffect, useMemo, useState } from "react";
 
@@ -93,6 +94,7 @@ export default function ImageTools({ mode, lang = "ko" }: Props) {
         completed.push({name: base + "-" + (mode === "compress" ? "compressed" : "resized") + "." + extension(blob.type),url,size:blob.size,originalSize:file.size,width:targetWidth,height:targetHeight,type:blob.type});
       }
       setOutputs(completed);
+      if(completed.length>0)trackToolUsage(mode==="compress"?"image-compressor":"image-resizer","online-tool","run",lang);
     } catch (e) {
       completed.forEach(item => URL.revokeObjectURL(item.url));
       setError(e instanceof Error && e.message === "too-large" ? t.tooLarge : t.error);
