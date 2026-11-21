@@ -22,4 +22,6 @@ for(const [path,id] of tests){const source=readFileSync(join(process.cwd(),path)
 const ko=readFileSync(join(process.cwd(),"app/tools.tsx"),"utf8");
 const en=readFileSync(join(process.cwd(),"app/en/[tool]/EnglishCalculator.tsx"),"utf8");
 if(!ko.includes("trackToolUsage(toolId")||!ko.includes("onChangeCapture")||!en.includes("trackToolUsage(tool")||!en.includes("onChangeCapture")) throw new Error("Calculator usage tracking is not connected.");
-console.log("Tool usage analytics structure, personality tests, and calculator tracking checks passed.");
+const online=[["components/ImageTools.tsx","image-compressor"],["components/PDFTools.tsx","pdf-merge"],["components/QRCodeGenerator.tsx","qr-code-generator"],["components/TextTools.tsx","character-counter"],["components/SpeechTimeCalculator.tsx","speech-time"],["components/ImageFormatConverter.tsx","image-converter"],["components/BackgroundRemover.tsx","background-remover"],["components/ImageToTextOCR.tsx","image-to-text"],["components/TextToSpeechTool.tsx","text-to-speech"]];
+for(const [path,id] of online){const source=readFileSync(join(process.cwd(),path),"utf8");if(!source.includes("trackToolUsage")||!source.includes(id))throw new Error(`Missing online-tool tracking: ${path}`);}
+console.log("Tool usage analytics structure, calculators, personality tests, and online-tool tracking checks passed.");
