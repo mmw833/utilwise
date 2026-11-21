@@ -128,9 +128,10 @@ const relatedCalculators:Record<string,[string,string][]>={
 export function CalculatorShell({title,desc,children}:{title:string,desc:string,children:React.ReactNode}){
  const pathname = usePathname();
  const toolId=pathname.split("/").filter(Boolean)[0]||"";
- const changed=useRef(false);
+ const recorded=useRef(false);
  const timer=useRef<ReturnType<typeof setTimeout>|null>(null);
- const usage=useMemo(()=>({changed:()=>{changed.current=true;},commit:()=>{if(!changed.current)return;if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{changed.current=false;trackToolUsage(toolId,"calculator","run","ko");},700);}}),[toolId]);
+ const schedule=()=>{if(recorded.current)return;if(timer.current)clearTimeout(timer.current);timer.current=setTimeout(()=>{if(recorded.current)return;recorded.current=true;trackToolUsage(toolId,"calculator","run","ko");},700);};
+ const usage=useMemo(()=>({changed:schedule,commit:schedule}),[toolId]);
  const pageUrl = `https://utilwise.kr${pathname}`;
  const structuredData = {
   "@context": "https://schema.org",
