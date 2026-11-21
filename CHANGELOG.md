@@ -1,3 +1,8 @@
+## 2026-11-21
+- 네이버 서치어드바이저에서 기존 요청 URL과 중복되지 않는 핵심 페이지 7개(/area, /loan, /brokerage, /online-tools, /blog, /dsr, /year-end-tax)의 수집 요청 접수 완료.
+- 공개 사이트맵 91개 URL 및 한국어 블로그 RSS 피드 응답 확인. RSS 제출은 CAPTCHA 후 목록 반영이 확인되지 않아 미완료로 기록.
+- 최신 네이버 진단은 색인 0, 색인 제외 0, SEO 0, 수집제한 1(favicon.ico HTTP 400; 최근 업데이트 11/18). 기존 favicon route가 main에 있으나 운영 응답/네이버 재수집 결과가 불명확해 해결 완료로 처리하지 않음.
+
 ## 2026-11-21 — Cloudflare 방문자 통계 일별 집계 오류 수정
 - `httpRequests1hGroups(limit: 1)`가 하루 전체가 아니라 한 시간 그룹만 반환할 수 있는 문제를 확인.
 - `httpRequests1dGroups`의 일별 `uniq.uniques`로 교체하고 집계 기준을 UTC 달력일로 명확히 표시.

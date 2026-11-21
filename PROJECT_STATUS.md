@@ -1,3 +1,11 @@
+## 2026-11-21 네이버 검색 수집 재점검 및 요청
+- 네이버 서치어드바이저 최신 진단: 색인 0, 색인 제외 0, SEO 진단 0, 수집제한 1. 수집제한 URL은 `https://utilwise.kr/favicon.ico`, HTTP 400으로 표시되며 해당 진단의 최근 업데이트는 2026-11-18.
+- 기존 코드에 `app/favicon.ico/route.ts`가 이미 존재하며 SVG 아이콘을 HTTP 200으로 반환하도록 구현되어 있음. 해당 코드가 main에 포함되고 2026-11-21 Production Deploy(run #117)가 성공한 것은 확인했으나, 브라우저 점검에서 리다이렉트로 관찰되는 등 응답 결과가 일치하지 않아 해결 완료로 판단하지 않음. 네이버의 다음 수집 후 재진단 필요.
+- 현재 공개 사이트맵은 91개 URL. 123개에서 감소한 것은 MBTI 개인 결과 URL 32개 제외 및 중복 정리 기록과 일치. 사이트맵은 이미 등록 상태로 변경하지 않음.
+- 공개 RSS `https://utilwise.kr/blog/rss.xml` 응답 및 발행 글 4건을 확인. 네이버 RSS 제출은 CAPTCHA 후 제출된 RSS 목록이 비어 있어 최종 등록 미확인.
+- 이전에 요청한 홈(/), /salary, /severance, 구식 /tools는 재요청하지 않음. 신규 URL 7개(/area, /loan, /brokerage, /online-tools, /blog, /dsr, /year-end-tax)의 웹 페이지 수집 요청 접수 완료(2026-11-21 16:09~16:10 KST).
+- 노출/클릭 데이터는 아직 없음. 수집 요청 접수는 색인이나 노출을 보장하지 않으므로 다음 진단에서 수집·색인 변화 확인.
+
 ## 2026-11-21 방문자 통계 일별 집계 오류 수정 (진행 중)
 - 운영 API `/api/analytics/visitors`를 직접 확인: `today: 63`, `total: 1,930`.
 - 기존 GraphQL 조회는 `httpRequests1hGroups(limit: 1)`를 사용하면서 하루 전체 고유 방문자라고 처리해 실제로는 한 시간 그룹만 읽을 수 있는 결함 확인.
