@@ -1,3 +1,9 @@
+## 2026-11-22 — favicon.ico 응답 경로 수정 진행
+- 네이버 진단 상세에서 유일한 수집제한 URL이 `/favicon.ico`이며 HTTP 400으로 기록된 것을 확인.
+- 운영 및 Worker 기본 도메인에서 `/favicon.ico`가 홈페이지로 이동하고, `/favicon-32x32.png`는 이미지로 정상 제공되는 현상을 재현.
+- Next.js `beforeFiles` rewrite를 추가해 `/favicon.ico` 요청을 기존 정상 PNG 아이콘으로 내부 rewrite하도록 수정. Preview 검증 및 운영 배포 전.
+- PR #69 배포 로그에서 Cloudflare 선택 URL 캐시 purge 단계가 HTTP 401로 실패한 점도 기록. Worker 배포 단계 자체는 성공.
+
 ## 2026-11-21 — favicon 캐시 후속 조치
 - 운영에서 PNG/Apple 아이콘은 정상 제공되고 /favicon.ico는 cache-busting query가 있을 때 실제 ICO로 표시되는 것을 확인.
 - /favicon.ico의 이전 캐시 응답 재사용 가능성에 대응해 정적 파일 응답에 Cache-Control: no-store를 지정하고, 운영 배포 후 Cloudflare에서 해당 URL만 선택적으로 purge하도록 workflow 보완.
