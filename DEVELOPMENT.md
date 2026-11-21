@@ -1,3 +1,9 @@
+## favicon 캐시 진단 및 배포
+- Cloudflare Workers Static Assets는 public/의 _headers 파일에서 정적 리소스별 응답 헤더를 설정할 수 있다.
+- /favicon.ico에 과거 캐시 응답이 남은 경우 public/_headers의 Cache-Control: no-store 규칙을 적용한다.
+- 운영 배포 workflow는 Worker 배포 직후 Cloudflare Zone Cache API로 https://utilwise.kr/favicon.ico만 선택적으로 purge한다. 토큰에는 Zone Cache Purge 권한이 필요하다.
+- 검증은 캐시 우회 쿼리가 없는 기본 URL을 브라우저에서 직접 열어 실제 ICO 이미지가 표시되는지 확인한다. 네이버 Search Advisor의 수집제한 상태는 재진단 결과로 별도 판정한다.
+
 ## favicon 및 앱 아이콘 정적 리소스
 - 정적 파일은 `public/` 아래에서 제공한다: `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`, `manifest.json`.
 - 아이콘 경로는 `app/layout.tsx`의 Next.js `metadata.icons` 및 `metadata.manifest`와 일치시킨다.

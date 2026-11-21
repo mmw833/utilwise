@@ -43,3 +43,19 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: 22d2885f057f1bde31d4638a26c107bb
         run: npx wrangler deploy --config wrangler.jsonc
+      - name: Purge stale favicon cache
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: caad14f3d32670b5acd9d2c7d2417f4b
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "::error::CLOUDFLARE_API_TOKEN repository secret is missing."
+            exit 1
+          fi
+          response="$(curl --fail-with-body --silent --show-error --retry 2 --retry-all-errors \
+            "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"files":["https://utilwise.kr/favicon.ico"]}')"
+          echo "$response" | jq -e '.success == true' >/dev/null
+          echo "Purged cached response for https://utilwise.kr/favicon.ico"

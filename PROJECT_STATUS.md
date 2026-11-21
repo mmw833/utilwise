@@ -1,3 +1,10 @@
+## 2026-11-21 favicon 운영 캐시 후속 조치 (원인 확인, 캐시 제거 PR 준비)
+- 운영 배포 후 두 호스트(utilwise.kr 및 utilwise.mmw833.workers.dev)에서 PNG 16x16/32x32 및 Apple Touch Icon이 실제 이미지로 표시됨.
+- /favicon.ico는 일반 URL로 열면 이전 홈페이지 이동 응답이 재사용되는 현상이 관찰됐지만, 쿼리 문자열을 붙인 캐시 우회 URL에서는 양쪽 호스트 모두 실제 ICO 이미지가 표시됨.
+- 파일 누락이나 Worker 배포 실패가 아니라 /favicon.ico의 이전 캐시 응답이 남아 있는 현상으로 판단. 브라우저 캐시와 Cloudflare 엣지 캐시를 구분하기 위해 후속 확인 필요.
+- 후속 PR에서 /favicon.ico에 Cache-Control: no-store를 적용하고 운영 배포 후 Cloudflare Zone Cache API로 해당 URL만 선택적으로 purge하도록 배포 workflow를 보완.
+- 미완료: PR 검사/병합, Cloudflare cache purge 성공, 캐시 우회 없이 https://utilwise.kr/favicon.ico 정상 이미지 응답 확인, 네이버 서치어드바이저 favicon 재진단.
+
 ## 2026-11-21 favicon 정적 파일 복구 (Preview 검증 완료, 운영 검증 대기)
 - `app/favicon.ico/route.ts`가 Next.js 빌드 라우트에 포함되지 않고 운영에서 홈페이지로 연결되던 문제를 확인.
 - `public/`에 정적 ICO, 16x16/32x32 PNG, 180x180 Apple Touch Icon 및 `manifest.json`을 추가하고 `app/layout.tsx` metadata를 실제 파일 경로와 일치시킴.
