@@ -19,4 +19,4 @@ const tests=[
   ["components/PsychologyCollection.tsx","psychology-"],["components/ZombieExperience.tsx","psychology-zombie"],
 ];
 for(const [path,id] of tests){const source=readFileSync(join(process.cwd(),path),"utf8");if(!source.includes("trackToolUsageStart")||!source.includes("trackToolUsage(")||!source.includes(id))throw new Error(`Missing start/completion tracking: ${path}`);}
-console.log("Tool usage analytics structure and personality-test tracking checks passed.");
+const ko=readFileSync(join(process.cwd(),"app/tools.tsx"),"utf8");\nconst en=readFileSync(join(process.cwd(),"app/en/[tool]/EnglishCalculator.tsx"),"utf8");\nif(!ko.includes("trackToolUsage(toolId")||!ko.includes("onChangeCapture")||!en.includes("trackToolUsage(tool")||!en.includes("onChangeCapture")) throw new Error("Calculator usage tracking is not connected.");\nconsole.log("Tool usage analytics structure, personality tests, and calculator tracking checks passed.");
