@@ -1,0 +1,8 @@
+{
+  "name": "UTILWISE",
+  "short_name": "UTILWISE",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#22292a",
+  "theme_color": "#22292a"
+}
