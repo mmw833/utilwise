@@ -22,7 +22,7 @@ export default async function AdminBlogPage() {
             <h1>블로그 관리자</h1>
             <p>게시글 작성과 발행 상태, 조회수를 관리합니다.</p>
           </div>
-          <div className="blog-admin-header-actions"><Link href="/blog" className="blog-admin-secondary">일반 블로그 보기 ↗</Link><AdminLogoutButton /></div>
+          <div className="blog-admin-header-actions"><Link href="/admin/blog/usage" className="blog-admin-secondary">도구 사용량 분석</Link><Link href="/blog" className="blog-admin-secondary">일반 블로그 보기 ↗</Link><AdminLogoutButton /></div>
         </div>
         <AdminBlogManager />
       </section>
