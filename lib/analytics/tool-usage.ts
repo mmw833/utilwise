@@ -1,0 +1,13 @@
+"use client";
+export type UsageCategory="calculator"|"online-tool"|"personality-test"|"psychology-test";
+export type UsageEvent="run"|"start"|"complete";
+/** Send event metadata only. Never pass user answers, input values, or result data. */
+export function trackToolUsage(toolId:string,category:UsageCategory,eventType:UsageEvent="complete",locale:"ko"|"en"="ko"){
+ if(typeof window==="undefined"||!/^[a-z0-9-]{2,64}$/.test(toolId))return;
+ const eventId=crypto.randomUUID();
+ void fetch("/api/analytics/tool-usage",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({eventId,toolId,category,eventType,locale}),keepalive:true,credentials:"same-origin"}).catch(()=>undefined);
+}
+export function trackToolUsageStart(toolId:string,category:UsageCategory,locale:"ko"|"en"="ko"){
+ try{const key="uw-usage-started:"+toolId;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,"1");}catch{}
+ trackToolUsage(toolId,category,"start",locale);
+}
