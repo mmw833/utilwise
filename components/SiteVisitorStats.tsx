@@ -35,7 +35,7 @@ export default function SiteVisitorStats() {
     <div
       className="site-visitor-stats"
       aria-label="Site visitors"
-      title="TODAY: Cloudflare unique visitors today (Korea time). TOTAL: one-time 30-day starting count plus daily visitors accumulated since setup."
+      title="TODAY: Cloudflare unique visitors for the current UTC calendar day. TOTAL: one-time 30-day starting count plus daily visitors accumulated since setup."
     >
       <span><span className="site-visitor-label">TODAY</span> <strong>{stats ? stats.today.toLocaleString() : "—"}</strong></span>
       <span><span className="site-visitor-label">TOTAL</span> <strong>{stats ? stats.total.toLocaleString() : "—"}</strong></span>
