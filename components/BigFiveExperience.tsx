@@ -1,4 +1,5 @@
 "use client";
+import {trackToolUsage,trackToolUsageStart} from "@/lib/analytics/tool-usage";
 import Link from "next/link";
 import {useEffect,useMemo,useRef,useState} from "react";
 
@@ -83,6 +84,7 @@ return en?enText[code][level==="high"?0:level==="mid"?1:2]:ko[code][level==="hig
 };
 export default function BigFiveExperience({mode,locale="ko"}:{mode:"intro"|"test"|"result";locale?:"ko"|"en"}){
 const en=locale==="en";
+useEffect(()=>{if(mode==="test")trackToolUsageStart("big-five","personality-test",locale);},[mode,locale]);
 const [answers,setAnswers]=useState<number[]>([]);
 const [index,setIndex]=useState(0);
 const [scores,setScores]=useState<number[]|null>(null);
@@ -108,7 +110,7 @@ const total=selected.reduce((sum,x)=>sum+(x.item.reverse?6-x.value:x.value),0);
 return Math.round(((total/selected.length)-1)*25);
 });
 const query=result.map((v,i)=>"s"+i+"="+v).join("&");
-window.location.href=(en?"/en":"")+"/big-five/result?"+query;
+trackToolUsage("big-five","personality-test","complete",locale);window.location.href=(en?"/en":"")+"/big-five/result?"+query;
 };
 const choose=(value:number)=>{
 if(advancing.current||!Number.isInteger(value)||value<1||value>5)return;
