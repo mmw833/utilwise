@@ -1,3 +1,9 @@
+## 2026-11-21 방문자 통계 집계 기준
+- `GET /api/analytics/visitors`는 Cloudflare GraphQL `httpRequests1dGroups`와 `uniq.uniques`를 사용한다.
+- TODAY 및 R2 날짜 키는 UTC 달력일 기준이다. UI 툴팁에서 UTC 기준을 안내한다.
+- `httpRequests1hGroups(limit: 1)`는 한 시간 그룹만 반환할 수 있으므로 하루 고유 방문자 집계에 사용하지 않는다.
+- 최초 수정 배포 후 R2의 `visitor-stats/daily/` 스냅샷을 2026-11-17부터 일별 롤업으로 1회 재보정한다. 완료 표식은 `visitor-stats/daily-rollup-backfill-v1.json`이다.
+
 ## Cloudflare 방문자 통계
 - 홈 헤더 컴포넌트: `components/SiteVisitorStats.tsx`
 - 통계 API: `GET /api/analytics/visitors`

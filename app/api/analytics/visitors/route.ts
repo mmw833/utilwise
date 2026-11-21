@@ -6,11 +6,14 @@ import {
 
 export const dynamic = "force-dynamic";
 
-type AnalyticsGroup = { uniq?: { uniques?: number } };
+type AnalyticsGroup = {
+  dimensions?: { date?: string };
+  uniq?: { uniques?: number };
+};
 type CloudflareAnalyticsResponse = {
   data?: {
     viewer?: {
-      zones?: Array<{ visitors: AnalyticsGroup[] }>;
+      zones?: Array<{ visitors?: AnalyticsGroup[] }>;
     };
   };
   errors?: Array<{ message?: string }>;
@@ -21,12 +24,19 @@ type R2ListResult = { objects: R2Object[]; truncated: boolean; cursor?: string }
 
 const BASELINE_KEY = "visitor-stats/baseline.json";
 const DAILY_PREFIX = "visitor-stats/daily/";
-const KOREA_OFFSET_MS = 9 * 60 * 60 * 1000;
+const BACKFILL_KEY = "visitor-stats/daily-rollup-backfill-v1.json";
+const BACKFILL_START_DATE = "2026-11-17";
 // Set this once to the 30-day visitor count supplied by the site owner before first production use.
 const INITIAL_TOTAL_BASELINE = 1260;
 
-function koreaDate(now: Date): string {
-  return new Date(now.getTime() + KOREA_OFFSET_MS).toISOString().slice(0, 10);
+function utcDate(now: Date): string {
+  return now.toISOString().slice(0, 10);
+}
+
+function nextUtcDate(date: string): string {
+  const next = new Date(`${date}T00:00:00.000Z`);
+  next.setUTCDate(next.getUTCDate() + 1);
+  return utcDate(next);
 }
 
 async function readJson<T>(bucket: ReturnType<typeof getBlogImageBucket>, key: string): Promise<T | null> {
@@ -35,23 +45,27 @@ async function readJson<T>(bucket: ReturnType<typeof getBlogImageBucket>, key: s
   return JSON.parse(await new Response(object.body).text()) as T;
 }
 
-async function queryTodayVisitors(
+/**
+ * Query Cloudflare's daily rollup. A 1d group returns one unique-IP count for
+ * the whole UTC calendar day; hourly unique counts must never be summed because
+ * the same visitor can appear in multiple hourly groups.
+ */
+async function queryDailyVisitors(
   apiToken: string,
   zoneId: string,
-  today: string,
-  now: Date,
-): Promise<number> {
-  // With no time dimension selected, Cloudflare returns one aggregate for the
-  // requested period instead of one row per hour. This keeps uniq.uniques
-  // deduplicated across the whole Korea calendar day.
+  startDate: string,
+  endDate: string,
+): Promise<Map<string, number>> {
   const query = `
-    query SiteVisitors($zoneTag: String!, $start: Time!, $end: Time!) {
+    query SiteDailyVisitors($zoneTag: String!, $start: Date!, $end: Date!) {
       viewer {
         zones(filter: { zoneTag: $zoneTag }) {
-          visitors: httpRequests1hGroups(
-            limit: 1
-            filter: { datetime_geq: $start, datetime_lt: $end }
+          visitors: httpRequests1dGroups(
+            limit: 1000
+            filter: { date_geq: $start, date_lt: $end }
+            orderBy: [date_ASC]
           ) {
+            dimensions { date }
             uniq { uniques }
           }
         }
@@ -59,7 +73,6 @@ async function queryTodayVisitors(
     }
   `;
 
-  const start = new Date(`${today}T00:00:00+09:00`);
   const response = await fetch("https://api.cloudflare.com/client/v4/graphql", {
     method: "POST",
     headers: {
@@ -68,20 +81,38 @@ async function queryTodayVisitors(
     },
     body: JSON.stringify({
       query,
-      variables: {
-        zoneTag: zoneId,
-        start: start.toISOString(),
-        end: now.toISOString(),
-      },
+      variables: { zoneTag: zoneId, start: startDate, end: endDate },
     }),
     signal: AbortSignal.timeout(8000),
   });
 
   if (!response.ok) throw new Error("Cloudflare Analytics request failed.");
   const result = (await response.json()) as CloudflareAnalyticsResponse;
-  const value = result.data?.viewer?.zones?.[0]?.visitors?.[0]?.uniq?.uniques;
-  if (result.errors?.length || !Number.isFinite(value)) {
-    throw new Error("Cloudflare Analytics returned incomplete visitor data.");
+  const rows = result.data?.viewer?.zones?.[0]?.visitors;
+  if (result.errors?.length || !Array.isArray(rows)) {
+    throw new Error("Cloudflare Analytics returned incomplete daily visitor data.");
+  }
+
+  const daily = new Map<string, number>();
+  for (const row of rows) {
+    const date = row.dimensions?.date;
+    const visitors = row.uniq?.uniques;
+    if (date && Number.isFinite(visitors)) {
+      daily.set(date, Math.max(0, Math.floor(Number(visitors))));
+    }
+  }
+  return daily;
+}
+
+async function queryTodayVisitors(
+  apiToken: string,
+  zoneId: string,
+  today: string,
+): Promise<number> {
+  const daily = await queryDailyVisitors(apiToken, zoneId, today, nextUtcDate(today));
+  const value = daily.get(today);
+  if (!Number.isFinite(value)) {
+    throw new Error("Cloudflare Analytics has no daily visitor value for the current UTC date yet.");
   }
   return Math.max(0, Math.floor(Number(value)));
 }
@@ -96,6 +127,47 @@ async function saveDailySnapshot(
     new TextEncoder().encode(JSON.stringify({ date, visitors })),
     { httpMetadata: { contentType: "application/json" } },
   );
+}
+
+/**
+ * The previous implementation stored only one hourly group's uniques per day.
+ * Rebuild snapshots from the daily rollup once so TOTAL no longer includes
+ * those incomplete hourly values.
+ */
+async function backfillDailySnapshotsIfNeeded(
+  bucket: ReturnType<typeof getBlogImageBucket>,
+  apiToken: string,
+  zoneId: string,
+  now: Date,
+): Promise<Map<string, number> | null> {
+  const marker = await readJson<{ version?: number }>(bucket, BACKFILL_KEY);
+  if (marker?.version === 1) return null;
+
+  const today = utcDate(now);
+  const endDate = nextUtcDate(today);
+  const daily = await queryDailyVisitors(apiToken, zoneId, BACKFILL_START_DATE, endDate);
+
+  // Do not mark the repair complete until Cloudflare has returned today's row.
+  if (!daily.has(today)) {
+    throw new Error("Cloudflare daily rollup is not ready for the current UTC date.");
+  }
+
+  for (let date = BACKFILL_START_DATE; date < endDate; date = nextUtcDate(date)) {
+    await saveDailySnapshot(bucket, date, daily.get(date) ?? 0);
+  }
+
+  await bucket.put(
+    BACKFILL_KEY,
+    new TextEncoder().encode(JSON.stringify({
+      version: 1,
+      completedAt: now.toISOString(),
+      startDate: BACKFILL_START_DATE,
+      endDate,
+    })),
+    { httpMetadata: { contentType: "application/json" } },
+  );
+
+  return daily;
 }
 
 async function sumDailySnapshots(
@@ -131,7 +203,7 @@ export async function GET() {
 
     const bucket = getBlogImageBucket();
     const now = new Date();
-    const today = koreaDate(now);
+    const today = utcDate(now);
 
     // The owner-provided 30-day starting count is stored only once.
     let baseline = await readJson<{ total: number }>(bucket, BASELINE_KEY);
@@ -143,8 +215,16 @@ export async function GET() {
       baseline = (await readJson<{ total: number }>(bucket, BASELINE_KEY)) ?? baseline;
     }
 
-    const todayVisitors = await queryTodayVisitors(config.apiToken, config.zoneId, today, now);
-    // Replace today's snapshot rather than incrementing it on every API call.
+    const backfilled = await backfillDailySnapshotsIfNeeded(
+      bucket,
+      config.apiToken,
+      config.zoneId,
+      now,
+    );
+    const todayVisitors = backfilled?.get(today)
+      ?? await queryTodayVisitors(config.apiToken, config.zoneId, today);
+
+    // Replace today's UTC daily snapshot rather than incrementing it on every API call.
     await saveDailySnapshot(bucket, today, todayVisitors);
 
     const total = baseline.total + await sumDailySnapshots(bucket);
