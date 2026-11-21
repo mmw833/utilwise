@@ -1,3 +1,10 @@
+## 2026-11-21 favicon 정적 파일 복구 (Preview 검증 완료, 운영 검증 대기)
+- `app/favicon.ico/route.ts`가 Next.js 빌드 라우트에 포함되지 않고 운영에서 홈페이지로 연결되던 문제를 확인.
+- `public/`에 정적 ICO, 16x16/32x32 PNG, 180x180 Apple Touch Icon 및 `manifest.json`을 추가하고 `app/layout.tsx` metadata를 실제 파일 경로와 일치시킴.
+- 기존 route handler를 제거해 Next.js favicon 특수 파일 경로 충돌을 방지.
+- Cloudflare Preview 빌드/배포 성공. Preview에서 `/favicon.ico`, `/favicon-16x16.png`, `/favicon-32x32.png`, `/apple-touch-icon.png`, `/manifest.json` 모두 정상 표시 확인.
+- **남은 작업:** 운영 배포 후 동일 5개 URL의 상태·MIME 및 홈페이지 head 링크 확인, 네이버 서치어드바이저의 favicon 수집제한 재진단.
+
 ## 2026-11-21 방문자 통계 일별 집계 오류 수정 (진행 중)
 - 운영 API `/api/analytics/visitors`를 직접 확인: `today: 63`, `total: 1,930`.
 - 기존 GraphQL 조회는 `httpRequests1hGroups(limit: 1)`를 사용하면서 하루 전체 고유 방문자라고 처리해 실제로는 한 시간 그룹만 읽을 수 있는 결함 확인.

@@ -1,3 +1,9 @@
+## favicon 및 앱 아이콘 정적 리소스
+- 정적 파일은 `public/` 아래에서 제공한다: `favicon.ico`, `favicon-16x16.png`, `favicon-32x32.png`, `apple-touch-icon.png`, `manifest.json`.
+- 아이콘 경로는 `app/layout.tsx`의 Next.js `metadata.icons` 및 `metadata.manifest`와 일치시킨다.
+- `app/favicon.ico/route.ts` 형태의 route handler로 favicon을 대체하지 않는다. Next.js favicon 특수 파일 규칙과 경로 충돌을 피하기 위해 정적 파일을 사용한다.
+- Preview 브라우저에서 5개 파일이 정상 표시되는 것을 확인했다. 운영 배포 후 HTTP 상태·Content-Type·파일 형식 및 홈페이지 head 링크를 재검증한다.
+
 ## 2026-11-21 방문자 통계 집계 기준
 - `GET /api/analytics/visitors`는 Cloudflare GraphQL `httpRequests1dGroups`와 `uniq.uniques`를 사용한다.
 - TODAY 및 R2 날짜 키는 UTC 달력일 기준이다. UI 툴팁에서 UTC 기준을 안내한다.

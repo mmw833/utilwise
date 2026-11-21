@@ -1,3 +1,8 @@
+## 2026-11-21 — favicon 정적 파일 및 메타데이터 경로 복구
+- Next.js 빌드 라우트에 포함되지 않던 `app/favicon.ico/route.ts`를 제거하고 `public/` 정적 아이콘으로 전환.
+- ICO, 16x16/32x32 PNG, Apple Touch Icon 및 manifest를 추가하고 `app/layout.tsx` 메타데이터 경로와 일치시킴.
+- Preview 브라우저에서 5개 리소스가 정상 표시되는 것을 확인. 운영 응답 및 네이버 재진단은 배포 후 확인 예정.
+
 ## 2026-11-21 — Cloudflare 방문자 통계 일별 집계 오류 수정
 - `httpRequests1hGroups(limit: 1)`가 하루 전체가 아니라 한 시간 그룹만 반환할 수 있는 문제를 확인.
 - `httpRequests1dGroups`의 일별 `uniq.uniques`로 교체하고 집계 기준을 UTC 달력일로 명확히 표시.
