@@ -1,4 +1,5 @@
 "use client";
+import {trackToolUsage} from "@/lib/analytics/tool-usage";
 import {useEffect,useMemo,useRef,useState} from "react";
 const fmt=(n:number,en=false)=>{const v=Math.max(0,Math.round(n)),m=Math.floor(v/60),s=v%60;return en?(m>0?m+" min "+s+" sec":s+" sec"):(m>0?m+"분 "+s+"초":s+"초");};
 const count=(s:string)=>Array.from(s).length;
