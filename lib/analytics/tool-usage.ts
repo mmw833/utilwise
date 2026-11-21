@@ -8,6 +8,6 @@ export function trackToolUsage(toolId:string,category:UsageCategory,eventType:Us
  void fetch("/api/analytics/tool-usage",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({eventId,toolId,category,eventType,locale}),keepalive:true,credentials:"same-origin"}).catch(()=>undefined);
 }
 export function trackToolUsageStart(toolId:string,category:UsageCategory,locale:"ko"|"en"="ko"){
- try{const key="uw-usage-started:"+toolId;if(sessionStorage.getItem(key))return;sessionStorage.setItem(key,"1");}catch{}
+ try{const key="uw-usage-started:"+toolId+":"+locale;const last=Number(sessionStorage.getItem(key)||0);if(Date.now()-last<3000)return;sessionStorage.setItem(key,String(Date.now()));}catch{}
  trackToolUsage(toolId,category,"start",locale);
 }
