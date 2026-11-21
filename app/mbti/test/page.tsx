@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
-import {useState} from "react";
+import {useEffect,useState} from "react";
 import LanguageSwitcher from "../../../components/LanguageSwitcher";
 import {answerLabels,questions} from "../data";
+import {trackToolUsage,trackToolUsageStart} from "@/lib/analytics/tool-usage";
 const axes=["E","S","T","J"] as const;
 const opposite:Record<string,string>={E:"I",S:"N",T:"F",J:"P"};
 export default function MbtiTest(){
@@ -11,11 +12,13 @@ export default function MbtiTest(){
  const [answers,setAnswers]=useState<number[]>(Array(24).fill(0));
  const [index,setIndex]=useState(0);
  const q=questions[index];
+ useEffect(()=>{trackToolUsageStart("mbti","personality-test","ko");},[]);
  function finish(finalAnswers:number[]){
   const scores:Record<string,number>={E:0,S:0,T:0,J:0};
   questions.forEach((item,i)=>{scores[item.axis]+=item.reverse?6-finalAnswers[i]:finalAnswers[i];});
   const type=axes.map(axis=>scores[axis]>=18?axis:opposite[axis]).join("");
   const query=new URLSearchParams({e:String(scores.E),s:String(scores.S),t:String(scores.T),j:String(scores.J)});
+  trackToolUsage("mbti","personality-test","complete","ko");
   router.push("/mbti/result/"+type+"?"+query.toString());
  }
  function selectAnswer(value:number){
