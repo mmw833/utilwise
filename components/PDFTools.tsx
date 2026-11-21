@@ -1,4 +1,5 @@
 "use client";
+import {trackToolUsage} from "@/lib/analytics/tool-usage";
 
 import { useEffect, useState } from "react";
 import { PDFDocument, degrees } from "pdf-lib";
@@ -127,6 +128,7 @@ export default function PDFTools({ mode, lang = "ko" }: Props) {
         }
       }
       setOutputs(done);
+      if(done.length>0){const id=mode==="images"?"image-to-pdf":mode==="merge"?"pdf-merge":mode==="split"?"pdf-split":mode==="rotate"?"pdf-rotate":"pdf-organize";trackToolUsage(id,"online-tool","run",lang);}
     } catch (e) {
       done.forEach(item => URL.revokeObjectURL(item.url));
       setError(e instanceof Error && e.message === "range" ? t.noPages : t.error);
