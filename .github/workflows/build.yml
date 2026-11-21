@@ -28,5 +28,7 @@ jobs:
         run: npm install
       - name: Validate sitemap and tool routes
         run: npm run check:sitemap-tools
+      - name: Validate visitor analytics query
+        run: npm run check:visitor-analytics
       - name: Build
         run: npm run build
