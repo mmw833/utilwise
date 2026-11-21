@@ -1,4 +1,5 @@
 "use client";
+import {trackToolUsage} from "@/lib/analytics/tool-usage";
 
 import { useEffect, useState } from "react";
 
@@ -78,6 +79,7 @@ export default function ImageFormatConverter({ lang = "ko" }: { lang?: "ko" | "e
         converted.push({ name: base + "-converted." + EXT[blob.type], url: URL.createObjectURL(blob), size: blob.size, originalSize: file.size, width: canvas.width, height: canvas.height });
       }
       setResults(converted); setDone(true);
+      if(converted.length>0)trackToolUsage("image-converter","online-tool","run",lang);
     } catch (e) {
       converted.forEach(x => URL.revokeObjectURL(x.url));
       const message = e instanceof Error ? e.message : "";
