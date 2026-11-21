@@ -781,5 +781,6 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 날짜는 한국시간(KST) 기준으로 저장한다. 날짜별 합계와 기간별 합계를 제공하며 오늘의 실시간 카운터는 제공하지 않는다.
 - 이벤트는 UUID를 기본키로 중복 삽입을 방지한다. 개인정보 및 테스트 답변은 수집하지 않는다.
 - 클라이언트 함수: `trackToolUsage(toolId, category, eventType, locale)`, `trackToolUsageStart(...)`.
-- 계산기/온라인 도구는 실제 성공 처리 지점에서 `run` 이벤트를 연결해야 통계에 반영된다.
+- 공통 한국어 계산기 및 영어 동적 계산기는 입력 변경 후 포커스 이탈/입력 중단 시 `run` 이벤트를 집계한다. 값 자체는 API로 전송하지 않는다.
+- 부피/날짜/팁 등 별도 컴포넌트와 일반 온라인 도구는 각 기능의 성공 처리 지점에 `run` 이벤트를 추가해야 한다.
 - 검증: `npm run check:tool-usage-analytics`, `npm run build`; D1 migration 적용 후 Preview에서 API 및 관리자 UI를 테스트한다.
