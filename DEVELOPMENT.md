@@ -1,3 +1,8 @@
+## favicon.ico 응답 라우팅
+- Cloudflare Workers/OpenNext 운영에서 `public/favicon.ico`가 정적 이미지로 제공되지 않고 홈페이지로 이동하는 경우, 기존 정상 정적 이미지인 `/favicon-32x32.png`를 Next.js `rewrites().beforeFiles`에서 `/favicon.ico` 요청에 내부 rewrite한다.
+- URL은 `/favicon.ico`로 유지되며 실제 응답은 PNG 이미지이므로 MIME은 `image/png`가 된다. 검색 로봇의 다운로드 가능 여부를 우선 검증한다.
+- Preview와 운영에서 쿼리 문자열 없이 `/favicon.ico`를 열어 홈페이지가 아닌 이미지가 반환되는지 확인한다. 이어서 네이버 서치어드바이저 진단 갱신 여부를 별도 확인한다.
+
 ## favicon 캐시 진단 및 배포
 - Cloudflare Workers Static Assets는 public/의 _headers 파일에서 정적 리소스별 응답 헤더를 설정할 수 있다.
 - /favicon.ico에 과거 캐시 응답이 남은 경우 public/_headers의 Cache-Control: no-store 규칙을 적용한다.
