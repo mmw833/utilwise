@@ -783,4 +783,5 @@ npx wrangler secret put ADMIN_SESSION_SECRET
 - 클라이언트 함수: `trackToolUsage(toolId, category, eventType, locale)`, `trackToolUsageStart(...)`.
 - 공통 한국어 계산기 및 영어 동적 계산기는 입력 변경 후 포커스 이탈/입력 중단 시 `run` 이벤트를 집계한다. 값 자체는 API로 전송하지 않는다.
 - 부피/날짜/팁 등 별도 컴포넌트와 일반 온라인 도구는 각 기능의 성공 처리 지점에 `run` 이벤트를 추가해야 한다.
-- 검증: `npm run check:tool-usage-analytics`, `npm run build`; D1 migration 적용 후 Preview에서 API 및 관리자 UI를 테스트한다.
+- CI의 구조 검사와 Next.js production build, Preview OpenNext build 및 D1 migration/Worker 배포/한·영 블로그 smoke test까지 통과했다. 관리자 UI 로그인과 실제 통계 이벤트 집계는 별도 브라우저 확인이 필요하다.
+- 로컬 검증: `npm run check:tool-usage-analytics`, `npm run build`; D1 migration 적용 후 Preview에서 API 및 관리자 UI를 테스트한다.
