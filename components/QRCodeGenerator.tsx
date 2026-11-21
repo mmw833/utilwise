@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
+import {trackToolUsage} from "@/lib/analytics/tool-usage";
 
 type Lang = "ko" | "en";
 type Mode = "url" | "text" | "wifi" | "email" | "phone";
@@ -124,7 +125,7 @@ export default function QRCodeGenerator({ lang = "ko" }: { lang?: Lang }) {
         <h2>{t.title}</h2>
         <div className="qr-image-frame">{image ? <img src={image} alt={t.title} width={size} height={size}/> : <div className="qr-empty">{error || t.empty}</div>}</div>
         {error && <p className="qr-error" role="alert">{error}</p>}
-        {image && <a className="primary qr-download" href={image} download="utilwise-qr-code.png">{t.download}</a>}
+        {image && <a className="primary qr-download" href={image} download="utilwise-qr-code.png" onClick={()=>trackToolUsage("qr-code-generator","online-tool","run",lang)}>{t.download}</a>}
       </section>
     </div>
     <section className="qr-guide">
