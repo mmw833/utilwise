@@ -1,3 +1,11 @@
+## 2026-11-22 favicon.ico 실제 응답 문제 재진단 및 수정 진행
+- 네이버 서치어드바이저에서 정확히 `https://utilwise.kr`를 선택한 상태로 진단 확인: 색인 0, 수집제한 1, 색인제외 0, SEO 오류 0 (2026-11-20 갱신).
+- 수집제한 1건의 상세 URL은 `https://utilwise.kr/favicon.ico`, HTTP 400, 마지막 갱신 2026-11-07 14:55:48.
+- 2026-11-22 운영 직접 확인에서 `/favicon.ico`가 홈페이지로 이동하는 문제 재현. `/favicon-32x32.png`는 원본 이미지로 정상 응답.
+- PR #69는 Worker 배포 단계까지 성공했으나 Cloudflare cache purge API가 HTTP 401로 실패. Worker 기본 도메인에서도 .ico가 홈페이지로 이동하므로 단순 Zone 캐시만의 문제는 아님.
+- 수정 방향: Next.js `beforeFiles` rewrite로 `/favicon.ico` 요청을 정상 제공되는 `/favicon-32x32.png`로 내부 rewrite. URL은 .ico로 유지하고 응답은 이미지로 제공.
+- 작업 브랜치: `fix/favicon-ico-static-rewrite-2026-11-22`. **미완료:** Preview 빌드/실제 .ico 경로 검증, PR 병합, 운영 배포 및 운영 URL 검증, 네이버 재진단.
+
 ## 2026-11-21 favicon 운영 캐시 후속 조치 (원인 확인, 캐시 제거 PR 준비)
 - 운영 배포 후 두 호스트(utilwise.kr 및 utilwise.mmw833.workers.dev)에서 PNG 16x16/32x32 및 Apple Touch Icon이 실제 이미지로 표시됨.
 - /favicon.ico는 일반 URL로 열면 이전 홈페이지 이동 응답이 재사용되는 현상이 관찰됐지만, 쿼리 문자열을 붙인 캐시 우회 URL에서는 양쪽 호스트 모두 실제 ICO 이미지가 표시됨.
