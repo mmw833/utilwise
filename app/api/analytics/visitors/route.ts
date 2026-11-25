@@ -12,7 +12,7 @@ type AnalyticsGroup = {
 };
 type HourlyAnalyticsGroup = {
   dimensions?: { datetime?: string };
-  sum?: { pageViews?: number };
+  sum?: { browserMap?: Array<{ pageViews?: number }> };
 };
 type CloudflareAnalyticsResponse = {
   data?: {
@@ -123,29 +123,69 @@ async function queryTodayPageViews(
 }
 
 
-async function queryTodayKstPageViews(apiToken: string, zoneId: string, now: Date): Promise<number> {
-  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  const midnightUtc = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth(), kstNow.getUTCDate()) - 9 * 60 * 60 * 1000);
+// Page views count successful HTML requests, including reloads and repeat visits.
+// Hourly rollups count repeated page views; the display uses the last 24 completed hours.
+async function queryLast24HoursPageViews(
+  apiToken: string,
+  zoneId: string,
+  now: Date,
+): Promise<number> {
+  // httpRequests1hGroups are hour-bucketed. Query the last 24 completed UTC
+  // hours so the first and last buckets are not partial or inconsistently excluded.
   const completedHour = new Date(now);
   completedHour.setUTCMinutes(0, 0, 0);
-  if (completedHour <= midnightUtc) return 0;
-  const query = "query SiteTodayKstPageViews($zoneTag: String!, $start: Time!, $end: Time!) { viewer { zones(filter: { zoneTag: $zoneTag }) { hourlyPageViews: httpRequests1hGroups(limit: 100 filter: { datetime_geq: $start, datetime_lt: $end } orderBy: [datetime_ASC]) { dimensions { datetime } sum { pageViews } } } } }";
+  const end = completedHour.toISOString();
+  const start = new Date(completedHour.getTime() - 24 * 60 * 60 * 1000).toISOString();
+  const query = `
+    query SiteLast24HoursPageViews($zoneTag: String!, $start: Time!, $end: Time!) {
+      viewer {
+        zones(filter: { zoneTag: $zoneTag }) {
+          hourlyPageViews: httpRequests1hGroups(
+            limit: 100
+            filter: { datetime_geq: $start, datetime_lt: $end }
+            orderBy: [datetime_ASC]
+          ) {
+            dimensions { datetime }
+            sum { browserMap { pageViews } }
+          }
+        }
+      }
+    }
+  `;
+
   const response = await fetch("https://api.cloudflare.com/client/v4/graphql", {
     method: "POST",
-    headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ query, variables: { zoneTag: zoneId, start: midnightUtc.toISOString(), end: completedHour.toISOString() } }),
+    headers: {
+      Authorization: `Bearer ${apiToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query, variables: { zoneTag: zoneId, start, end } }),
     signal: AbortSignal.timeout(8000),
   });
+
   if (!response.ok) throw new Error("Cloudflare hourly page-view request failed.");
   const result = (await response.json()) as CloudflareAnalyticsResponse;
   const rows = result.data?.viewer?.zones?.[0]?.hourlyPageViews;
-  if (result.errors?.length || !Array.isArray(rows)) throw new Error("Cloudflare Analytics returned incomplete TODAY data.");
+  if (result.errors?.length || !Array.isArray(rows)) {
+    throw new Error("Cloudflare Analytics returned incomplete hourly page-view data.");
+  }
+
   return rows.reduce((total, row) => {
-    const pageViews = row.sum?.pageViews;
-    if (!Number.isFinite(pageViews)) throw new Error("Cloudflare returned an invalid hourly page-view value.");
-    return total + Math.max(0, Math.floor(Number(pageViews)));
+    const browserRows = row.sum?.browserMap;
+    if (!Array.isArray(browserRows)) {
+      throw new Error("Cloudflare returned incomplete hourly browser page-view data.");
+    }
+    const hourPageViews = browserRows.reduce((hourTotal, browser) => {
+      const value = browser.pageViews;
+      if (!Number.isFinite(value)) {
+        throw new Error("Cloudflare returned an invalid hourly page-view value.");
+      }
+      return hourTotal + Math.max(0, Math.floor(Number(value)));
+    }, 0);
+    return total + hourPageViews;
   }, 0);
 }
+
 async function saveDailySnapshot(
   bucket: ReturnType<typeof getBlogImageBucket>,
   date: string,
@@ -251,7 +291,7 @@ export async function GET() {
     );
     const todayPageViews = backfilled?.get(today)
       ?? await queryTodayPageViews(config.apiToken, config.zoneId, today);
-    const todayKst = await queryTodayKstPageViews(config.apiToken, config.zoneId, now);
+    const last24Hours = await queryLast24HoursPageViews(config.apiToken, config.zoneId, now);
 
     // Replace today's UTC daily page-view snapshot; repeated page loads are counted.
     await saveDailySnapshot(bucket, today, todayPageViews);
@@ -259,7 +299,8 @@ export async function GET() {
     const total = baseline.total + await sumDailyPageViews(bucket);
     return NextResponse.json(
       {
-        today: todayKst,
+        today: todayPageViews,
+        last24Hours,
         total,
         source: "cloudflare",
         metric: "pageViews",
