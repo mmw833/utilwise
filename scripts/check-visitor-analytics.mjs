@@ -7,8 +7,13 @@ const errors = [];
 if (!route.includes("httpRequests1dGroups")) {
   errors.push("Visitor analytics must use Cloudflare's daily rollup dataset.");
 }
-if (route.includes("httpRequests1hGroups")) {
-  errors.push("Visitor analytics must not use hourly groups for daily unique visitors.");
+const dailyQuery = route.slice(route.indexOf("async function queryDailyVisitors"), route.indexOf("async function queryTodayVisitors"));
+const hourlyQuery = route.slice(route.indexOf("async function queryLast24HoursVisitors"), route.indexOf("async function saveDailySnapshot"));
+if (!dailyQuery.includes("httpRequests1dGroups")) {
+  errors.push("Daily TOTAL snapshots must use the daily rollup dataset.");
+}
+if (!hourlyQuery.includes("httpRequests1hGroups")) {
+  errors.push("Rolling 24-hour display must use hourly rollup groups.");
 }
 if (!route.includes("date_geq: $start") || !route.includes("date_lt: $end")) {
   errors.push("Daily visitor query must use a bounded date range.");
