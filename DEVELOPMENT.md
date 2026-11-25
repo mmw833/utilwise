@@ -1,8 +1,9 @@
-## 방문자 통계 기간 안내 (2026-11-25)
-- 홈 헤더 `UTC DAY`는 Cloudflare GraphQL `httpRequests1dGroups`의 UTC 달력일 `uniq.uniques` 값이다.
-- Cloudflare 대시보드의 `이전 24시간`은 rolling 24시간 범위이므로 `UTC DAY`와 직접 비교하면 안 된다.
-- `httpRequests1hGroups`의 시간별 `uniq.uniques`를 단순 합산하면 같은 방문자가 여러 시간대에 중복될 수 있다. 이 합계를 24시간 전체 고유 인원으로 표시하지 않는다.
-- 정확한 rolling 24H 지표를 추가하려면 Cloudflare가 전체 시간 범위에 대해 중복 제거된 고유 방문자 수를 제공하는 지원 API인지 확인하고 실측 대조해야 한다. deprecated Zone Analytics API를 검토 없이 신규 의존성으로 추가하지 않는다.
+## 방문자 통계: 페이지뷰 기준 (2026-11-25)
+- 홈 헤더 `24H`: Cloudflare GraphQL `httpRequests1hGroups`의 `sum.pageViews`를 최근 24시간 범위로 조회한 시간별 페이지뷰 합계.
+- `TOTAL`: `httpRequests1dGroups`의 `sum.pageViews`를 UTC 날짜별 R2 스냅샷으로 저장해 2026-11-17부터 누적한 값.
+- 페이지뷰는 성공한 HTML 요청을 기준으로 하므로 페이지 새로고침과 같은 사용자의 반복 페이지 방문이 다시 집계된다. 정적 이미지/CSS/JS 요청 수를 그대로 방문으로 세는 방식은 사용하지 않는다.
+- 기존 고유 IP 기준 `visitor-stats/baseline.json`, `visitor-stats/daily/` 데이터와 별도 네임스페이스(`pageviews-baseline-v1.json`, `pageviews-daily/`, `pageviews-backfill-v1.json`)를 사용해 단위를 혼합하지 않는다.
+- Cloudflare 응답 필드, 24시간 경계, R2 backfill 및 운영 API를 확인한 뒤 배포한다.
 
 ## favicon 캐시 진단 및 배포
 - Cloudflare Workers Static Assets는 public/의 _headers 파일에서 정적 리소스별 응답 헤더를 설정할 수 있다.
