@@ -186,6 +186,32 @@ async function queryLast24HoursPageViews(
   }, 0);
 }
 
+async function queryTodayKstPageViews(apiToken: string, zoneId: string, now: Date): Promise<number> {
+  const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  const midnightUtc = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth(), kstNow.getUTCDate()) - 9 * 60 * 60 * 1000);
+  const completedHour = new Date(now);
+  completedHour.setUTCMinutes(0, 0, 0);
+  if (completedHour <= midnightUtc) return 0;
+  const query = "query SiteTodayKstPageViews($zoneTag: String!, $start: Time!, $end: Time!) { viewer { zones(filter: { zoneTag: $zoneTag }) { hourlyPageViews: httpRequests1hGroups(limit: 100 filter: { datetime_geq: $start, datetime_lt: $end } orderBy: [datetime_ASC]) { dimensions { datetime } sum { browserMap { pageViews } } } } } }";
+  const response = await fetch("https://api.cloudflare.com/client/v4/graphql", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ query, variables: { zoneTag: zoneId, start: midnightUtc.toISOString(), end: completedHour.toISOString() } }),
+    signal: AbortSignal.timeout(8000),
+  });
+  if (!response.ok) throw new Error("Cloudflare hourly page-view request failed.");
+  const result = (await response.json()) as CloudflareAnalyticsResponse;
+  const rows = result.data?.viewer?.zones?.[0]?.hourlyPageViews;
+  if (result.errors?.length || !Array.isArray(rows)) throw new Error("Cloudflare Analytics returned incomplete TODAY data.");
+  return rows.reduce((total, row) => {
+    const browsers = row.sum?.browserMap;
+    if (!Array.isArray(browsers)) throw new Error("Cloudflare returned incomplete hourly browser page-view data.");
+    return total + browsers.reduce((sum, browser) => {
+      if (!Number.isFinite(browser.pageViews)) throw new Error("Cloudflare returned an invalid hourly page-view value.");
+      return sum + Math.max(0, Math.floor(Number(browser.pageViews)));
+    }, 0);
+  }, 0);
+}
 async function saveDailySnapshot(
   bucket: ReturnType<typeof getBlogImageBucket>,
   date: string,
@@ -291,7 +317,7 @@ export async function GET() {
     );
     const todayPageViews = backfilled?.get(today)
       ?? await queryTodayPageViews(config.apiToken, config.zoneId, today);
-    const last24Hours = await queryLast24HoursPageViews(config.apiToken, config.zoneId, now);
+    const todayKst = await queryTodayKstPageViews(config.apiToken, config.zoneId, now);
 
     // Replace today's UTC daily page-view snapshot; repeated page loads are counted.
     await saveDailySnapshot(bucket, today, todayPageViews);
@@ -299,8 +325,7 @@ export async function GET() {
     const total = baseline.total + await sumDailyPageViews(bucket);
     return NextResponse.json(
       {
-        today: todayPageViews,
-        last24Hours,
+        today: todayKst,
         total,
         source: "cloudflare",
         metric: "pageViews",
