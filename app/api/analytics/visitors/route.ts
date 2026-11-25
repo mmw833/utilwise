@@ -10,10 +10,17 @@ type AnalyticsGroup = {
   dimensions?: { date?: string };
   uniq?: { uniques?: number };
 };
+type AnalyticsHourGroup = {
+  dimensions?: { datetimeHour?: string };
+  uniq?: { uniques?: number };
+};
 type CloudflareAnalyticsResponse = {
   data?: {
     viewer?: {
-      zones?: Array<{ visitors?: AnalyticsGroup[] }>;
+      zones?: Array<{
+        visitors?: AnalyticsGroup[];
+        hourlyVisitors?: AnalyticsHourGroup[];
+      }>;
     };
   };
   errors?: Array<{ message?: string }>;
@@ -115,6 +122,63 @@ async function queryTodayVisitors(
     throw new Error("Cloudflare Analytics has no daily visitor value for the current UTC date yet.");
   }
   return Math.max(0, Math.floor(Number(value)));
+}
+
+
+// Cloudflare's dashboard plots unique visitors by hour for rolling 24-hour views.
+// Sum the hourly unique counts to mirror that hourly-series total; repeat visitors
+// in different hours can be counted again, so this is not a deduplicated person count.
+async function queryLast24HoursVisitors(
+  apiToken: string,
+  zoneId: string,
+  now: Date,
+): Promise<number> {
+  const start = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+  const end = now.toISOString();
+  const query = `
+    query SiteHourlyVisitors($zoneTag: String!, $start: Time!, $end: Time!) {
+      viewer {
+        zones(filter: { zoneTag: $zoneTag }) {
+          hourlyVisitors: httpRequests1hGroups(
+            limit: 100
+            filter: { datetime_geq: $start, datetime_lt: $end }
+            orderBy: [datetimeHour_ASC]
+          ) {
+            dimensions { datetimeHour }
+            uniq { uniques }
+          }
+        }
+      }
+    }
+  `;
+
+  const response = await fetch("https://api.cloudflare.com/client/v4/graphql", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query,
+      variables: { zoneTag: zoneId, start, end },
+    }),
+    signal: AbortSignal.timeout(8000),
+  });
+
+  if (!response.ok) throw new Error("Cloudflare hourly Analytics request failed.");
+  const result = (await response.json()) as CloudflareAnalyticsResponse;
+  const rows = result.data?.viewer?.zones?.[0]?.hourlyVisitors;
+  if (result.errors?.length || !Array.isArray(rows)) {
+    throw new Error("Cloudflare Analytics returned incomplete hourly visitor data.");
+  }
+
+  return rows.reduce((total, row) => {
+    const value = row.uniq?.uniques;
+    if (!Number.isFinite(value)) {
+      throw new Error("Cloudflare returned an invalid hourly unique visitor value.");
+    }
+    return total + Math.max(0, Math.floor(Number(value)));
+  }, 0);
 }
 
 async function saveDailySnapshot(
@@ -223,13 +287,22 @@ export async function GET() {
     );
     const todayVisitors = backfilled?.get(today)
       ?? await queryTodayVisitors(config.apiToken, config.zoneId, today);
+    const last24Hours = await queryLast24HoursVisitors(config.apiToken, config.zoneId, now);
 
     // Replace today's UTC daily snapshot rather than incrementing it on every API call.
+    // Keep daily snapshots separate from the rolling 24-hour display metric.
     await saveDailySnapshot(bucket, today, todayVisitors);
 
     const total = baseline.total + await sumDailySnapshots(bucket);
     return NextResponse.json(
-      { today: todayVisitors, total, source: "cloudflare", totalMode: "owner-baseline-plus-daily" },
+      {
+        today: todayVisitors,
+        last24Hours,
+        total,
+        source: "cloudflare",
+        totalMode: "owner-baseline-plus-daily",
+        last24HoursMode: "sum-of-hourly-unique-counts",
+      },
       { headers: { "Cache-Control": "private, max-age=60" } },
     );
   } catch {
