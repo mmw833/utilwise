@@ -7,8 +7,8 @@ const errors = [];
 if (!route.includes("httpRequests1dGroups") || !route.includes("sum { pageViews }")) {
   errors.push("Daily totals must use Cloudflare's page-view rollup, not unique IP counts.");
 }
-if (!route.includes("httpRequests1hGroups") || !route.includes("hourlyPageViews")) {
-  errors.push("The rolling 24-hour metric must use hourly page-view rollups.");
+if (!route.includes("httpRequests1hGroups") || !route.includes("browserMap { pageViews }")) {
+  errors.push("The rolling 24-hour metric must use the hourly browserMap page-view field.");
 }
 if (!route.includes("datetime_geq: $start") || !route.includes("datetime_lt: $end")) {
   errors.push("The rolling 24-hour query must use a bounded time range.");
@@ -29,4 +29,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Visitor analytics check passed: daily and rolling 24-hour page views, repeat counting, separate R2 history, and disclosure verified.");
+console.log("Visitor analytics check passed: daily pageViews, hourly browserMap.pageViews, repeat counting, separate R2 history, and disclosure verified.");
