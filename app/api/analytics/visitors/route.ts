@@ -145,7 +145,6 @@ async function queryTodayKstPageViews(apiToken: string, zoneId: string, now: Dat
     if (!Number.isFinite(pageViews)) throw new Error("Cloudflare returned an invalid hourly page-view value.");
     return total + Math.max(0, Math.floor(Number(pageViews)));
   }, 0);
-  }, 0);
 }
 async function saveDailySnapshot(
   bucket: ReturnType<typeof getBlogImageBucket>,
