@@ -19,8 +19,8 @@ if (!route.includes("pageviews-daily/") || !route.includes("pageviews-backfill-v
 if (route.includes("uniq { uniques }") || route.includes("sum { visits }")) {
   errors.push("Displayed traffic must count page views, not unique IPs or referrer-only visits.");
 }
-if (!component.includes("last24Hours") || !component.includes("Reloads and repeat visits are counted")) {
-  errors.push("The homepage must show rolling 24-hour page views and disclose repeat counting.");
+if (!component.includes("last24Hours") || !component.includes("Reloads and repeat visits are counted") || !component.includes(">TODAY<")) {
+  errors.push("The homepage must retain rolling 24-hour page views, disclose repeat counting, and display the TODAY label.");
 }
 
 if (errors.length) {

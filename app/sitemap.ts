@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { listPublishedPosts } from "@/lib/blog/posts";
+import { listPublishedPosts, listPublishedTags } from "@/lib/blog/posts";
 const siteUrl = "https://utilwise.kr";
 const calculators = ["/area","/date","/loan","/brokerage","/salary","/year-end-tax","/severance","/savings","/dsr","/rent-conversion","/fuel","/vat","/volume","/tip"];
 const englishCalculators = calculators.filter((route) => route !== "/year-end-tax").map((route) => `/en${route}`);
@@ -44,9 +44,10 @@ export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [koPosts, enPosts] = await Promise.all([
-    listPublishedPosts("ko", 50),
-    listPublishedPosts("en", 50),
+    listPublishedPosts("ko", 50000),
+    listPublishedPosts("en", 50000),
   ]);
+  const [koTags, enTags] = await Promise.all([listPublishedTags("ko"), listPublishedTags("en")]);
   const staticEntries = pages.map(({ route, priority, changeFrequency }) => ({
     url: `${siteUrl}${route}`,
     changeFrequency,
@@ -58,8 +59,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "monthly" as const,
     priority: 0.65,
   }));
+  const tagEntries = [...koTags.map((tag) => ({ language: "ko" as const, tag })), ...enTags.map((tag) => ({ language: "en" as const, tag }))].map(({ language, tag }) => ({ url: siteUrl + "/" + (language === "en" ? "en/" : "") + "blog/tag/" + encodeURIComponent(tag), changeFrequency: "weekly" as const, priority: 0.45 }));
   const uniqueEntries = new Map<string, MetadataRoute.Sitemap[number]>();
-  for (const entry of [...staticEntries, ...postEntries]) {
+  for (const entry of [...staticEntries, ...postEntries, ...tagEntries]) {
     // Keep one canonical sitemap entry per URL even if route arrays overlap.
     uniqueEntries.set(entry.url, entry);
   }

@@ -54,7 +54,7 @@ export async function listPublishedPosts(
   language: BlogLanguage,
   limit = 20,
 ): Promise<BlogPostSummary[]> {
-  const safeLimit = Math.min(50, Math.max(1, Math.floor(limit)));
+  const safeLimit = Math.min(50000, Math.max(1, Math.floor(limit)));
   const db = getBlogDatabase();
   const result = await db
     .prepare(`
@@ -186,4 +186,43 @@ export async function getBlogVisitorStats(): Promise<{ today: number; total: num
   const daily = await db.prepare("SELECT COUNT(*) AS count FROM blog_site_visits WHERE visit_date = ?").bind(start).first<{ count: number }>();
   const total = await db.prepare("SELECT COUNT(*) AS count FROM blog_site_visitors").first<{ count: number }>();
   return { today: Number(daily?.count || 0), total: Number(total?.count || 0) };
+}
+
+
+/** Returns published posts whose JSON tag array contains an exact tag value. */
+export async function listPublishedPostsByTag(
+  language: BlogLanguage,
+  tag: string,
+  limit = 100,
+): Promise<BlogPostSummary[]> {
+  const safeLimit = Math.min(500, Math.max(1, Math.floor(limit)));
+  const db = getBlogDatabase();
+  const result = await db.prepare(`
+    ${POST_SUMMARY_SELECT}
+    WHERE p.language = ? AND p.status = 'published'
+      AND EXISTS (
+        SELECT 1
+        FROM json_each(CASE WHEN json_valid(p.tags_json) THEN p.tags_json ELSE '[]' END) AS tag_item
+        WHERE tag_item.type = 'text' AND tag_item.value = ?
+      )
+    ORDER BY p.published_at DESC, p.created_at DESC
+    LIMIT ?
+  `).bind(language, tag, safeLimit).all<BlogPostSummary>();
+  return result.results ?? [];
+}
+
+/** Returns crawlable tag archives with at least two published posts. */
+export async function listPublishedTags(language: BlogLanguage): Promise<string[]> {
+  const db = getBlogDatabase();
+  const result = await db.prepare(`
+    SELECT tag_item.value AS tag, COUNT(DISTINCT p.id) AS post_count
+    FROM blog_posts p,
+      json_each(CASE WHEN json_valid(p.tags_json) THEN p.tags_json ELSE '[]' END) AS tag_item
+    WHERE p.language = ? AND p.status = 'published' AND tag_item.type = 'text'
+      AND length(trim(tag_item.value)) BETWEEN 1 AND 40
+    GROUP BY tag_item.value
+    HAVING COUNT(DISTINCT p.id) >= 2
+    ORDER BY tag_item.value COLLATE NOCASE
+  `).bind(language).all<{ tag: string; post_count: number }>();
+  return (result.results ?? []).map((row) => row.tag);
 }
