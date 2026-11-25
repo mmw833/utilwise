@@ -12,7 +12,7 @@ type AnalyticsGroup = {
 };
 type HourlyAnalyticsGroup = {
   dimensions?: { datetime?: string };
-  sum?: { browserMap?: Array<{ pageViews?: number }> };
+  sum?: { pageViews?: number };
 };
 type CloudflareAnalyticsResponse = {
   data?: {
@@ -129,7 +129,7 @@ async function queryTodayKstPageViews(apiToken: string, zoneId: string, now: Dat
   const completedHour = new Date(now);
   completedHour.setUTCMinutes(0, 0, 0);
   if (completedHour <= midnightUtc) return 0;
-  const query = "query SiteTodayKstPageViews($zoneTag: String!, $start: Time!, $end: Time!) { viewer { zones(filter: { zoneTag: $zoneTag }) { hourlyPageViews: httpRequests1hGroups(limit: 100 filter: { datetime_geq: $start, datetime_lt: $end } orderBy: [datetime_ASC]) { dimensions { datetime } sum { browserMap { pageViews } } } } } }";
+  const query = "query SiteTodayKstPageViews($zoneTag: String!, $start: Time!, $end: Time!) { viewer { zones(filter: { zoneTag: $zoneTag }) { hourlyPageViews: httpRequests1hGroups(limit: 100 filter: { datetime_geq: $start, datetime_lt: $end } orderBy: [datetime_ASC]) { dimensions { datetime } sum { pageViews } } } } }";
   const response = await fetch("https://api.cloudflare.com/client/v4/graphql", {
     method: "POST",
     headers: { Authorization: `Bearer ${apiToken}`, "Content-Type": "application/json" },
@@ -141,12 +141,10 @@ async function queryTodayKstPageViews(apiToken: string, zoneId: string, now: Dat
   const rows = result.data?.viewer?.zones?.[0]?.hourlyPageViews;
   if (result.errors?.length || !Array.isArray(rows)) throw new Error("Cloudflare Analytics returned incomplete TODAY data.");
   return rows.reduce((total, row) => {
-    const browsers = row.sum?.browserMap;
-    if (!Array.isArray(browsers)) throw new Error("Cloudflare returned incomplete hourly browser page-view data.");
-    return total + browsers.reduce((sum, browser) => {
-      if (!Number.isFinite(browser.pageViews)) throw new Error("Cloudflare returned an invalid hourly page-view value.");
-      return sum + Math.max(0, Math.floor(Number(browser.pageViews)));
-    }, 0);
+    const pageViews = row.sum?.pageViews;
+    if (!Number.isFinite(pageViews)) throw new Error("Cloudflare returned an invalid hourly page-view value.");
+    return total + Math.max(0, Math.floor(Number(pageViews)));
+  }, 0);
   }, 0);
 }
 async function saveDailySnapshot(
