@@ -7,13 +7,8 @@ const errors = [];
 if (!route.includes("httpRequests1dGroups")) {
   errors.push("Visitor analytics must use Cloudflare's daily rollup dataset.");
 }
-const dailyQuery = route.slice(route.indexOf("async function queryDailyVisitors"), route.indexOf("async function queryTodayVisitors"));
-const hourlyQuery = route.slice(route.indexOf("async function queryLast24HoursVisitors"), route.indexOf("async function saveDailySnapshot"));
-if (!dailyQuery.includes("httpRequests1dGroups")) {
-  errors.push("Daily TOTAL snapshots must use the daily rollup dataset.");
-}
-if (!hourlyQuery.includes("httpRequests1hGroups")) {
-  errors.push("Rolling 24-hour display must use hourly rollup groups.");
+if (route.includes("httpRequests1hGroups")) {
+  errors.push("Visitor analytics must not use hourly groups for daily unique visitors.");
 }
 if (!route.includes("date_geq: $start") || !route.includes("date_lt: $end")) {
   errors.push("Daily visitor query must use a bounded date range.");
@@ -21,14 +16,8 @@ if (!route.includes("date_geq: $start") || !route.includes("date_lt: $end")) {
 if (!route.includes("BACKFILL_START_DATE") || !route.includes("BACKFILL_KEY")) {
   errors.push("Daily visitor snapshots must include the one-time historical correction.");
 }
-if (!route.includes("httpRequests1hGroups") || !route.includes("datetime_geq: $start") || !route.includes("datetime_lt: $end")) {
-  errors.push("Rolling 24-hour visitors must use a bounded hourly Cloudflare query.");
-}
-if (!route.includes("queryLast24HoursVisitors") || !route.includes("last24HoursMode")) {
-  errors.push("Visitor API must expose the rolling 24-hour hourly-series metric separately from daily totals.");
-}
-if (!component.includes("last24Hours") || !component.includes("same visitor may be counted")) {
-  errors.push("Visitor counter must show the 24-hour value and disclose hourly repeat counting.");
+if (!component.includes("UTC calendar day")) {
+  errors.push("Visitor counter tooltip must disclose the UTC day boundary.");
 }
 
 if (errors.length) {
@@ -37,4 +26,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log("Visitor analytics check passed: daily TOTAL rollup, rolling 24-hour hourly metric, historical repair, and repeat-count disclosure verified.");
+console.log("Visitor analytics check passed: daily unique rollup, bounded date query, historical repair, and UTC label verified.");
