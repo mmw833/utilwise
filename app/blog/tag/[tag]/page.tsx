@@ -13,6 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `#${tag} 관련 글 | UTILWISE 블로그`,
     description: `${tag} 주제와 관련된 UTILWISE의 실용적인 정보와 가이드를 모았습니다.`,
+    robots: posts.length < 2 ? { index: false, follow: true } : { index: true, follow: true },
     alternates: { canonical: `/blog/tag/${encodeURIComponent(tag)}` },
   };
 }
