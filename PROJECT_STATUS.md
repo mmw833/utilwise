@@ -1,9 +1,9 @@
 ## 2026-11-25 방문자 통계 재방문 포함 방식으로 변경 (PR/검증 대기)
 - 사용자는 동일 방문자의 반복 방문도 사이트 활성도에 포함하기를 원함. 고유 IP(uniq.uniques)가 아니라 Cloudflare `pageViews`를 표시하도록 방향 변경.
 - 홈 헤더 첫 번째 지표는 최근 24시간 페이지뷰(`24H`), 두 번째는 2026-11-17 이후 UTC 일별 페이지뷰 누적(`TOTAL`)로 변경.
-- Cloudflare GraphQL `httpRequests1hGroups`의 `sum.pageViews`로 최근 24시간 데이터를, `httpRequests1dGroups`의 `sum.pageViews`로 일별 누적을 집계. 페이지 새로고침과 재방문이 페이지뷰에 포함됨.
+- Cloudflare GraphQL `httpRequests1hGroups`의 `sum.browserMap.pageViews`를 브라우저별로 합산해 최근 24개 완료 시간(UTC)을 집계하고, `httpRequests1dGroups`의 `sum.pageViews`로 일별 누적을 집계. 페이지 새로고침과 재방문이 페이지뷰에 포함됨.
 - 기존 unique-IP 스냅샷/기준값 1,260은 새 페이지뷰 수치와 섞지 않도록 R2의 별도 `pageviews-*` 키 공간 사용. 2026-11-17부터 일별 데이터를 1회 재구성.
-- **미완료:** GitHub Build Check, Cloudflare GraphQL 실응답에서 두 pageViews 필드 확인, R2 재보정 및 API 수치 확인, Preview UI 검증. 검증 전 병합·운영 배포 금지.
+- **진행 상태:** GitHub Build Check 성공. Cloudflare 공식 문서의 GraphQL 필드 정의를 대조해 시간별 쿼리를 `browserMap.pageViews`로 수정하고 24개 완료 시간 기준으로 정렬. 다만 계정 실응답, R2 backfill 및 Preview API/UI 실동작은 배포 후 확인 필요.
 
 ## 2026-11-21 favicon 운영 캐시 후속 조치 (원인 확인, 캐시 제거 PR 준비)
 - 운영 배포 후 두 호스트(utilwise.kr 및 utilwise.mmw833.workers.dev)에서 PNG 16x16/32x32 및 Apple Touch Icon이 실제 이미지로 표시됨.
