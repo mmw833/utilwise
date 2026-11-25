@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type VisitorStats = { today: number; total: number; source?: "cloudflare"; metric?: "pageViews" };
+type VisitorStats = { last24Hours: number; total: number; source?: "cloudflare"; metric?: "pageViews" };
 
 export default function SiteVisitorStats() {
   const [stats, setStats] = useState<VisitorStats | null>(null);
@@ -17,7 +17,7 @@ export default function SiteVisitorStats() {
           return;
         }
         const data = (await response.json()) as VisitorStats;
-        if (active && Number.isFinite(data.today) && Number.isFinite(data.total)) setStats(data);
+        if (active && Number.isFinite(data.last24Hours) && Number.isFinite(data.total)) setStats(data);
       } catch {
         if (active) setStats(null);
       }
@@ -35,9 +35,9 @@ export default function SiteVisitorStats() {
     <div
       className="site-visitor-stats"
       aria-label="Site visitors"
-      title="TODAY: page views since midnight Korea Standard Time, counted through the last completed hour. TOTAL: daily page views accumulated since 2026-11-17."
+      title="24H: Cloudflare page views over the last 24 completed UTC hours. The current partial hour is excluded. Reloads and repeat visits are counted. TOTAL: daily page views accumulated since 2026-11-17."
     >
-      <span><span className="site-visitor-label">TODAY</span> <strong>{stats ? stats.today.toLocaleString() : "—"}</strong></span>
+      <span><span className="site-visitor-label">TODAY</span> <strong>{stats ? stats.last24Hours.toLocaleString() : "—"}</strong></span>
       <span><span className="site-visitor-label">TOTAL</span> <strong>{stats ? stats.total.toLocaleString() : "—"}</strong></span>
     </div>
   );
