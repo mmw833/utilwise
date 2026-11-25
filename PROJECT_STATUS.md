@@ -1292,3 +1292,6 @@
 - 홈페이지 방문자 통계의 `24H` 라벨을 `TODAY`로 변경. 수치도 한국시간 자정 이후 완료된 시간 단위 페이지뷰로 계산하도록 API 변경(새로고침·재방문 포함, 현재 진행 중인 시간은 제외).
 - TOTAL 누적 집계 및 R2 일별 스냅샷 저장 방식은 유지.
 - **검증 대기:** PR Build Check/Next.js build, Cloudflare GraphQL 시간별 조회 실제 응답, 사이트맵 URL 및 태그 아카이브 운영 HTML, 홈페이지 TODAY 숫자 표시, 운영 배포.
+
+- 추가 점검: 기존 `check-visitor-analytics.mjs`가 24H/browserMap 기준을 강제하고 있어 TODAY/hourly pageViews 기준으로 테스트 스크립트도 함께 갱신. Cloudflare 시간별 집계 쿼리는 `sum { pageViews }` 형태로 단순화하고 중복 집계 코드를 제거.
+- GitHub 커밋 상태/Actions 조회 결과 해당 커밋의 자동 워크플로 실행이 확인되지 않아 빌드 성공으로 간주하지 않음. PR #72는 빌드 검증 전 상태 유지.
