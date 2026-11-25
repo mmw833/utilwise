@@ -1,9 +1,9 @@
-## 2026-11-25 방문자 통계 기간 표시 명확화 (PR/검증 대기)
-- Cloudflare 화면의 `이전 24시간`과 UTILWISE의 `TODAY`는 집계 기간이 다름. 기존 사이트 값은 UTC 달력일 00:00부터 현재까지의 일별 고유 방문자임을 확인.
-- 시간별 `uniq.uniques`를 합산하면 시간대 간 동일 방문자가 중복될 수 있어 Cloudflare의 24시간 전체 고유 방문자와 동일하다고 보장할 수 없음. 근거 없이 24H 숫자로 대체하지 않음.
-- 홈 헤더 첫 번째 라벨을 `UTC DAY`로 바꾸고 툴팁에 Cloudflare 대시보드의 rolling 24H와 다른 기간임을 명시.
-- 기존 `httpRequests1dGroups` 일별 집계, R2 스냅샷 재보정, TOTAL 누적 계산은 변경하지 않음.
-- **남은 작업:** Build Check 및 Preview 화면 확인. Cloudflare 대시보드의 정확한 rolling 24H 고유 방문자와 동일한 산출값을 제공하는 비-deprecated API 경로가 확인되기 전에는 24H로 표시하지 않음.
+## 2026-11-25 방문자 통계 재방문 포함 방식으로 변경 (PR/검증 대기)
+- 사용자는 동일 방문자의 반복 방문도 사이트 활성도에 포함하기를 원함. 고유 IP(uniq.uniques)가 아니라 Cloudflare `pageViews`를 표시하도록 방향 변경.
+- 홈 헤더 첫 번째 지표는 최근 24시간 페이지뷰(`24H`), 두 번째는 2026-11-17 이후 UTC 일별 페이지뷰 누적(`TOTAL`)로 변경.
+- Cloudflare GraphQL `httpRequests1hGroups`의 `sum.pageViews`로 최근 24시간 데이터를, `httpRequests1dGroups`의 `sum.pageViews`로 일별 누적을 집계. 페이지 새로고침과 재방문이 페이지뷰에 포함됨.
+- 기존 unique-IP 스냅샷/기준값 1,260은 새 페이지뷰 수치와 섞지 않도록 R2의 별도 `pageviews-*` 키 공간 사용. 2026-11-17부터 일별 데이터를 1회 재구성.
+- **미완료:** GitHub Build Check, Cloudflare GraphQL 실응답에서 두 pageViews 필드 확인, R2 재보정 및 API 수치 확인, Preview UI 검증. 검증 전 병합·운영 배포 금지.
 
 ## 2026-11-21 favicon 운영 캐시 후속 조치 (원인 확인, 캐시 제거 PR 준비)
 - 운영 배포 후 두 호스트(utilwise.kr 및 utilwise.mmw833.workers.dev)에서 PNG 16x16/32x32 및 Apple Touch Icon이 실제 이미지로 표시됨.
