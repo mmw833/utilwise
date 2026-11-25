@@ -13,6 +13,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `#${tag} articles | UTILWISE Blog`,
     description: `Explore practical UTILWISE articles and guides about ${tag}.`,
+    robots: posts.length < 2 ? { index: false, follow: true } : { index: true, follow: true },
     alternates: { canonical: `/en/blog/tag/${encodeURIComponent(tag)}` },
   };
 }
