@@ -1,9 +1,9 @@
 ## 방문자 통계: 페이지뷰 기준 (2026-11-25)
-- 홈 헤더 `24H`: Cloudflare GraphQL `httpRequests1hGroups`의 `sum.pageViews`를 최근 24시간 범위로 조회한 시간별 페이지뷰 합계.
+- 홈 헤더 `24H`: Cloudflare GraphQL `httpRequests1hGroups`의 `sum.browserMap.pageViews`를 브라우저별로 합산한 최근 24개 완료 UTC 시간의 페이지뷰 합계.
 - `TOTAL`: `httpRequests1dGroups`의 `sum.pageViews`를 UTC 날짜별 R2 스냅샷으로 저장해 2026-11-17부터 누적한 값.
 - 페이지뷰는 성공한 HTML 요청을 기준으로 하므로 페이지 새로고침과 같은 사용자의 반복 페이지 방문이 다시 집계된다. 정적 이미지/CSS/JS 요청 수를 그대로 방문으로 세는 방식은 사용하지 않는다.
 - 기존 고유 IP 기준 `visitor-stats/baseline.json`, `visitor-stats/daily/` 데이터와 별도 네임스페이스(`pageviews-baseline-v1.json`, `pageviews-daily/`, `pageviews-backfill-v1.json`)를 사용해 단위를 혼합하지 않는다.
-- Cloudflare 응답 필드, 24시간 경계, R2 backfill 및 운영 API를 확인한 뒤 배포한다.
+- 시간별 데이터는 1시간 버킷이므로 현재 진행 중인 시간은 제외하고 최근 24개 완료 버킷을 표시한다. 계정 실응답, R2 backfill 및 Preview API/UI를 확인한 뒤 운영 반영한다.
 
 ## favicon 캐시 진단 및 배포
 - Cloudflare Workers Static Assets는 public/의 _headers 파일에서 정적 리소스별 응답 헤더를 설정할 수 있다.
