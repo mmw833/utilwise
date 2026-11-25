@@ -27,6 +27,13 @@ export default function BlogArticle({ post, language }: { post: BlogPost; langua
     ...(post.tags_json ? { keywords: (() => { try { return JSON.parse(post.tags_json); } catch { return []; } })() } : {}),
   };
   const date = new Intl.DateTimeFormat(en ? "en-US" : "ko-KR", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" }).format(new Date(post.published_at * 1000));
+  let tags: string[] = [];
+  try {
+    const parsed: unknown = JSON.parse(post.tags_json || "[]");
+    if (Array.isArray(parsed)) tags = parsed.filter((tag): tag is string => typeof tag === "string" && tag.trim().length > 0).slice(0, 12);
+  } catch {
+    tags = [];
+  }
   return <><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} /><BlogVisitorTracker /><main className="journal-page journal-article-page">
     <header className="journal-header">
       <Link href={home} className="journal-brand" aria-label="UTILWISE home">UTIL<span>WISE</span></Link>
@@ -53,10 +60,12 @@ export default function BlogArticle({ post, language }: { post: BlogPost; langua
       </header>
 
       <div className="journal-article-layout">
-        
         <div className="journal-article-content">
           <BlogMarkdown content={post.content_md} language={language} />
-          
+          {tags.length > 0 && <nav className="journal-article-tags" aria-label={en ? "Article tags" : "게시글 태그"}>
+            <span>{en ? "Topics" : "관련 태그"}</span>
+            {tags.map((tag) => <Link key={tag} href={base + "/tag/" + encodeURIComponent(tag)}>{tag}</Link>)}
+          </nav>}
         </div>
       </div>
     </article>
