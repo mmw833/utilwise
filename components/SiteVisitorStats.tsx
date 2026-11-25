@@ -35,7 +35,7 @@ export default function SiteVisitorStats() {
     <div
       className="site-visitor-stats"
       aria-label="Site visitors"
-      title="24H: Cloudflare page views over the previous 24 hours. Reloads and repeat visits are counted. TOTAL: daily page views accumulated since 2026-11-17."
+      title="24H: Cloudflare page views over the last 24 completed UTC hours. The current partial hour is excluded. Reloads and repeat visits are counted. TOTAL: daily page views accumulated since 2026-11-17."
     >
       <span><span className="site-visitor-label">24H</span> <strong>{stats ? stats.last24Hours.toLocaleString() : "—"}</strong></span>
       <span><span className="site-visitor-label">TOTAL</span> <strong>{stats ? stats.total.toLocaleString() : "—"}</strong></span>
