@@ -1,3 +1,11 @@
+## 2026-11-25 영문 이미지 압축 글 모바일 가독성 개선 완료
+- 기존 영문 게시글 `How to Compress Images Without Losing Quality`의 본문을 모바일에서 짧은 문장과 짧은 문단 중심으로 전면 정리.
+- 기존 게시글 ID, slug, translation group, 대표 이미지 키, 카테고리, 태그, SEO 제목/설명, 도구 버튼 토큰을 유지.
+- 기존 공개 상태(`published`)를 보존한 채 본문만 업데이트하고, 재조회로 저장 결과 확인.
+- 도구 버튼 `[[tool:image-compressor]]`, `[[tool:image-resizer]]` 유지 확인.
+- GitHub Actions run #10 성공, 업데이트 후 재조회에서 게시 상태·slug·대표 이미지·연결 그룹·본문 길이 확인.
+- 블로그 Agent Relay에 게시글 조회 기능과 기존 게시글 업데이트 시 공개 상태/대표 이미지 키를 보존하는 처리를 추가. 운영 사이트 코드 배포와는 별개인 GitHub Actions workflow 변경.
+
 ## 2026-11-25 방문자 라벨 단순 변경으로 정정
 - 요청 범위를 재확인해 기존 Cloudflare 최근 24시간 페이지뷰 조회 및 응답 필드(`last24Hours`)를 그대로 복원.
 - 홈페이지 방문자 숫자와 TOTAL 집계 로직은 유지하고 첫 번째 지표의 화면 라벨만 `24H`에서 `TODAY`로 변경.
