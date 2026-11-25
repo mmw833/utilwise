@@ -1,3 +1,9 @@
+## 방문자 통계 추가 원칙 (2026-11-25)
+- 홈 헤더 `24H`는 현재 시각 기준 직전 24시간의 시간별 `uniq.uniques` 합계이며, 시간대 간 동일 방문자가 중복될 수 있음을 사용자에게 공개한다.
+- 이 rolling 24H 지표를 UTC 일별 스냅샷이나 TOTAL 누적 계산에 사용하지 않는다. TOTAL은 기존 일별 UTC 기준을 유지한다.
+- Cloudflare 대시보드의 24시간 수치와 실제 운영 API를 같은 시각에 비교하기 전에는 두 값이 완전히 일치한다고 주장하지 않는다.
+- GraphQL 응답 오류/누락 시 임의로 0 또는 이전 값을 정상값처럼 표시하지 않고 기존 오류 처리(대시보드 `—`)를 유지한다.
+
 ## 방문자 통계 원칙
 - 홈 헤더 TODAY/TOTAL은 Cloudflare Analytics 데이터만 사용한다. D1 방문자 수를 조회·합산·대체 데이터로 사용하지 않는다.
 - TODAY는 Cloudflare GraphQL `httpRequests1dGroups`의 `uniq.uniques`를 사용하며 UTC 달력일 기준으로 표시한다. Cloudflare의 일별 고유 방문자는 고유 IP 기준이며 실제 사람 수와 완전히 같지는 않다.
