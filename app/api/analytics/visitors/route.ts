@@ -11,7 +11,7 @@ type AnalyticsGroup = {
   sum?: { pageViews?: number };
 };
 type HourlyAnalyticsGroup = {
-  dimensions?: { datetimeHour?: string };
+  dimensions?: { datetime?: string };
   sum?: { browserMap?: Array<{ pageViews?: number }> };
 };
 type CloudflareAnalyticsResponse = {
@@ -124,14 +124,18 @@ async function queryTodayPageViews(
 
 
 // Page views count successful HTML requests, including reloads and repeat visits.
-// Hourly rollups provide the recent-traffic window without deduplicating by IP.
+// Hourly rollups count repeated page views; the display uses the last 24 completed hours.
 async function queryLast24HoursPageViews(
   apiToken: string,
   zoneId: string,
   now: Date,
 ): Promise<number> {
-  const start = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-  const end = now.toISOString();
+  // httpRequests1hGroups are hour-bucketed. Query the last 24 completed UTC
+  // hours so the first and last buckets are not partial or inconsistently excluded.
+  const completedHour = new Date(now);
+  completedHour.setUTCMinutes(0, 0, 0);
+  const end = completedHour.toISOString();
+  const start = new Date(completedHour.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const query = `
     query SiteLast24HoursPageViews($zoneTag: String!, $start: Time!, $end: Time!) {
       viewer {
