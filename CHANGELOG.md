@@ -1,3 +1,10 @@
+## 2026-11-25 — 방문자 통계 24시간 비교 기준 보완
+- Cloudflare 대시보드의 이전 24시간과 사이트의 UTC 오늘 값이 서로 다른 기간이었던 점을 확인.
+- 홈 헤더 첫 번째 통계를 `TODAY`에서 `24H`로 바꾸고, API에서 현재 시각 기준 직전 24시간의 시간별 `uniq.uniques` 합계를 별도 제공.
+- 시간별 합계는 같은 방문자가 여러 시간대에 나타날 경우 중복될 수 있음을 툴팁에 명시.
+- 기존 UTC 일별 스냅샷 및 TOTAL 누적 계산은 그대로 유지.
+- Build Check 및 실제 Cloudflare 대시보드와 수치 비교 전까지 운영 반영 완료로 간주하지 않음.
+
 ## 2026-11-21 — favicon 캐시 후속 조치
 - 운영에서 PNG/Apple 아이콘은 정상 제공되고 /favicon.ico는 cache-busting query가 있을 때 실제 ICO로 표시되는 것을 확인.
 - /favicon.ico의 이전 캐시 응답 재사용 가능성에 대응해 정적 파일 응답에 Cache-Control: no-store를 지정하고, 운영 배포 후 Cloudflare에서 해당 URL만 선택적으로 purge하도록 workflow 보완.
