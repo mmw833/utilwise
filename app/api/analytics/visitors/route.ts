@@ -12,7 +12,7 @@ type AnalyticsGroup = {
 };
 type HourlyAnalyticsGroup = {
   dimensions?: { datetimeHour?: string };
-  sum?: { pageViews?: number };
+  sum?: { browserMap?: Array<{ pageViews?: number }> };
 };
 type CloudflareAnalyticsResponse = {
   data?: {
@@ -139,10 +139,10 @@ async function queryLast24HoursPageViews(
           hourlyPageViews: httpRequests1hGroups(
             limit: 100
             filter: { datetime_geq: $start, datetime_lt: $end }
-            orderBy: [datetimeHour_ASC]
+            orderBy: [datetime_ASC]
           ) {
-            dimensions { datetimeHour }
-            sum { pageViews }
+            dimensions { datetime }
+            sum { browserMap { pageViews } }
           }
         }
       }
@@ -167,9 +167,18 @@ async function queryLast24HoursPageViews(
   }
 
   return rows.reduce((total, row) => {
-    const value = row.sum?.pageViews;
-    if (!Number.isFinite(value)) throw new Error("Cloudflare returned an invalid page-view value.");
-    return total + Math.max(0, Math.floor(Number(value)));
+    const browserRows = row.sum?.browserMap;
+    if (!Array.isArray(browserRows)) {
+      throw new Error("Cloudflare returned incomplete hourly browser page-view data.");
+    }
+    const hourPageViews = browserRows.reduce((hourTotal, browser) => {
+      const value = browser.pageViews;
+      if (!Number.isFinite(value)) {
+        throw new Error("Cloudflare returned an invalid hourly page-view value.");
+      }
+      return hourTotal + Math.max(0, Math.floor(Number(value)));
+    }, 0);
+    return total + hourPageViews;
   }, 0);
 }
 
