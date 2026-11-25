@@ -1,3 +1,10 @@
+## 2026-11-25 도구 사용량 이벤트 전송 안정성 보완 (운영 검증 진행 중)
+- 운영 `/area`에서 입력 변경 및 실시간 계산 결과는 정상 동작하는 것을 브라우저로 확인.
+- Production Deploy #131에서 OpenNext 빌드, 운영 D1 migration, Worker 배포 단계는 성공. 후속 favicon 캐시 purge 단계만 실패했으며 도구 분석 배포와 무관.
+- 기존 클라이언트 추적 함수는 fetch 실패 및 HTTP 오류를 모두 무시해 수집 실패 원인을 관찰할 수 없었음.
+- 동일 eventId/payload로 HTTP 요청 실패 시 sendBeacon 보조 전송을 시도하고, HTTP 오류/네트워크 실패를 브라우저 콘솔에 기록하도록 보완. D1의 event_id PRIMARY KEY 및 INSERT OR IGNORE로 중복 저장 방지.
+- **미완료:** 새 코드 배포 후 실제 POST 응답 및 D1 저장 증가를 확인해야 함. 브라우저 자동화 환경에서는 개발자 도구 네트워크 응답을 읽을 수 없어 현재 POST 성공/실패를 확정하지 못함.
+
 ## 2026-11-25 영문 이미지 압축 글 모바일 가독성 개선 완료
 - 발행된 `How to Compress Images Without Losing Quality` 본문을 짧은 문장과 짧은 문단 중심으로 전면 정리.
 - 기존 게시글 ID, slug, translation group, 대표 이미지 키, 카테고리, 태그, SEO 제목/설명, 공개 상태를 유지.
