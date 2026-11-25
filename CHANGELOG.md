@@ -1,8 +1,8 @@
 ## 2026-11-25 — 방문자 통계를 재방문 포함 페이지뷰로 변경
 - 고유 IP 수가 아닌 페이지뷰를 집계하도록 변경해 새로고침과 반복 방문을 포함.
-- 홈 헤더 `24H`는 최근 24시간 페이지뷰, `TOTAL`은 2026-11-17부터 일별 페이지뷰 누적을 표시.
+- 홈 헤더 `24H`는 UTC 기준 최근 24개 완료 시간의 페이지뷰 합계, `TOTAL`은 2026-11-17부터 일별 페이지뷰 누적을 표시.
 - 기존 unique-IP 데이터와 혼합되지 않도록 R2 별도 저장 경로 및 일회성 페이지뷰 재보정 추가.
-- Build Check, Cloudflare 실응답 및 Preview 검증 전까지 운영 반영 완료로 처리하지 않음.
+- Build Check 성공. Cloudflare 시간별 집계는 `sum.browserMap.pageViews`를 합산하도록 수정했으며, 실계정 응답·R2 backfill·Preview/운영 표시 확인은 남아 있음.
 
 ## 2026-11-21 — favicon 캐시 후속 조치
 - 운영에서 PNG/Apple 아이콘은 정상 제공되고 /favicon.ico는 cache-busting query가 있을 때 실제 ICO로 표시되는 것을 확인.
