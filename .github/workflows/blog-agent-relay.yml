@@ -11,27 +11,17 @@ concurrency:
   group: utilwise-blog-agent-${{ github.ref }}
   cancel-in-progress: false
 jobs:
-  save-draft:
-    name: Save blog draft
+  fetch-post:
+    name: Find existing draft
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Checkout request branch
-        uses: actions/checkout@v4
-      - name: Validate post request
-        shell: bash
-        run: |
-          set -euo pipefail
-          test -f requests/post.json
-          jq -e '(.post | type == "object") and (.post.language == "ko" or .post.language == "en") and (.post.title | type == "string" and length > 0 and length <= 180) and (.post.content_md | type == "string" and length <= 100000)' requests/post.json > /dev/null
-      - name: Save post as draft
+      - uses: actions/checkout@v4
+      - name: Fetch matching draft
         env:
           BLOG_AGENT_API_TOKEN: ${{ secrets.BLOG_AGENT_API_TOKEN }}
         shell: bash
         run: |
           set -euo pipefail
-          test -n "$BLOG_AGENT_API_TOKEN" || { echo "::error::Repository secret BLOG_AGENT_API_TOKEN is missing"; exit 1; }
-          jq '.post | .status = "draft" | del(.cover_image_key)' requests/post.json > /tmp/post.json
-          RESPONSE="$(curl --silent --show-error --fail-with-body -H "Authorization: Bearer $BLOG_AGENT_API_TOKEN" -H "Content-Type: application/json" --data-binary @/tmp/post.json https://utilwise.kr/api/agent/blog/posts)"
-          echo "## UTILWISE 블로그 임시저장 결과" >> "$GITHUB_STEP_SUMMARY"
-          printf '%s\n' "$RESPONSE" | jq . >> "$GITHUB_STEP_SUMMARY"
+          RESPONSE="$(curl --silent --show-error --fail-with-body -H "Authorization: Bearer $BLOG_AGENT_API_TOKEN" https://utilwise.kr/api/agent/blog/posts)"
+          printf '%s\n' "$RESPONSE" | jq -c '.posts[] | select(.slug == "how-to-compress-images") | {id, slug, title, language, status, updated_at}'
