@@ -25,7 +25,7 @@ jobs:
           test -f requests/post.json
           ACTION="$(jq -r '.action // "save"' requests/post.json)"
           if [ "$ACTION" = "lookup" ]; then
-            jq -e '(.slug | type == "string" and length > 0 and length <= 100)' requests/post.json > /dev/null
+            jq -e '((.slug // .title) | type == "string" and length > 0 and length <= 180)' requests/post.json > /dev/null
           else
             jq -e '(.post | type == "object") and (.post.language == "ko" or .post.language == "en") and (.post.title | type == "string" and length > 0 and length <= 180) and (.post.content_md | type == "string" and length <= 100000)' requests/post.json > /dev/null
           fi
@@ -38,9 +38,10 @@ jobs:
           test -n "$BLOG_AGENT_API_TOKEN" || { echo "::error::Repository secret BLOG_AGENT_API_TOKEN is missing"; exit 1; }
           ACTION="$(jq -r '.action // "save"' requests/post.json)"
           if [ "$ACTION" = "lookup" ]; then
-            SLUG="$(jq -r '.slug' requests/post.json)"
+            SLUG="$(jq -r '.slug // empty' requests/post.json)"
+            TITLE="$(jq -r '.title // empty' requests/post.json)"
             RESPONSE="$(curl --silent --show-error --fail-with-body -H "Authorization: Bearer $BLOG_AGENT_API_TOKEN" https://utilwise.kr/api/agent/blog/posts)"
-            MATCH="$(printf '%s\n' "$RESPONSE" | jq -c --arg slug "$SLUG" '[.posts[] | select(.slug == $slug)]')"
+            MATCH="$(printf '%s\n' "$RESPONSE" | jq -c --arg slug "$SLUG" --arg title "$TITLE" '[.posts[] | select(($slug != "" and .slug == $slug) or ($title != "" and .title == $title))]')"
             echo "## UTILWISE 게시글 조회 결과" >> "$GITHUB_STEP_SUMMARY"
             printf '%s\n' "$MATCH" | jq 'map({id, slug, title, language, status, updated_at})' >> "$GITHUB_STEP_SUMMARY"
             printf '%s\n' "$MATCH" | jq -c '.[] | {id, slug, title, language, status, updated_at}'
