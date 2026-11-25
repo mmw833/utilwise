@@ -1,10 +1,9 @@
-## 2026-11-25 방문자 통계 24시간 비교 기준 보완 (PR/검증 대기)
-- 사용자 Cloudflare 화면은 `이전 24시간` 범위이며, 기존 UTILWISE TODAY는 UTC 달력일 00:00부터 현재까지라 서로 다른 기간을 비교하고 있었음.
-- 홈 헤더 첫 번째 값을 `24H`로 변경하고 Cloudflare `httpRequests1hGroups`에서 현재 시각 기준 직전 24시간의 시간별 `uniq.uniques`를 조회하도록 API 확장.
-- 시간별 고유 방문자 수를 합산하는 값이므로 같은 방문자가 서로 다른 시간대에 재방문하면 중복 집계될 수 있음을 툴팁과 API 응답 모드에 명시. Cloudflare 대시보드의 24시간 숫자와 실측 비교가 필요하며, 정확히 동일한 산출 방식이라고 아직 단정하지 않음.
-- 기존 `today` 일별 UTC 집계, R2 스냅샷 재보정, TOTAL 누적 로직은 유지하고 `last24Hours`를 별도 필드로 추가해 TOTAL 계산에 혼합하지 않음.
-- 회귀 검사 스크립트를 rolling 24H API/표시/중복 가능성 고지 기준으로 확장.
-- **미완료:** Build Check, Cloudflare GraphQL 실응답에서 시간별 데이터 반환 확인, API의 `last24Hours`와 Cloudflare 대시보드 이전 24시간 값 대조, UI 확인. 검증 전 병합·운영 배포 금지.
+## 2026-11-25 방문자 통계 기간 표시 명확화 (PR/검증 대기)
+- Cloudflare 화면의 `이전 24시간`과 UTILWISE의 `TODAY`는 집계 기간이 다름. 기존 사이트 값은 UTC 달력일 00:00부터 현재까지의 일별 고유 방문자임을 확인.
+- 시간별 `uniq.uniques`를 합산하면 시간대 간 동일 방문자가 중복될 수 있어 Cloudflare의 24시간 전체 고유 방문자와 동일하다고 보장할 수 없음. 근거 없이 24H 숫자로 대체하지 않음.
+- 홈 헤더 첫 번째 라벨을 `UTC DAY`로 바꾸고 툴팁에 Cloudflare 대시보드의 rolling 24H와 다른 기간임을 명시.
+- 기존 `httpRequests1dGroups` 일별 집계, R2 스냅샷 재보정, TOTAL 누적 계산은 변경하지 않음.
+- **남은 작업:** Build Check 및 Preview 화면 확인. Cloudflare 대시보드의 정확한 rolling 24H 고유 방문자와 동일한 산출값을 제공하는 비-deprecated API 경로가 확인되기 전에는 24H로 표시하지 않음.
 
 ## 2026-11-21 favicon 운영 캐시 후속 조치 (원인 확인, 캐시 제거 PR 준비)
 - 운영 배포 후 두 호스트(utilwise.kr 및 utilwise.mmw833.workers.dev)에서 PNG 16x16/32x32 및 Apple Touch Icon이 실제 이미지로 표시됨.
