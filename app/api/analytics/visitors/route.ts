@@ -123,69 +123,6 @@ async function queryTodayPageViews(
 }
 
 
-// Page views count successful HTML requests, including reloads and repeat visits.
-// Hourly rollups count repeated page views; the display uses the last 24 completed hours.
-async function queryLast24HoursPageViews(
-  apiToken: string,
-  zoneId: string,
-  now: Date,
-): Promise<number> {
-  // httpRequests1hGroups are hour-bucketed. Query the last 24 completed UTC
-  // hours so the first and last buckets are not partial or inconsistently excluded.
-  const completedHour = new Date(now);
-  completedHour.setUTCMinutes(0, 0, 0);
-  const end = completedHour.toISOString();
-  const start = new Date(completedHour.getTime() - 24 * 60 * 60 * 1000).toISOString();
-  const query = `
-    query SiteLast24HoursPageViews($zoneTag: String!, $start: Time!, $end: Time!) {
-      viewer {
-        zones(filter: { zoneTag: $zoneTag }) {
-          hourlyPageViews: httpRequests1hGroups(
-            limit: 100
-            filter: { datetime_geq: $start, datetime_lt: $end }
-            orderBy: [datetime_ASC]
-          ) {
-            dimensions { datetime }
-            sum { browserMap { pageViews } }
-          }
-        }
-      }
-    }
-  `;
-
-  const response = await fetch("https://api.cloudflare.com/client/v4/graphql", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ query, variables: { zoneTag: zoneId, start, end } }),
-    signal: AbortSignal.timeout(8000),
-  });
-
-  if (!response.ok) throw new Error("Cloudflare hourly page-view request failed.");
-  const result = (await response.json()) as CloudflareAnalyticsResponse;
-  const rows = result.data?.viewer?.zones?.[0]?.hourlyPageViews;
-  if (result.errors?.length || !Array.isArray(rows)) {
-    throw new Error("Cloudflare Analytics returned incomplete hourly page-view data.");
-  }
-
-  return rows.reduce((total, row) => {
-    const browserRows = row.sum?.browserMap;
-    if (!Array.isArray(browserRows)) {
-      throw new Error("Cloudflare returned incomplete hourly browser page-view data.");
-    }
-    const hourPageViews = browserRows.reduce((hourTotal, browser) => {
-      const value = browser.pageViews;
-      if (!Number.isFinite(value)) {
-        throw new Error("Cloudflare returned an invalid hourly page-view value.");
-      }
-      return hourTotal + Math.max(0, Math.floor(Number(value)));
-    }, 0);
-    return total + hourPageViews;
-  }, 0);
-}
-
 async function queryTodayKstPageViews(apiToken: string, zoneId: string, now: Date): Promise<number> {
   const kstNow = new Date(now.getTime() + 9 * 60 * 60 * 1000);
   const midnightUtc = new Date(Date.UTC(kstNow.getUTCFullYear(), kstNow.getUTCMonth(), kstNow.getUTCDate()) - 9 * 60 * 60 * 1000);
