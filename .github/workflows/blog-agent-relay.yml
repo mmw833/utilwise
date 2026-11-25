@@ -43,10 +43,10 @@ jobs:
             RESPONSE="$(curl --silent --show-error --fail-with-body -H "Authorization: Bearer $BLOG_AGENT_API_TOKEN" https://utilwise.kr/api/agent/blog/posts)"
             MATCH="$(printf '%s\n' "$RESPONSE" | jq -c --arg slug "$SLUG" --arg title "$TITLE" '[.posts[] | select(($slug != "" and .slug == $slug) or ($title != "" and .title == $title))]')"
             echo "## UTILWISE 게시글 조회 결과" >> "$GITHUB_STEP_SUMMARY"
-            printf '%s\n' "$MATCH" | jq 'map({id, slug, title, language, status, updated_at})' >> "$GITHUB_STEP_SUMMARY"
+            printf '%s\n' "$MATCH" | jq 'map({id, slug, title, language, status, updated_at, excerpt, category_id, category_name, tags, seo_title, seo_description, cover_image_key})' >> "$GITHUB_STEP_SUMMARY"
             printf '%s\n' "$MATCH" | jq -c '.[] | {id, slug, title, language, status, updated_at}'
           else
-            jq '.post | .status = "draft" | del(.cover_image_key)' requests/post.json > /tmp/post.json
+            jq 'if .post.id then .post else (.post | .status = "draft" | del(.cover_image_key)) end' requests/post.json > /tmp/post.json
             RESPONSE="$(curl --silent --show-error --fail-with-body -H "Authorization: Bearer $BLOG_AGENT_API_TOKEN" -H "Content-Type: application/json" --data-binary @/tmp/post.json https://utilwise.kr/api/agent/blog/posts)"
             echo "## UTILWISE 블로그 임시저장 결과" >> "$GITHUB_STEP_SUMMARY"
             printf '%s\n' "$RESPONSE" | jq . >> "$GITHUB_STEP_SUMMARY"
