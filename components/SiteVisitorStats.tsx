@@ -35,7 +35,7 @@ export default function SiteVisitorStats() {
     <div
       className="site-visitor-stats"
       aria-label="Site visitors"
-      title="TODAY: page views since midnight Korea Standard Time. TOTAL: daily page views accumulated since 2026-11-17."
+      title="TODAY: page views since midnight Korea Standard Time, counted through the last completed hour. TOTAL: daily page views accumulated since 2026-11-17."
     >
       <span><span className="site-visitor-label">TODAY</span> <strong>{stats ? stats.today.toLocaleString() : "—"}</strong></span>
       <span><span className="site-visitor-label">TOTAL</span> <strong>{stats ? stats.total.toLocaleString() : "—"}</strong></span>
