@@ -1257,3 +1257,31 @@ a{color:inherit;text-decoration:none}button,input,select{font:inherit}.wrap{max-
 
 
 .uw-usage-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.uw-usage-detail-head h3{margin-bottom:5px}.uw-usage-detail-head nav{display:flex;gap:6px;flex-wrap:wrap}.uw-usage-detail-head nav button{padding:7px 10px;border:1px solid #dce3ec;border-radius:8px;background:#fff;color:#526176;font-size:12px}.uw-usage-detail-head nav button.active{background:#203858;color:#fff;border-color:#203858}.uw-usage-detail-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.uw-usage-detail-list article{min-width:0;padding:12px;border:1px solid #edf0f4;border-radius:9px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 10px;align-items:center}.uw-usage-detail-name{min-width:0;display:grid;gap:3px}.uw-usage-detail-name b{font-size:13px;overflow-wrap:anywhere}.uw-usage-detail-name small,.uw-usage-detail-locale{font-size:11px;color:#8793a4}.uw-usage-detail-list article>strong{font-size:14px;white-space:nowrap}.uw-usage-detail-locale{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap}.uw-usage-detail-head .uw-usage-muted{font-size:12px}@media(max-width:620px){.uw-usage-detail-list{grid-template-columns:1fr}.uw-usage-detail-head nav{width:100%}.uw-usage-detail-head nav button{flex:1}}
+
+/* Keep the visitor counters visible on narrow screens without competing
+   with the logo, language switcher, or menu in the first header row. */
+@media(max-width:760px){
+  .header{
+    flex-wrap:wrap;
+    min-height:0;
+    row-gap:8px;
+    padding-top:12px;
+    padding-bottom:10px;
+  }
+  .header>.logo{order:0;flex:0 0 auto}
+  .header>.mobile-language-toggle{order:1;margin-left:auto}
+  .header>.mobile-menu{order:2;margin-left:8px}
+  .header>.site-visitor-stats{
+    order:3;
+    flex:0 0 100%;
+    width:100%;
+    justify-content:flex-end;
+    gap:12px;
+    margin:0;
+    padding-top:8px;
+    border-top:1px solid var(--line);
+    font-size:10px;
+  }
+  .header>.site-visitor-stats .site-visitor-label{font-size:9px}
+  .header>.site-visitor-stats strong{font-size:10px}
+}
