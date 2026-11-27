@@ -299,7 +299,7 @@ export async function GET() {
     const total = baseline.total + await sumDailyPageViews(bucket);
     return NextResponse.json(
       {
-        today: todayPageViews,
+        today: daily.get(today)!,
         last24Hours,
         total,
         source: "cloudflare",
