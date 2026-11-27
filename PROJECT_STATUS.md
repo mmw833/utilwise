@@ -1,4 +1,4 @@
-## 2026-11-27 방문자 TOTAL 일별 데이터 재조정 (병합 완료)
+## 2026-11-27 PDF 압축 도구 추가 (검증 대기)\n- 기존 PDFTools 컴포넌트와 pdf-lib 의존성을 재사용해 브라우저 기반 PDF 재저장/구조 최적화 기능을 추가. 문서 메타데이터 제거, 결과 파일 크기 비교 및 다운로드 지원.\n- 한국어 `/pdf-compress`, 영어 `/en/pdf-compress` 페이지와 온라인 도구 목록, 공통 도구 registry, sitemap 연결 추가. 도구 ID는 `pdf-compress`.\n- 현재 구현은 PDF 내부 스캔 이미지 재인코딩/해상도 저하는 하지 않으므로 이미지 중심 PDF의 용량 감소를 보장하지 않으며 UI에 제한을 명시. 파일은 브라우저 내 처리.\n- 블로그 글 `How to Reduce PDF File Size for Easy Sharing`에 실제 도구 버튼 토큰 연결 예정.\n- **검증 대기:** Build Check, sitemap tool check, Next.js production build, PDF 샘플 파일 전후 크기/열림 테스트 및 운영 배포 확인.\n\n## 2026-11-27 방문자 TOTAL 일별 데이터 재조정 (병합 완료)
 - 기존 TOTAL은 최초 1회 backfill 때 Cloudflare가 아직 반환하지 않은 날짜를 0으로 저장하고 완료 처리할 수 있어, 이후 해당 날짜의 실제 페이지뷰가 누적에서 빠질 가능성이 있었음.
 - 개선: API 갱신마다 2026-11-17부터 현재 UTC 날짜까지 Cloudflare 일별 pageViews를 다시 조회하고, 반환된 날짜별 R2 스냅샷을 갱신한 뒤 전체 합계를 계산.
 - 기존 unique-IP baseline을 TOTAL 계산에서 제거. 현재 UTC 날짜의 일별 row가 없으면 불완전한 수치를 반환하지 않도록 처리.
