@@ -3,7 +3,7 @@ import { listPublishedPosts, listPublishedTags } from "@/lib/blog/posts";
 const siteUrl = "https://utilwise.kr";
 const calculators = ["/area","/date","/loan","/brokerage","/salary","/year-end-tax","/severance","/savings","/dsr","/rent-conversion","/fuel","/vat","/volume","/tip"];
 const englishCalculators = calculators.filter((route) => route !== "/year-end-tax").map((route) => `/en${route}`);
-const pdfToolPages = ["/pdf-merge","/pdf-split","/pdf-rotate","/pdf-organize","/image-to-pdf"];
+const pdfToolPages = ["/pdf-merge","/pdf-split","/pdf-rotate","/pdf-organize","/pdf-compress","/image-to-pdf"];
 const onlineToolPages = ["/online-tools","/qr-code-generator","/image-compressor","/image-resizer","/background-remover","/image-converter",...pdfToolPages];
 const englishOnlineToolPages = onlineToolPages.map((route) => `/en${route}`);
 const textToolPages = ["/text-tools","/image-to-text","/text-to-speech","/text-tools/character-counter","/text-tools/text-compare","/text-tools/remove-duplicates","/text-tools/speech-time"];
