@@ -10,8 +10,9 @@
 - 기존 고유 IP 기준 통계 정책은 폐기했다. 현재 홈 통계는 `pageViews`를 사용하며 새로고침과 같은 사용자의 반복 페이지 방문을 포함한다.
 - 시간별 통계는 `httpRequests1hGroups.sum.browserMap.pageViews`를 브라우저별로 합산한다. `datetime` 기준 UTC 24개 완료 시간만 포함하고 현재 진행 중인 시간 버킷은 제외한다.
 - TOTAL은 2026-11-17부터 `httpRequests1dGroups.sum.pageViews`를 UTC 날짜별로 R2에 저장해 합산한다. 기존 unique-IP 시작값 1,260은 새 pageViews 합계에 포함하지 않는다.
-- pageViews 전용 R2 키 공간을 사용하고 일별 Cloudflare 롤업으로 1회 backfill한 뒤 완료 표식을 기록한다. 기존 unique-IP 스냅샷과 혼합하지 않는다.
-- 같은 날짜의 집계값은 날짜 키에 덮어써 API 반복 호출로 이중 합산되지 않게 한다. TOTAL은 2026-11-17 이후 일별 페이지뷰 합계이며 평생 고유 인원 수로 표현하지 않는다.
+- pageViews 전용 R2 키 공간을 사용하고 API 갱신 때마다 2026-11-17부터 현재 UTC 날짜까지의 일별 Cloudflare 롤업을 다시 조회해 반환된 날짜 스냅샷을 재조정한다. 일시적인 row 누락을 0으로 영구 확정하는 1회성 backfill 방식은 사용하지 않는다.
+- 같은 날짜의 집계값은 날짜 키에 덮어써 API 반복 호출로 이중 합산되지 않게 한다. TOTAL은 R2 날짜별 pageViews 스냅샷의 합계이며 평생 고유 인원 수로 표현하지 않는다.
+- 현재 UTC 날짜의 일별 row가 Cloudflare에서 반환되지 않으면 불완전한 TOTAL을 노출하지 않고 통계 오류로 처리한다.
 - 방문자 집계 저장은 기존 R2 버킷을 사용하며 D1은 방문자 통계에 사용하지 않는다. D1 자체는 블로그 등 기존 기능을 위해 유지한다.
 - Cloudflare API 토큰은 Worker Secret으로만 저장하고 클라이언트 코드, GitHub 파일, 로그, 채팅에 기록하지 않는다. Zone ID도 환경변수로 관리한다.
 - Cloudflare 설정 누락/API 오류 시 숫자 대신 — 표시. 빌드 성공과 별도로 실계정 API 응답, R2 backfill, Preview/운영 화면을 확인하기 전 기능 검증 완료로 보고하지 않는다.

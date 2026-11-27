@@ -13,8 +13,14 @@ if (!route.includes("httpRequests1hGroups") || !route.includes("browserMap { pag
 if (!route.includes("datetime_geq: $start") || !route.includes("datetime_lt: $end")) {
   errors.push("The rolling 24-hour query must use a bounded time range.");
 }
-if (!route.includes("pageviews-daily/") || !route.includes("pageviews-backfill-v1.json")) {
-  errors.push("Page-view totals must use their own R2 namespace and one-time historical backfill.");
+if (!route.includes("pageviews-daily/") || !route.includes("BACKFILL_START_DATE") || !route.includes("Reconcile the complete daily history")) {
+  errors.push("Page-view totals must use their own R2 namespace and reconcile the complete daily history on every refresh.");
+}
+if (!route.includes("for (const [date, pageViews] of daily)") || !route.includes("const total = await sumDailyPageViews(bucket)")) {
+  errors.push("TOTAL must refresh available daily rollups and sum the saved daily snapshots without adding a stale baseline.");
+}
+if (!route.includes("if (!daily.has(today))")) {
+  errors.push("The current UTC daily rollup must be present before returning a total.");
 }
 if (route.includes("uniq { uniques }") || route.includes("sum { visits }")) {
   errors.push("Displayed traffic must count page views, not unique IPs or referrer-only visits.");

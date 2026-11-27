@@ -30,9 +30,7 @@ type R2Object = { key: string };
 type R2ListResult = { objects: R2Object[]; truncated: boolean; cursor?: string };
 
 // Page-view totals use a separate R2 namespace so they never mix with legacy unique-IP snapshots.
-const BASELINE_KEY = "visitor-stats/pageviews-baseline-v1.json";
 const DAILY_PREFIX = "visitor-stats/pageviews-daily/";
-const BACKFILL_KEY = "visitor-stats/pageviews-backfill-v1.json";
 const BACKFILL_START_DATE = "2026-11-17";
 
 function utcDate(now: Date): string {
@@ -109,20 +107,6 @@ async function queryDailyPageViews(
   return daily;
 }
 
-async function queryTodayPageViews(
-  apiToken: string,
-  zoneId: string,
-  today: string,
-): Promise<number> {
-  const daily = await queryDailyPageViews(apiToken, zoneId, today, nextUtcDate(today));
-  const value = daily.get(today);
-  if (!Number.isFinite(value)) {
-    throw new Error("Cloudflare Analytics has no daily page-view value for the current UTC date yet.");
-  }
-  return Math.max(0, Math.floor(Number(value)));
-}
-
-
 // Page views count successful HTML requests, including reloads and repeat visits.
 // Hourly rollups count repeated page views; the display uses the last 24 completed hours.
 async function queryLast24HoursPageViews(
@@ -198,46 +182,6 @@ async function saveDailySnapshot(
   );
 }
 
-/**
- * Rebuild page-view snapshots from the daily rollup once. The separate v1
- * namespace prevents legacy unique-visitor totals from being mixed with views.
- */
-async function backfillDailySnapshotsIfNeeded(
-  bucket: ReturnType<typeof getBlogImageBucket>,
-  apiToken: string,
-  zoneId: string,
-  now: Date,
-): Promise<Map<string, number> | null> {
-  const marker = await readJson<{ version?: number }>(bucket, BACKFILL_KEY);
-  if (marker?.version === 1) return null;
-
-  const today = utcDate(now);
-  const endDate = nextUtcDate(today);
-  const daily = await queryDailyPageViews(apiToken, zoneId, BACKFILL_START_DATE, endDate);
-
-  // Do not mark the repair complete until Cloudflare has returned today's row.
-  if (!daily.has(today)) {
-    throw new Error("Cloudflare daily page-view rollup is not ready for the current UTC date.");
-  }
-
-  for (let date = BACKFILL_START_DATE; date < endDate; date = nextUtcDate(date)) {
-    await saveDailySnapshot(bucket, date, daily.get(date) ?? 0);
-  }
-
-  await bucket.put(
-    BACKFILL_KEY,
-    new TextEncoder().encode(JSON.stringify({
-      version: 1,
-      completedAt: now.toISOString(),
-      startDate: BACKFILL_START_DATE,
-      endDate,
-    })),
-    { httpMetadata: { contentType: "application/json" } },
-  );
-
-  return daily;
-}
-
 async function sumDailyPageViews(
   bucket: ReturnType<typeof getBlogImageBucket>,
 ): Promise<number> {
@@ -273,38 +217,32 @@ export async function GET() {
     const now = new Date();
     const today = utcDate(now);
 
-    // New page-view total starts at zero; backfill reconstructs all daily views
-    // available since BACKFILL_START_DATE without reusing the old unique-IP baseline.
-    let baseline = await readJson<{ total: number }>(bucket, BASELINE_KEY);
-    if (!baseline) {
-      baseline = { total: 0 };
-      await bucket.put(BASELINE_KEY, new TextEncoder().encode(JSON.stringify(baseline)), {
-        httpMetadata: { contentType: "application/json" },
-      });
-    }
-
-    const backfilled = await backfillDailySnapshotsIfNeeded(
-      bucket,
+    // Reconcile the complete daily history on every refresh. This repairs any
+    // earlier missing/partial daily rollups instead of permanently freezing zeros
+    // into R2 after a one-time backfill.
+    const daily = await queryDailyPageViews(
       config.apiToken,
       config.zoneId,
-      now,
+      BACKFILL_START_DATE,
+      nextUtcDate(today),
     );
-    const todayPageViews = backfilled?.get(today)
-      ?? await queryTodayPageViews(config.apiToken, config.zoneId, today);
+    if (!daily.has(today)) {
+      throw new Error("Cloudflare daily page-view rollup is not ready for the current UTC date.");
+    }
+    for (const [date, pageViews] of daily) {
+      await saveDailySnapshot(bucket, date, pageViews);
+    }
+
     const last24Hours = await queryLast24HoursPageViews(config.apiToken, config.zoneId, now);
-
-    // Replace today's UTC daily page-view snapshot; repeated page loads are counted.
-    await saveDailySnapshot(bucket, today, todayPageViews);
-
-    const total = baseline.total + await sumDailyPageViews(bucket);
+    const total = await sumDailyPageViews(bucket);
     return NextResponse.json(
       {
-        today: todayPageViews,
+        today: daily.get(today)!,
         last24Hours,
         total,
         source: "cloudflare",
         metric: "pageViews",
-        totalMode: "daily-pageviews-since-2026-11-17",
+        totalMode: "reconciled-daily-pageviews-since-2026-11-17",
       },
       { headers: { "Cache-Control": "private, max-age=60" } },
     );
