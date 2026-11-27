@@ -84,7 +84,17 @@ export default function PDFTools({ mode, lang = "ko" }: Props) {
     outputs.forEach(item => URL.revokeObjectURL(item.url)); setOutputs([]);
     const done: Download[] = [];
     try {
-      if (mode === "compress") {\n        if (files.length !== 1) throw new Error("range");\n        const original = files[0];\n        const source = await PDFDocument.load(await original.arrayBuffer());\n        source.catalog.delete(PDFName.of("Metadata"));\n        const bytes = await source.save({ useObjectStreams: true });\n        const item = downloadBlob(bytes, "compressed.pdf");\n        item.beforeBytes = original.size;\n        item.afterBytes = bytes.byteLength;\n        done.push(item);\n      } else if (mode === "merge") {
+      if (mode === "compress") {
+        if (files.length !== 1) throw new Error("range");
+        const original = files[0];
+        const source = await PDFDocument.load(await original.arrayBuffer());
+        source.catalog.delete(PDFName.of("Metadata"));
+        const bytes = await source.save({ useObjectStreams: true });
+        const item = downloadBlob(bytes, "compressed.pdf");
+        item.beforeBytes = original.size;
+        item.afterBytes = bytes.byteLength;
+        done.push(item);
+      } else if (mode === "merge") {
         if (files.length < 2) throw new Error("range");
         const merged = await PDFDocument.create();
         for (const file of files) {
