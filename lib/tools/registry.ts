@@ -25,6 +25,7 @@ export const RELATED_TOOLS: RelatedTool[] = [
   { id: "pdf-split", ko: "PDF 분할", en: "Split PDF", href: "/pdf-split" },
   { id: "pdf-rotate", ko: "PDF 회전", en: "Rotate PDF", href: "/pdf-rotate" },
   { id: "pdf-organize", ko: "PDF 페이지 정리", en: "Organize PDF Pages", href: "/pdf-organize" },
+  { id: "pdf-compress", ko: "PDF 압축", en: "Compress PDF", href: "/pdf-compress" },
   { id: "text-to-speech", ko: "텍스트 음성 변환기", en: "Text to Speech", href: "/text-to-speech" },
   { id: "character-counter", ko: "글자 수 세기", en: "Character Counter", href: "/text-tools/character-counter" },
   { id: "speech-time", ko: "발표 시간 계산기", en: "Speech Time Calculator", href: "/text-tools/speech-time" },

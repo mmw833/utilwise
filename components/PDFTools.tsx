@@ -2,11 +2,11 @@
 import {trackToolUsage} from "@/lib/analytics/tool-usage";
 
 import { useEffect, useState } from "react";
-import { PDFDocument, degrees } from "pdf-lib";
+import { PDFDocument, PDFName, degrees } from "pdf-lib";
 
-type Mode = "merge" | "split" | "rotate" | "organize" | "images";
+type Mode = "merge" | "split" | "rotate" | "organize" | "images" | "compress";
 type Props = { mode: Mode; lang?: "ko" | "en" };
-type Download = { name: string; url: string; pages?: number };
+type Download = { name: string; url: string; pages?: number; beforeBytes?: number; afterBytes?: number };
 
 const copy = {
   ko: {
@@ -15,6 +15,7 @@ const copy = {
     rotate: { title: "PDF 회전", lead: "PDF 페이지를 원하는 각도로 회전해 저장합니다.", upload: "PDF 파일 선택", help: "PDF 파일을 선택하고 회전할 페이지 범위를 입력하세요. 비워두면 모든 페이지가 회전합니다.", action: "페이지 회전하기", result: "회전된 PDF", privacy: "파일은 브라우저에서 처리되며 서버로 업로드되지 않습니다." },
     organize: { title: "PDF 페이지 정리", lead: "페이지 순서를 바꾸거나 필요 없는 페이지를 삭제합니다.", upload: "PDF 파일 선택", help: "페이지 순서를 쉼표로 입력하세요. 예: 3, 1, 2, 5 (입력한 순서대로 새 PDF를 만듭니다. 생략한 페이지는 삭제됩니다.)", action: "페이지 정리하기", result: "정리된 PDF", privacy: "파일은 브라우저에서 처리되며 서버로 업로드되지 않습니다." },
     images: { title: "이미지를 PDF로 변환", lead: "JPG, PNG 이미지를 하나의 PDF 문서로 만듭니다.", upload: "이미지 선택", help: "JPG, PNG 또는 WebP 이미지를 선택하세요. 선택한 순서대로 각 이미지가 PDF 한 페이지가 됩니다.", action: "PDF 만들기", result: "생성된 PDF", privacy: "이미지는 브라우저에서 처리되며 서버로 업로드되지 않습니다." },
+    compress: { title: "PDF 압축", lead: "PDF 문서를 다시 저장해 불필요한 문서 메타데이터를 제거하고 구조를 최적화합니다.", upload: "PDF 파일 선택", help: "PDF 한 개를 선택하세요. 브라우저에서 처리되며 스캔 이미지 자체를 다시 압축하지는 않으므로 파일에 따라 용량 감소가 작거나 없을 수 있습니다.", action: "PDF 최적화하기", result: "최적화 결과", privacy: "파일은 브라우저에서 처리되며 서버로 업로드되지 않습니다." },
     range: "페이지 범위", angle: "회전 각도", download: "다운로드", busy: "처리 중...", select: "파일을 먼저 선택해 주세요.", error: "파일을 처리하지 못했습니다. 올바른 파일인지 확인해 주세요.", count: "페이지 수", file: "선택한 파일", reorder: "페이지 순서", noPages: "페이지 범위를 확인해 주세요."
   },
   en: {
@@ -23,6 +24,7 @@ const copy = {
     rotate: { title: "Rotate PDF", lead: "Rotate PDF pages to the angle you need and save a new file.", upload: "Choose a PDF file", help: "Select a PDF and enter page ranges. Leave blank to rotate every page.", action: "Rotate pages", result: "Rotated PDF", privacy: "Files are processed in your browser and are never uploaded to our server." },
     organize: { title: "Organize PDF Pages", lead: "Reorder pages or remove pages you no longer need.", upload: "Choose a PDF file", help: "Enter page numbers separated by commas. Example: 3, 1, 2, 5. The new PDF follows this order; omitted pages are removed.", action: "Organize PDF", result: "Organized PDF", privacy: "Files are processed in your browser and are never uploaded to our server." },
     images: { title: "Image to PDF", lead: "Turn JPG and PNG images into a single PDF document.", upload: "Choose images", help: "Select JPG, PNG, or WebP images. Each image becomes one PDF page in the selected order.", action: "Create PDF", result: "Created PDF", privacy: "Images are processed in your browser and are never uploaded to our server." },
+    compress: { title: "Compress PDF", lead: "Re-save a PDF to remove document metadata and optimize its structure.", upload: "Choose a PDF file", help: "Select one PDF. Processing happens in your browser. Embedded scan images are not re-encoded, so size savings may be small or unavailable for some files.", action: "Optimize PDF", result: "Optimization result", privacy: "Files are processed in your browser and are never uploaded to our server." },
     range: "Page ranges", angle: "Rotation angle", download: "Download", busy: "Processing...", select: "Please select file(s) first.", error: "Could not process the file. Please check that it is a valid file.", count: "Pages", file: "Selected file", reorder: "Page order", noPages: "Please check the page range."
   }
 } as const;
@@ -82,7 +84,17 @@ export default function PDFTools({ mode, lang = "ko" }: Props) {
     outputs.forEach(item => URL.revokeObjectURL(item.url)); setOutputs([]);
     const done: Download[] = [];
     try {
-      if (mode === "merge") {
+      if (mode === "compress") {
+        if (files.length !== 1) throw new Error("range");
+        const original = files[0];
+        const source = await PDFDocument.load(await original.arrayBuffer());
+        source.catalog.delete(PDFName.of("Metadata"));
+        const bytes = await source.save({ useObjectStreams: true });
+        const item = downloadBlob(bytes, "compressed.pdf");
+        item.beforeBytes = original.size;
+        item.afterBytes = bytes.byteLength;
+        done.push(item);
+      } else if (mode === "merge") {
         if (files.length < 2) throw new Error("range");
         const merged = await PDFDocument.create();
         for (const file of files) {
@@ -128,7 +140,7 @@ export default function PDFTools({ mode, lang = "ko" }: Props) {
         }
       }
       setOutputs(done);
-      if(done.length>0){const id=mode==="images"?"image-to-pdf":mode==="merge"?"pdf-merge":mode==="split"?"pdf-split":mode==="rotate"?"pdf-rotate":"pdf-organize";trackToolUsage(id,"online-tool","run",lang);}
+      if(done.length>0){const id=mode==="images"?"image-to-pdf":mode==="merge"?"pdf-merge":mode==="split"?"pdf-split":mode==="rotate"?"pdf-rotate":mode==="compress"?"pdf-compress":"pdf-organize";trackToolUsage(id,"online-tool","run",lang);}
     } catch (e) {
       done.forEach(item => URL.revokeObjectURL(item.url));
       setError(e instanceof Error && e.message === "range" ? t.noPages : t.error);
@@ -154,6 +166,6 @@ export default function PDFTools({ mode, lang = "ko" }: Props) {
       {error && <p className="image-error" role="alert">{error}</p>}
       <p className="hint image-privacy">{t.privacy}</p>
     </div>
-    {outputs.length > 0 && <section className="image-output"><h2>{t.result}</h2><div className="image-output-grid">{outputs.map(item => <article className="image-output-card" key={item.url}><strong>{item.name}</strong><a className="primary image-download" href={item.url} download={item.name}>{t.download}</a></article>)}</div></section>}
+    {outputs.length > 0 && <section className="image-output"><h2>{t.result}</h2><div className="image-output-grid">{outputs.map(item => <article className="image-output-card" key={item.url}><strong>{item.name}</strong>{item.beforeBytes !== undefined && item.afterBytes !== undefined && <p className="hint">{lang === "ko" ? `원본 ${(item.beforeBytes / 1024 / 1024).toFixed(2)} MB → 결과 ${(item.afterBytes / 1024 / 1024).toFixed(2)} MB` : `Original ${(item.beforeBytes / 1024 / 1024).toFixed(2)} MB → Result ${(item.afterBytes / 1024 / 1024).toFixed(2)} MB`}{item.afterBytes < item.beforeBytes ? ` (${((1 - item.afterBytes / item.beforeBytes) * 100).toFixed(1)}% ${lang === "ko" ? "감소" : "smaller"})` : lang === "ko" ? " (용량 감소 없음)" : " (no size reduction)"}</p>}<a className="primary image-download" href={item.url} download={item.name}>{t.download}</a></article>)}</div></section>}
   </div>;
 }
