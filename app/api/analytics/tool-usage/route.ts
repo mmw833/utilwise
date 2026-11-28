@@ -37,7 +37,15 @@ export async function GET(req:NextRequest){
    ...RELATED_TOOLS.map(x=>({toolId:x.id,category:online.has(x.id)?"online-tool":"calculator",name:[x.ko,x.en] as [string,string]})),
    ...Object.entries(tests).map(([toolId,category])=>({toolId,category,name:labels[toolId]||[toolId,toolId] as [string,string]}))
   ];
-  const actual=new Map((toolsRows.results||[]).map((x:any)=>[x.toolId+":"+x.locale,x]));
+  const actual=new Map<string,{usage:number;starts:number;completions:number}>();
+  for(const x of toolsRows.results||[]){
+   const key=x.toolId+":"+x.locale;
+   const row=actual.get(key)||{usage:0,starts:0,completions:0};
+   row.usage+=Number(x.usage)||0;
+   row.starts+=Number(x.starts)||0;
+   row.completions+=Number(x.completions)||0;
+   actual.set(key,row);
+  }
   const expanded=catalog.flatMap(tool=>[("ko" as const),("en" as const)].map(locale=>{
    const x:any=actual.get(tool.toolId+":"+locale);
    return {toolId:tool.toolId,category:tool.category,locale,usage:Number(x?.usage)||0,starts:Number(x?.starts)||0,completions:Number(x?.completions)||0,name:tool.name};
