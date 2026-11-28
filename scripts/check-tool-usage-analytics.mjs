@@ -13,7 +13,7 @@ const migration=readFileSync(required[0],"utf8");
 for (const token of ["tool_usage_events","event_id TEXT PRIMARY KEY","event_date TEXT NOT NULL"]) if(!migration.includes(token)) throw new Error(`Usage migration missing: ${token}`);
 const categoryFix=readFileSync(required[1],"utf8");
 for(const token of ["UPDATE tool_usage_events","pdf-compress","calculator","online-tool"])if(!categoryFix.includes(token))throw new Error(`PDF usage category correction missing: ${token}`);
-const api=readFileSync(required[1],"utf8");
+const api=readFileSync(required[2],"utf8");
 for (const token of ["isAdminAuthenticated","INSERT OR IGNORE","event_date BETWEEN","tool_id","for(const x of toolsRows.results||[])","row.usage+=Number(x.usage)||0","row.starts+=Number(x.starts)||0","row.completions+=Number(x.completions)||0"]) if(!api.includes(token)) throw new Error(`Usage API missing: ${token}`);
 const tests=[
   ["app/mbti/test/page.tsx","mbti"],["app/en/mbti/test/page.tsx","mbti"],
