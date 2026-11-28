@@ -26,6 +26,6 @@ const online=[["components/ImageTools.tsx","image-compressor"],["components/PDFT
 const onlineIds=["qr-code-generator","image-compressor","image-resizer","image-converter","background-remover","image-to-text","image-to-pdf","pdf-merge","pdf-split","pdf-rotate","pdf-organize","pdf-compress","text-to-speech","character-counter","speech-time"];
 for(const id of onlineIds)if(!api.includes(`"${id}"`))throw new Error(`Online tool is missing from server category mapping: ${id}`);
 const qr=readFileSync(join(process.cwd(),"components/QRCodeGenerator.tsx"),"utf8");
-if(!qr.includes(newThen)||qr.includes("onClick={()=>trackToolUsage(\"qr-code-generator\""))throw new Error("QR usage must be recorded when generation succeeds, not only on download.");
+if(!qr.includes('.then(data => { if(active) { setImage(data); trackToolUsage("qr-code-generator","online-tool","run",lang); } })')||qr.includes("onClick={()=>trackToolUsage(\"qr-code-generator\""))throw new Error("QR usage must be recorded when generation succeeds, not only on download.");
 for(const [path,id] of online){const source=readFileSync(join(process.cwd(),path),"utf8");if(!source.includes("trackToolUsage")||!source.includes(id))throw new Error(`Missing online-tool tracking: ${path}`);}
 console.log("Tool usage analytics structure, calculators, personality tests, and online-tool tracking checks passed.");
