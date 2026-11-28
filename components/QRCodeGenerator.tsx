@@ -78,6 +78,7 @@ export default function QRCodeGenerator({ lang = "ko" }: { lang?: Lang }) {
 
   useEffect(() => {
     let active = true;
+    let trackingTimer: ReturnType<typeof setTimeout> | null = null;
     setError("");
     if (!payload.trim()) { setImage(""); return () => { active = false; }; }
     if (mode === "url" && !/^https?:\/\//i.test(payload)) {
@@ -93,9 +94,9 @@ export default function QRCodeGenerator({ lang = "ko" }: { lang?: Lang }) {
       setImage(""); setError(t.invalidPhone); return () => { active = false; };
     }
     QRCode.toDataURL(payload,{width:size,margin:2,errorCorrectionLevel:"M",color:{dark:"#172b4d",light:"#ffffff"}})
-      .then(data => { if(active) { setImage(data); trackToolUsage("qr-code-generator","online-tool","run",lang); } })
+      .then(data => { if(active) { setImage(data); trackingTimer = setTimeout(()=>trackToolUsage("qr-code-generator","online-tool","run",lang),700); } })
       .catch(() => { if(active) { setImage(""); setError(t.error); } });
-    return () => { active = false; };
+    return () => { active = false; if(trackingTimer) clearTimeout(trackingTimer); };
   },[payload,mode,email,phone,size,t]);
 
   return <div className="qr-page">
