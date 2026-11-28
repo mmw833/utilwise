@@ -3,7 +3,7 @@
 - QR 코드 사용량 기록 시점을 다운로드 클릭에서 QR 이미지 생성 성공으로 변경. QR 미리보기만 생성하고 다운로드하지 않은 이용도 집계하며 다운로드 클릭으로 인한 중복 기록을 방지. 입력 중 자동 재생성되는 QR 특성을 고려해 성공 후 700ms 디바운스하고, 후속 입력 시 이전 집계를 취소해 한 번의 입력 과정이 여러 회로 부풀려지지 않도록 보완.
 - 회귀 검사에서 15개 온라인 도구 ID가 서버 분류 목록에 모두 등록되어 있는지, QR 생성 성공 시점에 추적 이벤트가 연결되는지 확인하도록 강화.
 - D1 스키마와 기존 저장 데이터는 변경하지 않음. 과거 잘못 분류된 데이터는 소급 수정하지 않음.
-- PR #77 병합 및 Build Check/Next.js production build 성공. 700ms 디바운스 회귀 검사는 PR #78에서 추가 검증 중이며, 운영 배포 후 실제 D1 저장·관리자 화면 검증 대기.
+- PR #77 병합 및 Build Check/Next.js production build 성공. Production Deploy #142에서 D1 migration과 Worker 배포 성공(Worker version `cac89722-5b20-4140-be71-6ae77034ab32`). 후속 favicon purge는 Cloudflare API 401로 실패했으나 Worker 배포와는 별개. 700ms 디바운스 회귀 검사는 PR #78에서 추가 검증 중이며, 실제 이벤트 POST/D1 저장·관리자 화면 대조는 아직 미확인.
 
 ## 2026-11-27 — PDF 압축 도구 추가 (검증 대기)
 - `pdf-compress` 도구 ID 및 `/pdf-compress`, `/en/pdf-compress` 페이지 추가.
