@@ -93,7 +93,7 @@ export default function QRCodeGenerator({ lang = "ko" }: { lang?: Lang }) {
       setImage(""); setError(t.invalidPhone); return () => { active = false; };
     }
     QRCode.toDataURL(payload,{width:size,margin:2,errorCorrectionLevel:"M",color:{dark:"#172b4d",light:"#ffffff"}})
-      .then(data => { if(active) setImage(data); })
+      .then(data => { if(active) { setImage(data); trackToolUsage("qr-code-generator","online-tool","run",lang); } })
       .catch(() => { if(active) { setImage(""); setError(t.error); } });
     return () => { active = false; };
   },[payload,mode,email,phone,size,t]);
@@ -125,7 +125,7 @@ export default function QRCodeGenerator({ lang = "ko" }: { lang?: Lang }) {
         <h2>{t.title}</h2>
         <div className="qr-image-frame">{image ? <img src={image} alt={t.title} width={size} height={size}/> : <div className="qr-empty">{error || t.empty}</div>}</div>
         {error && <p className="qr-error" role="alert">{error}</p>}
-        {image && <a className="primary qr-download" href={image} download="utilwise-qr-code.png" onClick={()=>trackToolUsage("qr-code-generator","online-tool","run",lang)}>{t.download}</a>}
+        {image && <a className="primary qr-download" href={image} download="utilwise-qr-code.png">{t.download}</a>}
       </section>
     </div>
     <section className="qr-guide">

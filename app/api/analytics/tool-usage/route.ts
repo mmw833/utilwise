@@ -4,7 +4,7 @@ import {getBlogDatabase} from "@/lib/blog/db";
 import {RELATED_TOOLS} from "@/lib/tools/registry";
 export const dynamic="force-dynamic";
 const tests:Record<string,string>={"mbti":"personality-test","big-five":"personality-test","eq":"personality-test","psychology":"psychology-test","psychology-desire":"psychology-test","psychology-mirror":"psychology-test","psychology-zombie":"psychology-test"};
-const online=new Set(["qr-code-generator","image-compressor","image-resizer","image-converter","background-remover","image-to-text","image-to-pdf","pdf-merge","pdf-split","pdf-rotate","pdf-organize","text-to-speech","character-counter","speech-time"]);
+const online=new Set(["qr-code-generator","image-compressor","image-resizer","image-converter","background-remover","image-to-text","image-to-pdf","pdf-merge","pdf-split","pdf-rotate","pdf-organize","pdf-compress","text-to-speech","character-counter","speech-time"]);
 const tools=new Set(RELATED_TOOLS.map(x=>x.id));
 const json=(v:unknown,s=200)=>NextResponse.json(v,{status:s,headers:{"Cache-Control":"no-store"}});
 const dateKst=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
