@@ -1,9 +1,9 @@
 ## 2026-11-28 도구 사용량 집계 정확도 보완 (PR 검증 대기)
 - 코드 점검에서 신규 `pdf-compress` 도구가 API의 온라인 도구 분류 목록에서 빠져, 실행 이벤트가 `calculator`로 잘못 분류될 수 있는 문제 확인 및 수정.
 - QR 코드 생성기는 실제 QR 이미지 생성 성공 시점이 아니라 다운로드 링크 클릭 시점에만 기록하던 문제를 수정. 생성 성공 후 700ms 입력 안정화 시 1회 기록하고, 입력이 계속 바뀌면 이전 예약을 취소해 키 입력마다 중복 집계되지 않도록 보완. 다운로드 클릭 중복 기록 제거.
-- 집계 회귀 검사에 전체 온라인 도구 ID의 서버 분류 등록 여부와 QR 성공 시점 이벤트 기록을 추가.
+- 집계 회귀 검사에 전체 온라인 도구 ID의 서버 분류 등록 여부와 QR 성공 시점 이벤트 기록을 추가. 과거 PDF 압축 이벤트의 잘못된 계산기 분류는 D1 migration으로 온라인 도구 분류로 바로잡고, API가 도구/언어별 복수 category 행을 합산하도록 수정.
 - 기존 D1 데이터, 계산 공식, 개인정보 수집 항목은 변경하지 않음. 과거 잘못 분류된 이벤트는 소급 변경하지 않음.
-- **PR #77 병합 완료:** Build Check 및 Next.js production build 성공. Production Deploy #142에서 OpenNext 빌드, 운영 D1 migration, Cloudflare Worker 배포까지 성공했으며 Worker 버전은 `cac89722-5b20-4140-be71-6ae77034ab32`. 마지막 favicon 캐시 purge는 Cloudflare API 401로 실패했으나 Worker 배포 자체는 성공. QR 입력 연속 변경 시 과다 집계를 막는 700ms 디바운스는 후속 PR #78에서 검증 중. 실제 이벤트 POST 응답과 D1 row 증가 및 관리자 통계 대조는 아직 미확인으로, 운영 데이터 정상화 완료로 단정하지 않음.
+- **PR #77 병합 완료:** Build Check 및 Next.js production build 성공. Production Deploy #142에서 OpenNext 빌드, 운영 D1 migration, Cloudflare Worker 배포까지 성공했으며 Worker 버전은 `cac89722-5b20-4140-be71-6ae77034ab32`. 마지막 favicon 캐시 purge는 Cloudflare API 401로 실패했으나 Worker 배포 자체는 성공. QR 입력 연속 변경 시 과다 집계를 막는 700ms 디바운스는 후속 PR #78에서 검증 중. 실제 이벤트 POST 응답과 D1 row 증가 및 관리자 통계 대조는 아직 미확인으로, 운영 데이터 정상화 완료로 단정하지 않음. 과거 PDF 압축 분류 수정 및 복수 category 합산은 PR #78에 포함해 검증 중.
 
 ## 2026-11-27 PDF 압축 도구 추가 (검증 대기)
 - 기존 PDFTools 컴포넌트와 pdf-lib 의존성을 재사용해 브라우저 기반 PDF 재저장/구조 최적화 기능을 추가. 문서 메타데이터 제거, 결과 파일 크기 비교 및 다운로드 지원.
